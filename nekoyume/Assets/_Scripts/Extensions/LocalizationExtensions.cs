@@ -148,11 +148,10 @@ namespace Nekoyume
                     return L10nManager.Localize("UI_BUYER_MAIL_FORMAT", buyerItemName);
 
                 case OrderSellerMail orderSellerMail:
-                    var order = await Util.GetOrder(orderSellerMail.OrderId);
+                    var order = await Util.GetClientOrder(orderSellerMail.OrderId);
                     var sellerItemName =
                         await Util.GetItemNameByOrderId(orderSellerMail.OrderId, true);
-                    var taxedPrice = order.Price - order.GetTax();
-                    return L10nManager.Localize("UI_SELLER_MAIL_FORMAT", taxedPrice,
+                    return L10nManager.Localize("UI_SELLER_MAIL_FORMAT", order.TaxedPrice,
                         sellerItemName);
 
                 case OrderExpirationMail orderExpirationMail:

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Numerics;
 using System.Security.Cryptography;
 using Cysharp.Threading.Tasks;
-using Lib9c;
 using Lib9c.Renderers;
 using Libplanet.Common;
 using Libplanet.Crypto;
@@ -13,6 +12,7 @@ using Nekoyume.Blockchain;
 using Nekoyume.Helper;
 using Nekoyume.Model.Item;
 using Nekoyume.Model.State;
+using Nekoyume.SingleClient;
 using Nekoyume.State.Modifiers;
 
 namespace Nekoyume.State
@@ -130,7 +130,7 @@ namespace Nekoyume.State
             var modifier = new AgentCrystalModifier(fav);
             LocalLayer.Instance.Add(agentAddress, modifier);
             var crystalBalance =
-                StateGetter.GetBalance(eval.OutputState, agentAddress, Currencies.Crystal);
+                StateGetter.GetBalance(eval.OutputState, agentAddress, ClientCurrencies.Crystal);
             States.Instance.SetCrystalBalance(crystalBalance);
         }
 

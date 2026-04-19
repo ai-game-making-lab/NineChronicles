@@ -21,9 +21,11 @@ using Nekoyume.L10n;
 using Nekoyume.Model.Collection;
 using Nekoyume.Model.Mail;
 using Nekoyume.Model.State;
+using Nekoyume.SingleClient;
 using Nekoyume.State.Subjects;
 using Nekoyume.UI;
 using Nekoyume.UI.Scroller;
+using Nekoyume.Game.Battle;
 using RedeemCode = Nekoyume.Action.RedeemCode;
 using Nekoyume.Action.AdventureBoss;
 using Nekoyume.Action.CustomEquipmentCraft;
@@ -199,6 +201,11 @@ namespace Nekoyume.Blockchain
                 });
             }
 
+            if (SingleClientMode.IsEnabled(Game.Game.instance.CommandLineOptions))
+            {
+                return HackAndSlashInSingleClient(worldId, stageId, playCount, apStoneCount);
+            }
+
             var sentryTrace = Analyzer.Instance.Track(
                 "Unity/HackAndSlash",
                 new Dictionary<string, Value>()
@@ -254,6 +261,257 @@ namespace Nekoyume.Blockchain
                     Game.Game.BackToMainAsync(HandleException(action.Id, e)).Forget();
                 })
                 .Finally(() => Analyzer.Instance.FinishTrace(sentryTrace));
+        }
+
+        private IObservable<ActionEvaluation<HackAndSlash>> HackAndSlashInSingleClient(
+            int worldId,
+            int stageId,
+            int playCount,
+            int apStoneCount)
+        {
+            var game = Game.Game.instance;
+            var runtime = game.ClientRuntime;
+            if (runtime is null || !runtime.IsStarted)
+            {
+                NcDebug.LogError("Single-client runtime is not started.");
+                CompleteSingleClientHackAndSlashUi();
+                return Observable.Empty<ActionEvaluation<HackAndSlash>>();
+            }
+
+            try
+            {
+                var normalizedPlayCount = Math.Max(1, playCount);
+                var actionPointCost = GetSingleClientStageActionPointCost(
+                    stageId,
+                    normalizedPlayCount,
+                    apStoneCount);
+                var itemCosts = GetSingleClientStageItemCosts(
+                    stageId,
+                    normalizedPlayCount,
+                    apStoneCount);
+                var result = runtime.PlayStage(
+                    stageId,
+                    actionPointCost,
+                    itemCosts);
+                ApplySingleClientHackAndSlashResult(worldId, result);
+            }
+            catch (InvalidOperationException e)
+            {
+                NcDebug.LogException(e);
+                NotifySingleClientHackAndSlashFailure(stageId, playCount, apStoneCount);
+            }
+            catch (ArgumentException e)
+            {
+                NcDebug.LogException(e);
+            }
+            catch (OverflowException e)
+            {
+                NcDebug.LogException(e);
+            }
+            finally
+            {
+                CompleteSingleClientHackAndSlashUi();
+            }
+
+            return Observable.Empty<ActionEvaluation<HackAndSlash>>();
+        }
+
+        private static long GetSingleClientStageActionPointCost(
+            int stageId,
+            int playCount,
+            int apStoneCount)
+        {
+            if (!TableSheets.Instance.StageSheet.TryGetValue(stageId, out var stageRow))
+            {
+                throw new ArgumentException($"Stage row not found: {stageId}", nameof(stageId));
+            }
+
+            var costAp = stageRow.CostAP;
+            var stakingLevel = States.Instance.StakingLevel;
+            if (stakingLevel > 0)
+            {
+                costAp = TableSheets.Instance.StakeActionPointCoefficientSheet
+                    .GetActionPointByStaking(costAp, 1, stakingLevel);
+            }
+
+            var apPlayCount = playCount;
+            if (apStoneCount > 0)
+            {
+                if (costAp <= 0)
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid AP cost for stage {stageId}: {costAp}");
+                }
+
+                var actionPointMax = GetSingleClientActionPointMax();
+                var apStonePlayCount = checked(apStoneCount * (actionPointMax / costAp));
+                apPlayCount = checked(playCount - apStonePlayCount);
+                if (apPlayCount < 0)
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid single-client repeat play count. " +
+                        $"playCount={playCount}, apStoneCount={apStoneCount}, " +
+                        $"apStonePlayCount={apStonePlayCount}");
+                }
+            }
+
+            return checked((long)costAp * apPlayCount);
+        }
+
+        private static int GetSingleClientActionPointMax()
+        {
+            if (TableSheets.Instance.GameConfigSheet.TryGetValue(
+                    "action_point_max",
+                    out var actionPointMaxRow))
+            {
+                return TableExtensions.ParseInt(actionPointMaxRow.Value);
+            }
+
+            return Action.DailyReward.ActionPointMax;
+        }
+
+        private static (string entryCostItemId, long entryCostItemCount)
+            GetSingleClientStageEntryCost(int stageId, int playCount)
+        {
+            if (!TableSheets.Instance.StageSheet.TryGetValue(stageId, out var stageRow))
+            {
+                throw new ArgumentException($"Stage row not found: {stageId}", nameof(stageId));
+            }
+
+            if (stageRow.EntryCostItemId <= 0 || stageRow.EntryCostItemCount <= 0)
+            {
+                return (null, 0L);
+            }
+
+            return (
+                stageRow.EntryCostItemId.ToString(),
+                checked((long)stageRow.EntryCostItemCount * playCount));
+        }
+
+        private static IReadOnlyList<ClientItemCost> GetSingleClientStageItemCosts(
+            int stageId,
+            int playCount,
+            int apStoneCount)
+        {
+            var costs = new List<ClientItemCost>();
+            var (entryCostItemId, entryCostItemCount) =
+                GetSingleClientStageEntryCost(stageId, playCount);
+            if (entryCostItemId is not null)
+            {
+                costs.Add(new ClientItemCost(entryCostItemId, entryCostItemCount));
+            }
+
+            if (apStoneCount > 0)
+            {
+                costs.Add(new ClientItemCost(GetSingleClientApStoneItemId(), apStoneCount));
+            }
+
+            return costs;
+        }
+
+        private static string GetSingleClientApStoneItemId()
+        {
+            return TableSheets.Instance.MaterialItemSheet.Values
+                .First(row => row.ItemSubType == ItemSubType.ApStone)
+                .Id
+                .ToString();
+        }
+
+        private static void ApplySingleClientHackAndSlashResult(
+            int worldId,
+            ClientStagePlayResult result)
+        {
+            var avatarState = States.Instance.CurrentAvatarState;
+            if (avatarState is null)
+            {
+                return;
+            }
+
+            avatarState.actionPoint = checked((int)result.ActionPointAfter);
+            avatarState.worldInformation?.ClearStage(
+                worldId,
+                result.StageId,
+                result.State.BlockIndex,
+                TableSheets.Instance.WorldSheet,
+                TableSheets.Instance.WorldUnlockSheet);
+
+            ReactiveAvatarState.Initialize(avatarState);
+            ReactiveAvatarState.UpdateActionPoint(result.ActionPointAfter);
+
+            if (GameConfigStateSubject.ActionPointState.ContainsKey(avatarState.address))
+            {
+                GameConfigStateSubject.ActionPointState.Remove(avatarState.address);
+            }
+
+            if (Widget.TryFind<WorldMap>(out var worldMap) &&
+                avatarState.worldInformation is not null)
+            {
+                worldMap.SetWorldInformation(avatarState.worldInformation);
+            }
+        }
+
+        private static void NotifySingleClientHackAndSlashFailure(
+            int stageId,
+            int playCount,
+            int apStoneCount)
+        {
+            var normalizedPlayCount = Math.Max(1, playCount);
+            var actionPointCost = GetSingleClientStageActionPointCost(
+                stageId,
+                normalizedPlayCount,
+                apStoneCount);
+            var itemCosts = GetSingleClientStageItemCosts(
+                stageId,
+                normalizedPlayCount,
+                apStoneCount);
+            var preview = Game.Game.instance.ClientRuntime.PreviewStagePlay(
+                stageId,
+                actionPointCost,
+                itemCosts);
+
+            if (!preview.HasEnoughEntryCostItem)
+            {
+                OneLineSystem.Push(
+                    MailType.System,
+                    L10nManager.Localize("NOTIFICATION_NOT_ENOUGH_MATERIALS"),
+                    NotificationCell.NotificationType.Alert);
+                return;
+            }
+
+            OneLineSystem.Push(
+                MailType.System,
+                L10nManager.Localize("ERROR_ACTION_POINT"),
+                NotificationCell.NotificationType.Alert);
+        }
+
+        private static void CompleteSingleClientHackAndSlashUi()
+        {
+            ActionRenderHandler.Instance.Pending = false;
+            BattleRenderer.Instance.IsOnBattle = false;
+
+            var game = Game.Game.instance;
+            if (game is not null)
+            {
+                game.Stage.IsShowHud = false;
+            }
+
+            if (Widget.TryFind<LoadingScreen>(out var loadingScreen) &&
+                loadingScreen.IsActive())
+            {
+                loadingScreen.Close();
+            }
+
+            if (Widget.TryFind<StageLoadingEffect>(out var stageLoadingEffect) &&
+                stageLoadingEffect.IsActive())
+            {
+                stageLoadingEffect.Close();
+            }
+
+            if (Widget.TryFind<BattlePreparation>(out var battlePreparation) &&
+                battlePreparation.IsActive())
+            {
+                battlePreparation.Close(true);
+            }
         }
 
         public IObservable<ActionEvaluation<EventDungeonBattle>> EventDungeonBattle(
@@ -517,6 +775,11 @@ namespace Nekoyume.Blockchain
             int stageId,
             int? playCount)
         {
+            if (SingleClientMode.IsEnabled(Game.Game.instance.CommandLineOptions))
+            {
+                return HackAndSlashSweepInSingleClient(stageId, apStoneCount, actionPoint);
+            }
+
             var sentryTrace = Analyzer.Instance.Track("Unity/HackAndSlashSweep", new Dictionary<string, Value>()
             {
                 ["stageId"] = stageId,
@@ -580,6 +843,69 @@ namespace Nekoyume.Blockchain
                 .ObserveOnMainThread()
                 .Timeout(ActionTimeout)
                 .DoOnError(e => { Game.Game.BackToMainAsync(HandleException(action.Id, e)).Forget(); }).Finally(() => Analyzer.Instance.FinishTrace(sentryTrace));
+        }
+
+        private IObservable<ActionEvaluation<HackAndSlashSweep>> HackAndSlashSweepInSingleClient(
+            int stageId,
+            int apStoneCount,
+            int actionPoint)
+        {
+            var game = Game.Game.instance;
+            var runtime = game.ClientRuntime;
+            if (runtime is null || !runtime.IsStarted)
+            {
+                return Observable.Throw<ActionEvaluation<HackAndSlashSweep>>(
+                    new InvalidOperationException("Single-client runtime is not started."));
+            }
+
+            string apStoneItemId = null;
+            if (apStoneCount > 0 &&
+                TableSheets.Instance.MaterialItemSheet.Values.FirstOrDefault(
+                    r => r.ItemSubType == ItemSubType.ApStone) is { } apStoneRow)
+            {
+                apStoneItemId = apStoneRow.ItemId.ToString();
+            }
+
+            string entryCostItemId = null;
+            long entryCostItemCount = 0;
+            if (TableSheets.Instance.StageSheet.TryGetValue(stageId, out var stageRow) &&
+                stageRow.EntryCostItemId > 0 &&
+                stageRow.EntryCostItemCount > 0)
+            {
+                var costAp = stageRow.CostAP;
+                var stakingLevel = States.Instance.StakingLevel;
+                if (stakingLevel > 0)
+                {
+                    costAp = TableSheets.Instance.StakeActionPointCoefficientSheet
+                        .GetActionPointByStaking(costAp, 1, stakingLevel);
+                }
+
+                var actionPointMax = Action.DailyReward.ActionPointMax;
+                if (TableSheets.Instance.GameConfigSheet.TryGetValue(
+                        "action_point_max", out var apMaxRow))
+                {
+                    actionPointMax = TableExtensions.ParseInt(apMaxRow.Value);
+                }
+
+                var apMaxPlayCount = costAp > 0 ? actionPointMax / costAp : 0;
+                var apStonePlayCount = apMaxPlayCount * apStoneCount;
+                var apPlayCount = costAp > 0 ? actionPoint / costAp : 0;
+                var sweepPlayCount = apStonePlayCount + apPlayCount;
+
+                entryCostItemId = stageRow.EntryCostItemId.ToString();
+                entryCostItemCount = checked(stageRow.EntryCostItemCount * sweepPlayCount);
+            }
+
+            var result = runtime.SweepStage(
+                stageId,
+                actionPoint,
+                apStoneItemId,
+                apStoneCount,
+                entryCostItemId,
+                entryCostItemCount);
+            ReactiveAvatarState.UpdateActionPoint(result.ActionPointAfter);
+
+            return Observable.Empty<ActionEvaluation<HackAndSlashSweep>>();
         }
 
         public IObservable<ActionEvaluation<RegisterProduct>> RegisterProduct(
@@ -762,6 +1088,11 @@ namespace Nekoyume.Blockchain
 
         public IObservable<ActionEvaluation<DailyReward>> DailyReward()
         {
+            if (SingleClientMode.IsEnabled(Game.Game.instance.CommandLineOptions))
+            {
+                return DailyRewardInSingleClient();
+            }
+
             var action = new DailyReward
             {
                 avatarAddress = States.Instance.CurrentAvatarState.address
@@ -776,6 +1107,28 @@ namespace Nekoyume.Blockchain
                 .DoOnError(e => throw HandleException(action.Id, e));
         }
 
+        private IObservable<ActionEvaluation<DailyReward>> DailyRewardInSingleClient()
+        {
+            var game = Game.Game.instance;
+            var runtime = game.ClientRuntime;
+            if (runtime is null || !runtime.IsStarted)
+            {
+                return Observable.Throw<ActionEvaluation<DailyReward>>(
+                    new InvalidOperationException("Single-client runtime is not started."));
+            }
+
+            var state = runtime.FillActionPoint(Action.DailyReward.ActionPointMax);
+            ReactiveAvatarState.UpdateActionPoint(state.ActionPoint);
+
+            if (States.Instance.CurrentAvatarState is { } avatarState &&
+                GameConfigStateSubject.ActionPointState.ContainsKey(avatarState.address))
+            {
+                GameConfigStateSubject.ActionPointState.Remove(avatarState.address);
+            }
+
+            return Observable.Empty<ActionEvaluation<DailyReward>>();
+        }
+
         public IObservable<ActionEvaluation<ItemEnhancement>> ItemEnhancement(
             Equipment baseEquipment,
             List<Equipment> materialEquipments,
@@ -783,6 +1136,11 @@ namespace Nekoyume.Blockchain
             Dictionary<int, int> hammers,
             BigInteger costNCG)
         {
+            if (SingleClientMode.IsEnabled(Game.Game.instance.CommandLineOptions))
+            {
+                return ItemEnhancementInSingleClient(baseEquipment, materialEquipments);
+            }
+
             var agentAddress = States.Instance.AgentState.address;
             var avatarAddress = States.Instance.CurrentAvatarState.address;
 
@@ -846,6 +1204,44 @@ namespace Nekoyume.Blockchain
                 .First()
                 .ObserveOnMainThread()
                 .DoOnError(e => { Game.Game.BackToMainAsync(HandleException(action.Id, e)).Forget(); }).Finally(() => Analyzer.Instance.FinishTrace(sentryTrace));
+        }
+
+        private IObservable<ActionEvaluation<ItemEnhancement>> ItemEnhancementInSingleClient(
+            Equipment baseEquipment,
+            List<Equipment> materialEquipments)
+        {
+            var game = Game.Game.instance;
+            var runtime = game.ClientRuntime;
+            if (runtime is null || !runtime.IsStarted)
+            {
+                return Observable.Throw<ActionEvaluation<ItemEnhancement>>(
+                    new InvalidOperationException("Single-client runtime is not started."));
+            }
+
+            if (baseEquipment is null)
+            {
+                return Observable.Throw<ActionEvaluation<ItemEnhancement>>(
+                    new ArgumentNullException(nameof(baseEquipment)));
+            }
+
+            var baseId = baseEquipment.NonFungibleId.ToString();
+            var materialIds = (materialEquipments ?? new List<Equipment>())
+                .Where(e => e is not null)
+                .Select(e => e.NonFungibleId.ToString())
+                .ToArray();
+
+            try
+            {
+                runtime.EnhanceEquipment(baseId, materialIds);
+            }
+            catch (Exception e)
+            {
+                return Observable.Throw<ActionEvaluation<ItemEnhancement>>(e);
+            }
+
+            States.Instance.RemoveCurrentItemSlotStates(
+                materialEquipments?.Select(e => e.NonFungibleId).ToList() ?? new List<Guid>());
+            return Observable.Empty<ActionEvaluation<ItemEnhancement>>();
         }
 
         public IObservable<ActionEvaluation<RankingBattle>> RankingBattle(
@@ -1118,6 +1514,11 @@ namespace Nekoyume.Blockchain
 
         public IObservable<ActionEvaluation<ChargeActionPoint>> ChargeActionPoint()
         {
+            if (SingleClientMode.IsEnabled(Game.Game.instance.CommandLineOptions))
+            {
+                return ChargeActionPointInSingleClient();
+            }
+
             var avatarAddress = States.Instance.CurrentAvatarState.address;
             var row = TableSheets.Instance.MaterialItemSheet.Values
                 .First(r => r.ItemSubType == ItemSubType.ApStone);
@@ -1150,6 +1551,40 @@ namespace Nekoyume.Blockchain
                 .First()
                 .ObserveOnMainThread()
                 .DoOnError(e => HandleException(action.Id, e));
+        }
+
+        private IObservable<ActionEvaluation<ChargeActionPoint>> ChargeActionPointInSingleClient()
+        {
+            var game = Game.Game.instance;
+            var runtime = game.ClientRuntime;
+            if (runtime is null || !runtime.IsStarted)
+            {
+                return Observable.Throw<ActionEvaluation<ChargeActionPoint>>(
+                    new InvalidOperationException("Single-client runtime is not started."));
+            }
+
+            var state = runtime.FillActionPoint(Action.DailyReward.ActionPointMax);
+            ReactiveAvatarState.UpdateActionPoint(state.ActionPoint);
+
+            if (States.Instance.CurrentAvatarState is { } avatarState &&
+                GameConfigStateSubject.ActionPointState.ContainsKey(avatarState.address))
+            {
+                GameConfigStateSubject.ActionPointState.Remove(avatarState.address);
+            }
+
+            if (Widget.TryFind<HeaderMenuStatic>(out var headerMenu))
+            {
+                var apPortionUi = headerMenu.ApPotion;
+                apPortionUi.UpdateApPotion();
+                apPortionUi.SetActiveLoading(false);
+            }
+
+            NotificationSystem.Push(
+                MailType.System,
+                L10nManager.Localize("UI_CHARGE_AP"),
+                NotificationCell.NotificationType.Information);
+
+            return Observable.Empty<ActionEvaluation<ChargeActionPoint>>();
         }
 
         public IObservable<ActionEvaluation<Grinding>> Grinding(
