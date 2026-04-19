@@ -1250,6 +1250,13 @@ namespace Nekoyume.Blockchain
             List<Guid> equipmentIds
         )
         {
+            if (SingleClientMode.IsEnabled(Game.Game.instance.CommandLineOptions))
+            {
+                return Observable.Throw<ActionEvaluation<RankingBattle>>(
+                    new InvalidOperationException(
+                        "RankingBattle is not supported in single-client mode."));
+            }
+
             if (!ArenaHelperOld.TryGetThisWeekAddress(out var weeklyArenaAddress))
             {
                 throw new NullReferenceException(nameof(weeklyArenaAddress));
@@ -1498,6 +1505,13 @@ namespace Nekoyume.Blockchain
 
         public IObservable<ActionEvaluation<RedeemCode>> RedeemCode(string code)
         {
+            if (SingleClientMode.IsEnabled(Game.Game.instance.CommandLineOptions))
+            {
+                return Observable.Throw<ActionEvaluation<RedeemCode>>(
+                    new InvalidOperationException(
+                        "RedeemCode is not supported in single-client mode."));
+            }
+
             var action = new RedeemCode(
                 code,
                 States.Instance.CurrentAvatarState.address
@@ -2156,6 +2170,11 @@ namespace Nekoyume.Blockchain
             Address recipient,
             FungibleAssetValue amount)
         {
+            if (SingleClientMode.IsEnabled(Game.Game.instance.CommandLineOptions))
+            {
+                return Observable.Empty<ActionEvaluation<TransferAsset>>();
+            }
+
             var action = new TransferAsset(sender, recipient, amount);
             ProcessAction(action);
             return _agent.ActionRenderer.EveryRender<TransferAsset>()
@@ -2171,6 +2190,11 @@ namespace Nekoyume.Blockchain
             Address sender,
             params (Address, FungibleAssetValue)[] recipients)
         {
+            if (SingleClientMode.IsEnabled(Game.Game.instance.CommandLineOptions))
+            {
+                return Observable.Empty<ActionEvaluation<TransferAssets>>();
+            }
+
             var action = new TransferAssets(sender, recipients.ToList());
             ProcessAction(action);
             return _agent.ActionRenderer.EveryRender<TransferAssets>()
