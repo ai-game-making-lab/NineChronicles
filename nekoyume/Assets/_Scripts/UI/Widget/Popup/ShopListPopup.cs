@@ -10,7 +10,6 @@ using Cysharp.Threading.Tasks;
 using System.Numerics;
 using Nekoyume.ApiClient;
 using Nekoyume.L10n;
-using Nekoyume.Model.Item;
 using Nekoyume.State;
 using Nekoyume.Model.Mail;
 using Nekoyume.UI.Scroller;

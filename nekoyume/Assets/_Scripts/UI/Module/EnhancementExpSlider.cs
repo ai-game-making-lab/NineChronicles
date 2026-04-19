@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Nekoyume.Model.Item;
+using Nekoyume.SingleClient.Models.Items;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -24,7 +24,7 @@ namespace Nekoyume.UI
         private Coroutine _sliderEffectCor;
         private List<long> _expTable;
 
-        public void SetEquipment(Equipment equipment, bool reset = false)
+        public void SetEquipment(EquipmentSnapshot? equipment, bool reset = false)
         {
             if (reset)
             {
@@ -39,15 +39,19 @@ namespace Nekoyume.UI
                 }
             }
 
-            if (equipment is null)
+            if (!equipment.HasValue)
             {
                 return;
             }
 
+            // EnhancementCostSheetV3 row ItemSubType is the lib9c enum; the snapshot carries the
+            // client-owned mirror so convert it back at this single lib9c-sheet boundary.
+            var snapshot = equipment.Value;
+            var subTypeLib9c = snapshot.ItemSubType.ToLib9c();
             var enhancementCostSheet = Game.Game.instance.TableSheets.EnhancementCostSheetV3;
             _expTable = enhancementCostSheet.Values
-                .Where(row => row.Grade == equipment.Grade &&
-                    row.ItemSubType == equipment.ItemSubType)
+                .Where(row => row.Grade == snapshot.Grade &&
+                    row.ItemSubType == subTypeLib9c)
                 .Select(row => row.Exp).ToList();
             _expTable.Insert(0, 0);
         }

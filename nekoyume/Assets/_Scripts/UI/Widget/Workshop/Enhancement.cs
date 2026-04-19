@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using Nekoyume.L10n;
 using Nekoyume.Model.Item;
 using Nekoyume.Model.Mail;
+using Nekoyume.SingleClient.Models.Items;
+using ItemSubType = Nekoyume.Model.Item.ItemSubType;
 using Nekoyume.State;
 using Nekoyume.UI.Module;
 using UnityEngine;
@@ -386,6 +388,7 @@ namespace Nekoyume.UI
                 ClearInformation();
 
                 enhancementExpSlider.SetEquipment(null, true);
+                // null propagates into EnhancementExpSlider's nullable EquipmentSnapshot? reset branch.
 
                 autoSelectButton.Interactable = false;
                 removeAllButton.Interactable = false;
@@ -500,7 +503,7 @@ namespace Nekoyume.UI
 
                 if (targetRangeRows.Count >= 2)
                 {
-                    enhancementExpSlider.SetEquipment(equipment);
+                    enhancementExpSlider.SetEquipment(equipment.ToEquipmentSnapshot());
                     enhancementExpSlider.SliderGageEffect(targetExp, targetRow.Level);
                 }
                 else

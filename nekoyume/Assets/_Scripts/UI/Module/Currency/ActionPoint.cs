@@ -5,7 +5,6 @@ using System.Linq;
 using Nekoyume.Game.Battle;
 using Nekoyume.Action;
 using Nekoyume.L10n;
-using Nekoyume.Model.Item;
 using Nekoyume.Model.Mail;
 using Nekoyume.State;
 using Nekoyume.State.Subjects;

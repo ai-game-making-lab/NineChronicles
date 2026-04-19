@@ -2,7 +2,6 @@ using System;
 using System.Linq;
 using Nekoyume.Helper;
 using Nekoyume.L10n;
-using Nekoyume.Model.Item;
 using Nekoyume.SingleClient.Models.Elemental;
 using Nekoyume.TableData;
 using Nekoyume.UI.Model;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Nekoyume.Action;
 using Nekoyume.Model.Item;
+using Nekoyume.SingleClient.Models.Items;
 using Nekoyume.TableData;
 using Nekoyume.UI.Model;
 using Nekoyume.UI.Module;
@@ -143,7 +144,7 @@ namespace Nekoyume.UI
             hammerInformation.nameText.text = hammerItem.ItemBase.GetLocalizedName();
             hammerInformation.countText.text = hammerItem.Count.Value.ToString();
 
-            enhancementExpSlider.SetEquipment(baseModel, true);
+            enhancementExpSlider.SetEquipment(baseModel.ToEquipmentSnapshot(), true);
 
             _disposables.DisposeAllAndClear();
             _hammerItem.Count
