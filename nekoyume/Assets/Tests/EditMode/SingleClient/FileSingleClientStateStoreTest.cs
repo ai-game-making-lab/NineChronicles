@@ -98,6 +98,51 @@ namespace Tests.EditMode.SingleClient
             Assert.AreEqual(1, state.avatar.level);
             Assert.AreEqual(1, state.avatars.Count);
             Assert.AreEqual(SingleClientState.DefaultAvatarId, state.avatars[0].id);
+            Assert.IsNotNull(state.inventory);
+            Assert.IsNotNull(state.inventory.items);
+            Assert.IsNotNull(state.inventory.equipments);
+            Assert.IsNotNull(state.balances);
+        }
+
+        [Test]
+        public void EquipmentInventoryRoundTrips()
+        {
+            var path = Path.Combine(_temporaryDirectory, "state.json");
+            var session = new SingleClientSession(new FileSingleClientStateStore(path));
+            session.Start();
+            session.CreateOrSelectAvatar(0, "keeper");
+            session.GrantEquipment("eq-1", itemSheetId: 10110000, level: 2);
+            session.GrantEquipment("eq-2", itemSheetId: 10110100, level: 0, requiredBlockIndex: 7);
+
+            var reloaded = new FileSingleClientStateStore(path).LoadOrCreate();
+
+            Assert.AreEqual(2, reloaded.inventory.equipments.Count);
+            Assert.AreEqual("eq-1", reloaded.inventory.equipments[0].nonFungibleId);
+            Assert.AreEqual(10110000, reloaded.inventory.equipments[0].itemSheetId);
+            Assert.AreEqual(2, reloaded.inventory.equipments[0].level);
+            Assert.AreEqual("eq-2", reloaded.inventory.equipments[1].nonFungibleId);
+            Assert.AreEqual(7, reloaded.inventory.equipments[1].requiredBlockIndex);
+        }
+
+        [Test]
+        public void CurrencyBalancesRoundTripAcrossReload()
+        {
+            var path = Path.Combine(_temporaryDirectory, "state.json");
+            var session = new SingleClientSession(new FileSingleClientStateStore(path));
+            session.Start();
+            session.CreateOrSelectAvatar(0, "wallet");
+            session.AddCurrency("CRYSTAL", new System.Numerics.BigInteger(123456789));
+            session.AddCurrency("Mead", new System.Numerics.BigInteger(42));
+
+            var reloaded = new FileSingleClientStateStore(path).LoadOrCreate();
+
+            Assert.AreEqual(2, reloaded.balances.Count);
+            var crystal = reloaded.balances.Find(b => b.ticker == "CRYSTAL");
+            var mead = reloaded.balances.Find(b => b.ticker == "Mead");
+            Assert.IsNotNull(crystal);
+            Assert.AreEqual("123456789", crystal.rawValue);
+            Assert.IsNotNull(mead);
+            Assert.AreEqual("42", mead.rawValue);
         }
     }
 }
