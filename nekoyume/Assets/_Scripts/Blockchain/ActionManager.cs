@@ -545,6 +545,11 @@ namespace Nekoyume.Blockchain
             bool buyTicketIfNeeded,
             bool trackGuideQuest = false)
         {
+            if (IsSingleClientActive())
+            {
+                return SingleClientUnsupported<EventDungeonBattle>(nameof(EventDungeonBattle));
+            }
+
             if (trackGuideQuest)
             {
                 Analyzer.Instance.Track("Unity/Click Guided Quest Enter Event Dungeon", new Dictionary<string, Value>()
@@ -1367,6 +1372,12 @@ namespace Nekoyume.Blockchain
             BattleTokenResponse token
         )
         {
+            if (IsSingleClientActive())
+            {
+                throw new InvalidOperationException(
+                    "BattleArena is not supported in single-client mode.");
+            }
+
             try
             {
                 var action = new Action.Arena.Battle
@@ -1431,6 +1442,11 @@ namespace Nekoyume.Blockchain
             string tableName,
             string tableCsv)
         {
+            if (IsSingleClientActive())
+            {
+                return SingleClientUnsupported<PatchTableSheet>(nameof(PatchTableSheet));
+            }
+
             var action = new PatchTableSheet
             {
                 TableName = tableName,
@@ -1858,6 +1874,11 @@ namespace Nekoyume.Blockchain
             List<int> recipeIdList,
             BigInteger openCost)
         {
+            if (IsSingleClientActive())
+            {
+                return SingleClientNoOp<UnlockEquipmentRecipe>();
+            }
+
             LocalLayerModifier
                 .ModifyAgentCrystalAsync(
                     States.Instance.AgentState.address,
@@ -1891,6 +1912,11 @@ namespace Nekoyume.Blockchain
 
         public IObservable<ActionEvaluation<UnlockWorld>> UnlockWorld(List<int> worldIdList, int cost)
         {
+            if (IsSingleClientActive())
+            {
+                return SingleClientNoOp<UnlockWorld>();
+            }
+
             var avatarAddress = States.Instance.CurrentAvatarState.address;
             var sentryTrace = Analyzer.Instance.Track("Unity/UnlockWorld", new Dictionary<string, Value>()
             {
@@ -1917,6 +1943,11 @@ namespace Nekoyume.Blockchain
 
         public IObservable<ActionEvaluation<HackAndSlashRandomBuff>> HackAndSlashRandomBuff(bool advanced, long burntCrystal)
         {
+            if (IsSingleClientActive())
+            {
+                return SingleClientNoOp<HackAndSlashRandomBuff>();
+            }
+
             var sentryTrace = Analyzer.Instance.Track("Unity/Purchase Crystal Bonus Skill", new Dictionary<string, Value>()
             {
                 ["BurntCrystal"] = burntCrystal,
@@ -1950,6 +1981,11 @@ namespace Nekoyume.Blockchain
             List<RuneSlotInfo> runeInfos,
             bool payNcg)
         {
+            if (IsSingleClientActive())
+            {
+                return SingleClientUnsupported<Raid>(nameof(Raid));
+            }
+
             var action = new Raid
             {
                 AvatarAddress = States.Instance.CurrentAvatarState.address,
@@ -1971,6 +2007,11 @@ namespace Nekoyume.Blockchain
 
         public IObservable<ActionEvaluation<ClaimRaidReward>> ClaimRaidReward()
         {
+            if (IsSingleClientActive())
+            {
+                return SingleClientNoOp<ClaimRaidReward>();
+            }
+
             var action = new ClaimRaidReward(States.Instance.CurrentAvatarState.address);
             ProcessAction(action);
             _lastBattleActionId = action.Id;
@@ -1984,6 +2025,11 @@ namespace Nekoyume.Blockchain
 
         public IObservable<ActionEvaluation<ClaimWorldBossReward>> ClaimWorldBossReward()
         {
+            if (IsSingleClientActive())
+            {
+                return SingleClientNoOp<ClaimWorldBossReward>();
+            }
+
             var action = new ClaimWorldBossReward(States.Instance.CurrentAvatarState.address);
             ProcessAction(action);
             return _agent.ActionRenderer.EveryRender<ClaimWorldBossReward>()
@@ -1998,6 +2044,11 @@ namespace Nekoyume.Blockchain
             int runeId,
             int tryCount)
         {
+            if (IsSingleClientActive())
+            {
+                return SingleClientNoOp<RuneEnhancement>();
+            }
+
             var action = new RuneEnhancement
             {
                 AvatarAddress = States.Instance.CurrentAvatarState.address,
@@ -2016,6 +2067,11 @@ namespace Nekoyume.Blockchain
 
         public IObservable<ActionEvaluation<UnlockRuneSlot>> UnlockRuneSlot(int slotIndex)
         {
+            if (IsSingleClientActive())
+            {
+                return SingleClientNoOp<UnlockRuneSlot>();
+            }
+
             var action = new UnlockRuneSlot
             {
                 AvatarAddress = States.Instance.CurrentAvatarState.address,
@@ -2034,6 +2090,11 @@ namespace Nekoyume.Blockchain
 
         public IObservable<ActionEvaluation<UnlockCombinationSlot>> UnlockCombinationSlot(int slotIndex)
         {
+            if (IsSingleClientActive())
+            {
+                return SingleClientNoOp<UnlockCombinationSlot>();
+            }
+
             var action = new UnlockCombinationSlot
             {
                 AvatarAddress = States.Instance.CurrentAvatarState.address,
@@ -2053,6 +2114,11 @@ namespace Nekoyume.Blockchain
             int petId,
             int targetLevel)
         {
+            if (IsSingleClientActive())
+            {
+                return SingleClientNoOp<PetEnhancement>();
+            }
+
             var sentryTrace = Analyzer.Instance.Track("Unity/PetEnhancement", new Dictionary<string, Value>()
             {
                 ["AvatarAddress"] = States.Instance.CurrentAvatarState.address.ToString(),
@@ -2081,6 +2147,11 @@ namespace Nekoyume.Blockchain
             int collectionId,
             List<ICollectionMaterial> materials)
         {
+            if (IsSingleClientActive())
+            {
+                return SingleClientNoOp<ActivateCollection>();
+            }
+
             var avatarAddress = States.Instance.CurrentAvatarState.address;
             var agentAddress = States.Instance.AgentState.address;
             var materialsType = materials.First().Type;
@@ -2113,6 +2184,11 @@ namespace Nekoyume.Blockchain
 
         public IObservable<ActionEvaluation<ApprovePledge>> ApprovePledge(Address patronAddress)
         {
+            if (IsSingleClientActive())
+            {
+                return SingleClientUnsupported<ApprovePledge>(nameof(ApprovePledge));
+            }
+
             var action = new ApprovePledge
             {
                 PatronAddress = patronAddress
@@ -2246,6 +2322,11 @@ namespace Nekoyume.Blockchain
         public IObservable<ActionEvaluation<ClaimItems>> ClaimItems(
             params (Address, IReadOnlyList<FungibleAssetValue>)[] claimData)
         {
+            if (IsSingleClientActive())
+            {
+                return SingleClientNoOp<ClaimItems>();
+            }
+
             var action = new ClaimItems(claimData);
             ProcessAction(action);
             return _agent.ActionRenderer.EveryRender<ClaimItems>()
@@ -2302,6 +2383,13 @@ namespace Nekoyume.Blockchain
             Address recipient,
             FungibleAssetValue amount)
         {
+            if (IsSingleClientActive())
+            {
+                return Task.FromException<int>(
+                    new InvalidOperationException(
+                        "TransferAssetsForArenaBoardRefresh is not supported in single-client mode."));
+            }
+
             var action = new TransferAsset(sender, recipient, amount);
             var tcs = new TaskCompletionSource<int>();
             ProcessAction(action, (txid) =>
@@ -2341,6 +2429,13 @@ namespace Nekoyume.Blockchain
             int ticketCount,
             FungibleAssetValue amount)
         {
+            if (IsSingleClientActive())
+            {
+                return Task.FromException<int>(
+                    new InvalidOperationException(
+                        "TransferAssetsForBattleTicketPurchase is not supported in single-client mode."));
+            }
+
             var action = new TransferAsset(sender, recipient, amount);
             var tcs = new TaskCompletionSource<int>();
             ProcessAction(action, (txid) =>
@@ -2411,6 +2506,11 @@ namespace Nekoyume.Blockchain
 
         public IObservable<ActionEvaluation<ClaimUnbonded>> ClaimUnbonded()
         {
+            if (IsSingleClientActive())
+            {
+                return SingleClientNoOp<ClaimUnbonded>();
+            }
+
             var action = new ClaimUnbonded();
             ProcessAction(action);
             return _agent.ActionRenderer.EveryRender<ClaimUnbonded>()
@@ -2424,6 +2524,11 @@ namespace Nekoyume.Blockchain
 
         public IObservable<ActionEvaluation<ClaimReward>> ClaimReward()
         {
+            if (IsSingleClientActive())
+            {
+                return SingleClientNoOp<ClaimReward>();
+            }
+
             var action = new ClaimReward();
             ProcessAction(action);
             return _agent.ActionRenderer.EveryRender<ClaimReward>()
@@ -2439,6 +2544,11 @@ namespace Nekoyume.Blockchain
             Address avatarAddress,
             int giftId)
         {
+            if (IsSingleClientActive())
+            {
+                return SingleClientNoOp<ClaimGifts>();
+            }
+
             var action = new ClaimGifts(avatarAddress, giftId);
             ProcessAction(action);
             return _agent.ActionRenderer.EveryRender<ClaimGifts>()
@@ -2452,6 +2562,11 @@ namespace Nekoyume.Blockchain
 
         public IObservable<ActionEvaluation<Wanted>> Wanted(long season, FungibleAssetValue amount)
         {
+            if (IsSingleClientActive())
+            {
+                return SingleClientUnsupported<Wanted>(nameof(Wanted));
+            }
+
             var action = new Wanted
             {
                 AvatarAddress = States.Instance.CurrentAvatarState.address,
@@ -2473,6 +2588,11 @@ namespace Nekoyume.Blockchain
 
         public IObservable<ActionEvaluation<ExploreAdventureBoss>> ExploreAdventureBoss(List<Guid> costume, List<Guid> equipments, List<Guid> food, List<RuneSlotInfo> runeInfo, int seasonId)
         {
+            if (IsSingleClientActive())
+            {
+                return SingleClientUnsupported<ExploreAdventureBoss>(nameof(ExploreAdventureBoss));
+            }
+
             var action = new ExploreAdventureBoss
             {
                 AvatarAddress = States.Instance.CurrentAvatarState.address,
@@ -2497,6 +2617,11 @@ namespace Nekoyume.Blockchain
 
         public IObservable<ActionEvaluation<SweepAdventureBoss>> SweepAdventureBoss(List<Guid> costume, List<Guid> equipments, List<RuneSlotInfo> runeInfo, int seasonId)
         {
+            if (IsSingleClientActive())
+            {
+                return SingleClientUnsupported<SweepAdventureBoss>(nameof(SweepAdventureBoss));
+            }
+
             var action = new SweepAdventureBoss
             {
                 AvatarAddress = States.Instance.CurrentAvatarState.address,
@@ -2520,6 +2645,11 @@ namespace Nekoyume.Blockchain
 
         public IObservable<ActionEvaluation<UnlockFloor>> UnlockFloor(bool useNCG, int seasonId)
         {
+            if (IsSingleClientActive())
+            {
+                return SingleClientNoOp<UnlockFloor>();
+            }
+
             var action = new UnlockFloor
             {
                 AvatarAddress = States.Instance.CurrentAvatarState.address,
@@ -2540,6 +2670,11 @@ namespace Nekoyume.Blockchain
 
         public IObservable<ActionEvaluation<ClaimAdventureBossReward>> ClaimAdventureBossReward(long SeasonId)
         {
+            if (IsSingleClientActive())
+            {
+                return SingleClientNoOp<ClaimAdventureBossReward>();
+            }
+
             var action = new ClaimAdventureBossReward
             {
                 AvatarAddress = States.Instance.CurrentAvatarState.address
@@ -2558,6 +2693,11 @@ namespace Nekoyume.Blockchain
 
         public IObservable<ActionEvaluation<CustomEquipmentCraft>> CustomEquipmentCraft(int slotIndex, int recipeId, int iconId)
         {
+            if (IsSingleClientActive())
+            {
+                return SingleClientNoOp<CustomEquipmentCraft>();
+            }
+
             var action = new CustomEquipmentCraft()
             {
                 AvatarAddress = States.Instance.CurrentAvatarState.address,
@@ -2582,6 +2722,11 @@ namespace Nekoyume.Blockchain
 
         public IObservable<ActionEvaluation<ClaimPatrolReward>> ClaimPatrolReward()
         {
+            if (IsSingleClientActive())
+            {
+                return SingleClientNoOp<ClaimPatrolReward>();
+            }
+
             var action = new ClaimPatrolReward(States.Instance.CurrentAvatarState.address);
             ProcessAction(action);
             return _agent.ActionRenderer.EveryRender<ClaimPatrolReward>()
@@ -2602,6 +2747,11 @@ namespace Nekoyume.Blockchain
             bool buyTicketIfNeeded = false,
             bool useNcgForTicket = false)
         {
+            if (IsSingleClientActive())
+            {
+                return SingleClientUnsupported<InfiniteTowerBattle>(nameof(InfiniteTowerBattle));
+            }
+
             var avatarAddress = States.Instance.CurrentAvatarState.address;
             var action = new InfiniteTowerBattle
             {
@@ -2639,6 +2789,12 @@ namespace Nekoyume.Blockchain
             List<RuneSlotInfo> runeInfos,
             int playCount)
         {
+            if (IsSingleClientActive())
+            {
+                return SingleClientUnsupported<EventDungeonBattleSweep>(
+                    nameof(EventDungeonBattleSweep));
+            }
+
             var sentryTrace = Analyzer.Instance.Track("Unity/EventDungeonBattleSweep", new Dictionary<string, Value>()
             {
                 ["EventScheduleId"] = eventScheduleId,
@@ -2674,6 +2830,11 @@ namespace Nekoyume.Blockchain
 #if UNITY_EDITOR || LIB9C_DEV_EXTENSIONS
         public IObservable<ActionEvaluation<CreateTestbed>> CreateTestbed()
         {
+            if (IsSingleClientActive())
+            {
+                return SingleClientUnsupported<CreateTestbed>(nameof(CreateTestbed));
+            }
+
             var action = new CreateTestbed
             {
                 weeklyArenaAddress = WeeklyArenaState.DeriveAddress(
@@ -2696,6 +2857,11 @@ namespace Nekoyume.Blockchain
             int accountCount
         )
         {
+            if (IsSingleClientActive())
+            {
+                return SingleClientUnsupported<CreateArenaDummy>(nameof(CreateArenaDummy));
+            }
+
             var avatarAddress = States.Instance.CurrentAvatarState.address;
             var action = new CreateArenaDummy
             {
@@ -2729,6 +2895,11 @@ namespace Nekoyume.Blockchain
             List<(Address, Address, IValue)> stateList,
             List<(Address, FungibleAssetValue)> balanceList)
         {
+            if (IsSingleClientActive())
+            {
+                return SingleClientUnsupported<ManipulateState>(nameof(ManipulateState));
+            }
+
             var action = new ManipulateState
             {
                 StateList = stateList ?? new List<(Address accountAddr, Address addr, IValue value)>(),
