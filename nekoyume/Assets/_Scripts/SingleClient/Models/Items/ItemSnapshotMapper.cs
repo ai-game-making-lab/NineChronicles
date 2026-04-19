@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Nekoyume.SingleClient.Models.Buffs;
 using Nekoyume.SingleClient.Models.Elemental;
 using Nekoyume.SingleClient.Models.Skills;
 using Nekoyume.SingleClient.Models.Stats;
@@ -72,7 +73,12 @@ namespace Nekoyume.SingleClient.Models.Items
                 equipped: source.equipped,
                 madeWithMimisbrunnrRecipe: source.MadeWithMimisbrunnrRecipe,
                 requiredBlockIndex: source.RequiredBlockIndex,
-                optionCountFromCombination: source.optionCountFromCombination);
+                optionCountFromCombination: source.optionCountFromCombination,
+                iconId: source.IconId,
+                byCustomCraft: source.ByCustomCraft,
+                craftWithRandom: source.CraftWithRandom,
+                hasRandomOnlyIcon: source.HasRandomOnlyIcon,
+                uniqueStatType: BuffViewMapper.MapStatType(source.UniqueStatType));
         }
 
         public static CostumeSnapshot ToCostumeSnapshot(this Lib9cCostume source)

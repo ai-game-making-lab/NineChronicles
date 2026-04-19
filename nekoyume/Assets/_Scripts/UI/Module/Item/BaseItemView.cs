@@ -15,10 +15,13 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
+using IItemSnapshot = Nekoyume.SingleClient.Models.Items.IItemSnapshot;
+using ItemSnapshotIconExtensions = Nekoyume.SingleClient.Models.Items.ItemSnapshotIconExtensions;
+using SnapshotItemSubType = Nekoyume.SingleClient.Models.Items.ItemSubType;
 namespace Nekoyume
 {
-    using Lib9c;
     using Libplanet.Types.Assets;
+    using Nekoyume.SingleClient;
     using UniRx;
 
     public class BaseItemView : MonoBehaviour
@@ -185,9 +188,49 @@ namespace Nekoyume
             return icon;
         }
 
+        /// <summary>
+        /// Snapshot-facing overload of <see cref="GetItemIcon(ItemBase)"/>. Forwards to
+        /// <c>ItemSnapshotIconExtensions.GetIconSprite(IItemSnapshot)</c>, which mirrors the
+        /// lib9c <see cref="ItemExtensions.GetIconSprite(ItemBase)"/> branching: Equipment
+        /// uses the snapshot's <c>IconId</c> (which may diverge from <c>Id</c> for
+        /// custom-crafted equipment); every other subtype uses <see cref="IItemSnapshot.Id"/>
+        /// plus the subtype+grade fallback.
+        /// </summary>
+        public static Sprite GetItemIcon(IItemSnapshot item)
+        {
+            var icon = ItemSnapshotIconExtensions.GetIconSprite(item);
+            if (icon is null)
+            {
+                throw new FailedToLoadResourceException<Sprite>(item.Id.ToString());
+            }
+
+            return icon;
+        }
+
         public ItemViewData GetItemViewData(ItemBase itemBase)
         {
             return itemViewData.GetItemViewData(itemBase);
+        }
+
+        /// <summary>
+        /// Snapshot-facing overload of <see cref="GetItemViewData(ItemBase)"/>. Mirrors the
+        /// lib9c rule in <see cref="ItemViewDataScriptableObject.GetItemViewData(ItemBase)"/>:
+        /// non-Circle / non-Scroll <c>TradableMaterial</c> instances upgrade the view data by
+        /// one grade. <see cref="IItemSnapshot.TradableId"/> is only non-empty for the
+        /// <c>TradableMaterial</c> projection, so it doubles as the subtype marker here and
+        /// keeps the rule identical without requiring a lib9c downcast.
+        /// </summary>
+        public ItemViewData GetItemViewData(IItemSnapshot item)
+        {
+            var upgrade = 0;
+            if (item.ItemSubType != SnapshotItemSubType.Circle &&
+                item.ItemSubType != SnapshotItemSubType.Scroll &&
+                !string.IsNullOrEmpty(item.TradableId))
+            {
+                upgrade = 1;
+            }
+
+            return itemViewData.GetItemViewData(item.Grade + upgrade);
         }
 
         public ItemViewData GetItemViewData(int grade)
@@ -268,7 +311,7 @@ namespace Nekoyume
                     ItemViewSetCurrencyData("NCG", amount);
                     return true;
                 case 9999998:
-                    ItemViewSetCurrencyData(Currencies.Crystal.Ticker, amount);
+                    ItemViewSetCurrencyData(ClientCurrencies.Crystal.Ticker, amount);
                     return true;
                 case 9999997:
                     ItemViewSetCurrencyData("HOURGLASS", amount);

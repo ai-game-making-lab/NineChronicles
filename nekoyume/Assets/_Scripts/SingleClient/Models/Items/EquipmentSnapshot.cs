@@ -51,6 +51,39 @@ namespace Nekoyume.SingleClient.Models.Items
         /// </summary>
         public int? OptionCountFromCombination { get; }
 
+        /// <summary>
+        /// Mirrors lib9c <c>Equipment.IconId</c>. Diverges from <see cref="Id"/> for
+        /// custom-crafted equipment, so icon resolution MUST prefer this field over
+        /// <see cref="Id"/>. For vanilla equipment, lib9c initializes <c>IconId</c> to
+        /// <c>data.Id</c>, so this equals <see cref="Id"/> by default.
+        /// </summary>
+        public int IconId { get; }
+
+        /// <summary>
+        /// Mirrors lib9c <c>Equipment.ByCustomCraft</c>. Drives the custom-craft decoration area
+        /// in the inventory item view.
+        /// </summary>
+        public bool ByCustomCraft { get; }
+
+        /// <summary>
+        /// Mirrors lib9c <c>Equipment.CraftWithRandom</c>. Indicates random options were rolled
+        /// during custom-craft combination.
+        /// </summary>
+        public bool CraftWithRandom { get; }
+
+        /// <summary>
+        /// Mirrors lib9c <c>Equipment.HasRandomOnlyIcon</c>. When <see langword="true"/>, the
+        /// random-only icon variant should be used regardless of <see cref="IconId"/>.
+        /// </summary>
+        public bool HasRandomOnlyIcon { get; }
+
+        /// <summary>
+        /// Mirrors lib9c <c>Equipment.UniqueStatType</c> (the primary <c>Stat.StatType</c>).
+        /// Exposed alongside <see cref="Stat"/> so option views can read the unique stat without
+        /// touching the <see cref="StatView"/> struct.
+        /// </summary>
+        public StatType UniqueStatType { get; }
+
         public EquipmentSnapshot(
             ItemType itemType,
             ItemSubType itemSubType,
@@ -68,7 +101,12 @@ namespace Nekoyume.SingleClient.Models.Items
             bool equipped,
             bool madeWithMimisbrunnrRecipe,
             long? requiredBlockIndex,
-            int? optionCountFromCombination)
+            int? optionCountFromCombination,
+            int iconId,
+            bool byCustomCraft,
+            bool craftWithRandom,
+            bool hasRandomOnlyIcon,
+            StatType uniqueStatType)
         {
             ItemType = itemType;
             ItemSubType = itemSubType;
@@ -87,6 +125,11 @@ namespace Nekoyume.SingleClient.Models.Items
             MadeWithMimisbrunnrRecipe = madeWithMimisbrunnrRecipe;
             RequiredBlockIndex = requiredBlockIndex;
             OptionCountFromCombination = optionCountFromCombination;
+            IconId = iconId;
+            ByCustomCraft = byCustomCraft;
+            CraftWithRandom = craftWithRandom;
+            HasRandomOnlyIcon = hasRandomOnlyIcon;
+            UniqueStatType = uniqueStatType;
         }
 
         public bool Equals(EquipmentSnapshot other) =>

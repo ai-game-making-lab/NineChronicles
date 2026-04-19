@@ -122,6 +122,42 @@ namespace Tests.EditMode.SingleClient
             Assert.IsNotNull(snapshot.Skills);
             Assert.IsNotNull(snapshot.BuffSkills);
             Assert.IsNotNull(snapshot.StatsMap);
+
+            // Equipment-only fields round-tripped from lib9c.
+            // Vanilla ctor seeds IconId = iconId != 0 ? iconId : data.Id, so for a
+            // non-custom-craft weapon the snapshot IconId equals the row Id.
+            Assert.AreEqual(row.Id, snapshot.IconId);
+            Assert.AreEqual(weapon.IconId, snapshot.IconId);
+            Assert.IsFalse(snapshot.ByCustomCraft);
+            Assert.IsFalse(snapshot.CraftWithRandom);
+            Assert.IsFalse(snapshot.HasRandomOnlyIcon);
+            Assert.AreEqual(StatType.ATK, snapshot.UniqueStatType);
+            Assert.AreEqual((int)weapon.UniqueStatType, (int)snapshot.UniqueStatType);
+        }
+
+        [Test]
+        public void ToEquipmentSnapshotCustomCraftFieldsProjected()
+        {
+            // Custom-craft flags default to false in the ctor, but are mutable fields on lib9c
+            // Equipment. Flip them post-construction to confirm the mapper reads the live
+            // values (not just the ctor defaults) and that IconId is allowed to diverge from
+            // the row Id for the custom-craft random-only icon path.
+            var row = BuildWeaponRow();
+            var weapon = new Lib9cWeapon(row, Guid.NewGuid(), RequiredBlockIndex);
+            const int divergentIconId = 99999999;
+            weapon.IconId = divergentIconId;
+            weapon.ByCustomCraft = true;
+            weapon.CraftWithRandom = true;
+            weapon.HasRandomOnlyIcon = true;
+
+            var snapshot = weapon.ToEquipmentSnapshot();
+
+            Assert.AreEqual(divergentIconId, snapshot.IconId,
+                "IconId must follow lib9c.Equipment.IconId even when it diverges from Id.");
+            Assert.AreNotEqual(snapshot.Id, snapshot.IconId);
+            Assert.IsTrue(snapshot.ByCustomCraft);
+            Assert.IsTrue(snapshot.CraftWithRandom);
+            Assert.IsTrue(snapshot.HasRandomOnlyIcon);
         }
 
         [Test]
