@@ -8,6 +8,7 @@ using Nekoyume.Helper;
 using Nekoyume.L10n;
 using Nekoyume.Model.Item;
 using Nekoyume.Model.Stat;
+using Nekoyume.SingleClient.Models.Elemental;
 using Nekoyume.State;
 using Nekoyume.UI.Module.Common;
 using TMPro;
@@ -118,14 +119,14 @@ namespace Nekoyume.UI.Module
             iconArea.subTypeText.color = gradeColor;
             iconArea.gradeAndSubTypeSpacer.color = gradeColor;
 
-            var sprite = itemBase.ElementalType.GetSprite();
+            var sprite = itemBase.ElementalType.ToView().GetSprite();
             if (sprite is null || !itemBase.ItemType.HasElementType())
             {
                 iconArea.elementalTypeObject.SetActive(false);
                 return;
             }
 
-            iconArea.elementalTypeText.text = itemBase.ElementalType.GetLocalizedString();
+            iconArea.elementalTypeText.text = itemBase.ElementalType.ToView().GetLocalizedString();
             iconArea.elementalTypeText.color = itemBase.GetElementalTypeColor();
             iconArea.elementalTypeImage.overrideSprite = sprite;
             iconArea.elementalTypeObject.SetActive(true);

@@ -3,6 +3,7 @@ using System.Linq;
 using Nekoyume.Helper;
 using Nekoyume.L10n;
 using Nekoyume.Model.Item;
+using Nekoyume.SingleClient.Models.Elemental;
 using Nekoyume.TableData;
 using Nekoyume.UI.Model;
 using TMPro;
@@ -101,9 +102,10 @@ namespace Nekoyume.UI.Module
 
             if (itemRow.ItemType.HasElementType())
             {
-                iconArea.elementalTypeText.text = itemRow.ElementalType.GetLocalizedString();
-                iconArea.elementalTypeText.color = itemRow.ElementalType.GetElementalTypeColor();
-                var sprite = itemRow.ElementalType.GetSprite();
+                var elementalView = itemRow.ElementalType.ToView();
+                iconArea.elementalTypeText.text = elementalView.GetLocalizedString();
+                iconArea.elementalTypeText.color = elementalView.GetElementalTypeColor();
+                var sprite = elementalView.GetSprite();
                 if (sprite is not null)
                 {
                     iconArea.elementalTypeImage.overrideSprite = sprite;

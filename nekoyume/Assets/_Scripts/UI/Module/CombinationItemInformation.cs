@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Nekoyume.Model.Item;
 using Nekoyume.Model.Stat;
+using Nekoyume.SingleClient.Models.Elemental;
 using Nekoyume.UI.Model;
 using TMPro;
 using UnityEngine;
@@ -87,7 +88,7 @@ namespace Nekoyume.UI.Module
                 Model.item.Value.Count.Value));
 
             // 속성.
-            var sprite = item.ElementalType.GetSprite();
+            var sprite = item.ElementalType.ToView().GetSprite();
             var elementalCount = item.Grade;
             for (var i = 0; i < iconArea.elementalTypeImages.Count; i++)
             {

@@ -2,6 +2,7 @@ using Coffee.UIEffects;
 using Nekoyume.Game.ScriptableObject;
 using Nekoyume.Helper;
 using Nekoyume.Model.Item;
+using Nekoyume.SingleClient.Models.Elemental;
 using Nekoyume.State;
 using Nekoyume.TableData;
 using TMPro;
@@ -86,7 +87,7 @@ namespace Nekoyume.UI.Module
 
             if (itemRow.ItemType == ItemType.Equipment)
             {
-                elementImage.sprite = itemRow.ElementalType.GetSprite();
+                elementImage.sprite = itemRow.ElementalType.ToView().GetSprite();
             }
             else if (itemRow.ItemType == ItemType.Consumable)
             {
