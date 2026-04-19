@@ -144,6 +144,26 @@ namespace Nekoyume.Blockchain
             }
         }
 
+        private static bool IsSingleClientActive()
+        {
+            return SingleClientMode.IsEnabled(Game.Game.instance.CommandLineOptions);
+        }
+
+        private static IObservable<ActionEvaluation<T>> SingleClientUnsupported<T>(
+            string actionName)
+            where T : ActionBase
+        {
+            return Observable.Throw<ActionEvaluation<T>>(
+                new InvalidOperationException(
+                    $"{actionName} is not supported in single-client mode."));
+        }
+
+        private static IObservable<ActionEvaluation<T>> SingleClientNoOp<T>()
+            where T : ActionBase
+        {
+            return Observable.Empty<ActionEvaluation<T>>();
+        }
+
 #region Actions
 
         public IObservable<ActionEvaluation<CreateAvatar>> CreateAvatar(
@@ -601,6 +621,11 @@ namespace Nekoyume.Blockchain
             SubRecipeView.RecipeInfo recipeInfo,
             int slotIndex)
         {
+            if (IsSingleClientActive())
+            {
+                return SingleClientNoOp<CombinationConsumable>();
+            }
+
             var agentAddress = States.Instance.AgentState.address;
             var avatarState = States.Instance.CurrentAvatarState;
             var avatarAddress = avatarState.address;
@@ -661,6 +686,11 @@ namespace Nekoyume.Blockchain
                 SubRecipeView.RecipeInfo recipeInfo,
                 int slotIndex)
         {
+            if (IsSingleClientActive())
+            {
+                return SingleClientNoOp<EventConsumableItemCrafts>();
+            }
+
             var subRecipeId = recipeInfo.SubRecipeId ?? 0;
             var trackValue = new Dictionary<string, Value>()
             {
@@ -733,6 +763,11 @@ namespace Nekoyume.Blockchain
                 int recipeId,
                 Dictionary<int, int> materialsToUse)
         {
+            if (IsSingleClientActive())
+            {
+                return SingleClientNoOp<EventMaterialItemCrafts>();
+            }
+
             var avatarState = States.Instance.CurrentAvatarState;
             var avatarAddress = avatarState.address;
 
@@ -913,6 +948,11 @@ namespace Nekoyume.Blockchain
             List<IRegisterInfo> registerInfos,
             bool chargeAp)
         {
+            if (IsSingleClientActive())
+            {
+                return SingleClientUnsupported<RegisterProduct>(nameof(RegisterProduct));
+            }
+
             var registerInfo = registerInfos.First();
             var sentryTrace = Analyzer.Instance.Track("Unity/RegisterProduct", new Dictionary<string, Value>()
             {
@@ -960,6 +1000,12 @@ namespace Nekoyume.Blockchain
             List<IProductInfo> productInfo,
             bool chargeAp)
         {
+            if (IsSingleClientActive())
+            {
+                return SingleClientUnsupported<CancelProductRegistration>(
+                    nameof(CancelProductRegistration));
+            }
+
             var sentryTrace = Analyzer.Instance.Track("Unity/CancelProductRegistration", new Dictionary<string, Value>()
             {
                 ["AvatarAddress"] = avatarAddress.ToString(),
@@ -1003,6 +1049,11 @@ namespace Nekoyume.Blockchain
             List<(IProductInfo, IRegisterInfo)> reRegisterInfos,
             bool chargeAp)
         {
+            if (IsSingleClientActive())
+            {
+                return SingleClientUnsupported<ReRegisterProduct>(nameof(ReRegisterProduct));
+            }
+
             if (chargeAp)
             {
                 var row = Game.Game.instance.TableSheets.MaterialItemSheet.Values
@@ -1039,6 +1090,11 @@ namespace Nekoyume.Blockchain
             Address avatarAddress,
             List<IProductInfo> productInfos)
         {
+            if (IsSingleClientActive())
+            {
+                return SingleClientUnsupported<BuyProduct>(nameof(BuyProduct));
+            }
+
             var buyerAgentAddress = States.Instance.AgentState.address;
             foreach (var info in productInfos)
             {
@@ -1064,6 +1120,11 @@ namespace Nekoyume.Blockchain
 
         public IObservable<ActionEvaluation<Buy>> Buy(List<PurchaseInfo> purchaseInfos)
         {
+            if (IsSingleClientActive())
+            {
+                return SingleClientUnsupported<Buy>(nameof(Buy));
+            }
+
             var buyerAgentAddress = States.Instance.AgentState.address;
             foreach (var purchaseInfo in purchaseInfos)
             {
@@ -1391,6 +1452,11 @@ namespace Nekoyume.Blockchain
             bool useHammerPoint,
             int? petId)
         {
+            if (IsSingleClientActive())
+            {
+                return SingleClientNoOp<CombinationEquipment>();
+            }
+
             var sentryTx = Analyzer.Instance.Track(
                 "Unity/Create CombinationEquipment",
                 new Dictionary<string, Value>()
@@ -1470,6 +1536,11 @@ namespace Nekoyume.Blockchain
             List<CombinationSlotState> stateList,
             List<int> slotIndexList)
         {
+            if (IsSingleClientActive())
+            {
+                return SingleClientNoOp<RapidCombination>();
+            }
+
             var currentBlockIndex = Game.Game.instance.Agent.BlockIndex;
             var avatarAddress = States.Instance.CurrentAvatarState.address;
             var agentAddress = States.Instance.AgentState.address;
@@ -1719,6 +1790,11 @@ namespace Nekoyume.Blockchain
             Grade grade,
             ItemSubType itemSubType)
         {
+            if (IsSingleClientActive())
+            {
+                return SingleClientNoOp<Synthesize>();
+            }
+
             var avatarAddress = States.Instance.CurrentAvatarState.address;
             var removeNonFungibleIds = new List<Guid>();
             var removeItemIds = new List<(Guid, long, int)>();
@@ -2055,6 +2131,11 @@ namespace Nekoyume.Blockchain
 
         public IObservable<ActionEvaluation<AuraSummon>> AuraSummon(int groupId, int summonCount)
         {
+            if (IsSingleClientActive())
+            {
+                return SingleClientUnsupported<AuraSummon>(nameof(AuraSummon));
+            }
+
             var avatarState = States.Instance.CurrentAvatarState;
             var avatarAddress = avatarState.address;
 
@@ -2088,6 +2169,11 @@ namespace Nekoyume.Blockchain
 
         public IObservable<ActionEvaluation<RuneSummon>> RuneSummon(int groupId, int summonCount)
         {
+            if (IsSingleClientActive())
+            {
+                return SingleClientUnsupported<RuneSummon>(nameof(RuneSummon));
+            }
+
             var avatarState = States.Instance.CurrentAvatarState;
             var avatarAddress = avatarState.address;
 
@@ -2121,6 +2207,11 @@ namespace Nekoyume.Blockchain
 
         public IObservable<ActionEvaluation<CostumeSummon>> CostumeSummon(int groupId, int summonCount)
         {
+            if (IsSingleClientActive())
+            {
+                return SingleClientUnsupported<CostumeSummon>(nameof(CostumeSummon));
+            }
+
             var avatarState = States.Instance.CurrentAvatarState;
             var avatarAddress = avatarState.address;
 
@@ -2285,6 +2376,11 @@ namespace Nekoyume.Blockchain
 
         public IObservable<ActionEvaluation<Stake>> Stake(BigInteger amount, Address avatarAddress)
         {
+            if (IsSingleClientActive())
+            {
+                return SingleClientUnsupported<Stake>(nameof(Stake));
+            }
+
             var action = new Stake(amount, avatarAddress);
             ProcessAction(action);
             return _agent.ActionRenderer.EveryRender<Stake>()
@@ -2297,6 +2393,11 @@ namespace Nekoyume.Blockchain
 
         public IObservable<ActionEvaluation<ClaimStakeReward>> ClaimStakeReward(Address avatarAddress)
         {
+            if (IsSingleClientActive())
+            {
+                return SingleClientUnsupported<ClaimStakeReward>(nameof(ClaimStakeReward));
+            }
+
             var action = new ClaimStakeReward(avatarAddress);
             ProcessAction(action);
             return _agent.ActionRenderer.EveryRender<ClaimStakeReward>()
