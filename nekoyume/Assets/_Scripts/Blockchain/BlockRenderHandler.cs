@@ -4,12 +4,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using Bencodex.Types;
 using Cysharp.Threading.Tasks;
-using Lib9c;
 using Lib9c.Renderers;
 using Libplanet.Types.Assets;
 using Nekoyume.Exceptions;
 using Nekoyume.Helper;
 using Nekoyume.Model.State;
+using Nekoyume.SingleClient;
 using Nekoyume.State;
 using Nekoyume.State.Subjects;
 
@@ -42,6 +42,13 @@ namespace Nekoyume.Blockchain
                 blockRenderer ?? throw new ArgumentNullException(nameof(blockRenderer));
 
             Stop();
+
+            if (SingleClientMode.IsEnabled(Game.Game.instance.CommandLineOptions))
+            {
+                NcDebug.Log($"[{nameof(BlockRenderHandler)}] Skipping blockchain block subscriptions in single-client mode.");
+                return;
+            }
+
             _blockRenderer.BlockSubject
                 .ObserveOnMainThread()
                 .Subscribe(_ => UpdateWhenEveryBlockRenderBeginningAsync().Forget())
@@ -82,8 +89,8 @@ namespace Nekoyume.Blockchain
                         var ncg = States.Instance.GoldBalanceState.Gold.Currency;
                         var favArr = await Task.WhenAll(
                             agent.GetBalanceAsync(agentState.address, ncg),
-                            agent.GetBalanceAsync(agentState.address, Currencies.Crystal),
-                            agent.GetBalanceAsync(agentState.address, Currencies.Garage));
+                            agent.GetBalanceAsync(agentState.address, ClientCurrencies.Crystal),
+                            agent.GetBalanceAsync(agentState.address, ClientCurrencies.Garage));
                         gold = favArr[0];
                         crystal = favArr[1];
                         garage = favArr[2];

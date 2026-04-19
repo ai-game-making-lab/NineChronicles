@@ -21,7 +21,6 @@ using Nekoyume.State.Subjects;
 using Nekoyume.UI.Module;
 using UnityEngine;
 using Cysharp.Threading.Tasks;
-using Lib9c;
 using Lib9c.Renderers;
 using Libplanet.Action.State;
 using Libplanet.Common;
@@ -42,6 +41,7 @@ using Nekoyume.Model.BattleStatus.Arena;
 using Nekoyume.Model.EnumType;
 using Nekoyume.Model.InfiniteTower;
 using Nekoyume.Model.Market;
+using Nekoyume.SingleClient;
 using Nekoyume.UI.Model;
 using Nekoyume.UI.Module.WorldBoss;
 using Debug = UnityEngine.Debug;
@@ -96,6 +96,13 @@ namespace Nekoyume.Blockchain
             _actionRenderer = renderer ?? throw new ArgumentNullException(nameof(renderer));
 
             Stop();
+
+            if (SingleClientMode.IsEnabled(Game.Game.instance.CommandLineOptions))
+            {
+                NcDebug.Log($"[{nameof(ActionRenderHandler)}] Skipping blockchain action subscriptions in single-client mode.");
+                return;
+            }
+
             _actionRenderer.BlockEndSubject.ObserveOnMainThread().Subscribe(_ => { NcDebug.Log($"[{nameof(BlockRenderHandler)}] Render actions end"); }).AddTo(_disposables);
             _actionRenderer.ActionRenderSubject.ObserveOnMainThread().Subscribe(eval =>
             {
@@ -1905,7 +1912,7 @@ namespace Nekoyume.Blockchain
                 if (favProduct is not null)
                 {
                     count = (int)favProduct.Quantity;
-                    var currency = Currencies.GetMinterlessCurrency(favProduct.Ticker);
+                    var currency = ClientCurrencies.GetMinterlessCurrency(favProduct.Ticker);
                     UniTask.RunOnThreadPool(() => { States.Instance.SetCurrentAvatarBalance(eval, currency); }).Forget();
                 }
 
@@ -2371,10 +2378,10 @@ namespace Nekoyume.Blockchain
                         {
                             try
                             {
-                                var currency = Currencies.GetCurrencyByTicker(ticker);
-                                var recipientAddress = Currencies.PickAddress(currency, agentAddr, avatarAddr);
+                                var currency = ClientCurrencies.GetCurrencyByTicker(ticker);
+                                var recipientAddress = ClientCurrencies.PickAddress(currency, agentAddr, avatarAddr);
                                 var balance = StateGetter.GetBalance(states, recipientAddress, currency);
-                                var isCrystal = currency.Equals(Currencies.Crystal);
+                                var isCrystal = currency.Equals(ClientCurrencies.Crystal);
                                 balanceList.Add((currency, balance, isCrystal));
                             }
                             catch (Exception ex)
@@ -2816,10 +2823,10 @@ namespace Nekoyume.Blockchain
                         {
                             try
                             {
-                                var currency = Currencies.GetCurrencyByTicker(ticker);
-                                var recipientAddress = Currencies.PickAddress(currency, agentAddr, avatarAddr);
+                                var currency = ClientCurrencies.GetCurrencyByTicker(ticker);
+                                var recipientAddress = ClientCurrencies.PickAddress(currency, agentAddr, avatarAddr);
                                 var balance = StateGetter.GetBalance(states, recipientAddress, currency);
-                                var isCrystal = currency.Equals(Currencies.Crystal);
+                                var isCrystal = currency.Equals(ClientCurrencies.Crystal);
                                 balanceList.Add((currency, balance, isCrystal));
                             }
                             catch (Exception ex)
@@ -3982,7 +3989,7 @@ namespace Nekoyume.Blockchain
             var runeStone = StateGetter.GetBalance(
                 eval.OutputState,
                 action.AvatarAddress,
-                Currencies.GetRune(runeRow.Ticker));
+                ClientCurrencies.GetRune(runeRow.Ticker));
             States.Instance.SetCurrentAvatarBalance(runeStone);
             return (eval, runeStone, previousState);
         }
@@ -4051,7 +4058,7 @@ namespace Nekoyume.Blockchain
             States.Instance.CurrentAvatarBalances[soulStoneTicker] = StateGetter.GetBalance(
                 eval.OutputState,
                 eval.Action.AvatarAddress,
-                Currencies.GetMinterlessCurrency(soulStoneTicker));
+                ClientCurrencies.GetMinterlessCurrency(soulStoneTicker));
             UpdatePetState(eval.Action.AvatarAddress, eval.Action.PetId, eval.OutputState);
             return eval;
         }
@@ -4232,11 +4239,11 @@ namespace Nekoyume.Blockchain
                             var goldState = new GoldBalanceState(balanceAddr, balance);
                             gameStates.SetGoldBalanceState(goldState);
                         }
-                        else if (value.Currency.Equals(Currencies.Crystal))
+                        else if (value.Currency.Equals(ClientCurrencies.Crystal))
                         {
                             gameStates.SetCrystalBalance(balance);
                         }
-                        else if (value.Currency.Equals(Currencies.Garage))
+                        else if (value.Currency.Equals(ClientCurrencies.Garage))
                         {
                             AgentStateSubject.OnNextGarage(value);
                         }
@@ -4354,12 +4361,12 @@ namespace Nekoyume.Blockchain
                         foreach (var fav in favList)
                         {
                             var tokenCurrency = fav.Currency;
-                            if (Currencies.IsWrappedCurrency(tokenCurrency))
+                            if (ClientCurrencies.IsWrappedCurrency(tokenCurrency))
                             {
-                                var currency = Currencies.GetUnwrappedCurrency(tokenCurrency);
-                                var recipientAddress = Currencies.PickAddress(currency, agentAddr,
+                                var currency = ClientCurrencies.GetUnwrappedCurrency(tokenCurrency);
+                                var recipientAddress = ClientCurrencies.PickAddress(currency, agentAddr,
                                     avatarAddr);
-                                var isCrystal = currency.Equals(Currencies.Crystal);
+                                var isCrystal = currency.Equals(ClientCurrencies.Crystal);
                                 var balance = StateGetter.GetBalance(
                                     states,
                                     recipientAddress,
@@ -4399,12 +4406,12 @@ namespace Nekoyume.Blockchain
                         foreach (var fav in favList)
                         {
                             var tokenCurrency = fav.Currency;
-                            if (Currencies.IsWrappedCurrency(tokenCurrency))
+                            if (ClientCurrencies.IsWrappedCurrency(tokenCurrency))
                             {
-                                var currency = Currencies.GetUnwrappedCurrency(tokenCurrency);
-                                var recipientAddress = Currencies.PickAddress(currency, agentAddr,
+                                var currency = ClientCurrencies.GetUnwrappedCurrency(tokenCurrency);
+                                var recipientAddress = ClientCurrencies.PickAddress(currency, agentAddr,
                                     avatarAddr);
-                                var isCrystal = currency.Equals(Currencies.Crystal);
+                                var isCrystal = currency.Equals(ClientCurrencies.Crystal);
                                 var balance = StateGetter.GetBalance(
                                     states,
                                     recipientAddress,
@@ -4593,9 +4600,9 @@ namespace Nekoyume.Blockchain
                         var fav = spec.Assets.Value;
                         {
                             var tokenCurrency = fav.Currency;
-                            var recipientAddress = Currencies.PickAddress(tokenCurrency, agentAddr,
+                            var recipientAddress = ClientCurrencies.PickAddress(tokenCurrency, agentAddr,
                                 avatarAddr);
-                            var isCrystal = tokenCurrency.Equals(Currencies.Crystal);
+                            var isCrystal = tokenCurrency.Equals(ClientCurrencies.Crystal);
                             var balance = StateGetter.GetBalance(
                                 states,
                                 recipientAddress,
@@ -5353,9 +5360,9 @@ namespace Nekoyume.Blockchain
             foreach (var fav in mail.FungibleAssetValues)
             {
                 var currency = fav.Currency;
-                var recipientAddress = Currencies.PickAddress(currency, agentAddr,
+                var recipientAddress = ClientCurrencies.PickAddress(currency, agentAddr,
                     avatarAddr);
-                var isCrystal = currency.Equals(Currencies.Crystal);
+                var isCrystal = currency.Equals(ClientCurrencies.Crystal);
                 var balance = StateGetter.GetBalance(
                     states,
                     recipientAddress,
