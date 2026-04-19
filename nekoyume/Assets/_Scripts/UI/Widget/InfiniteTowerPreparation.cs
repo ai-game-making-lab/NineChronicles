@@ -17,6 +17,7 @@ using Nekoyume.Model.EnumType;
 using Nekoyume.Model.InfiniteTower;
 using Nekoyume.Model.Item;
 using Nekoyume.Model.Mail;
+using Nekoyume.SingleClient.Models.Elemental;
 using Nekoyume.State;
 using Nekoyume.TableData;
 using TMPro;
@@ -916,7 +917,8 @@ namespace Nekoyume.UI
             // 속성(ElementalType) 조건 추가
             if (_floorData != null && _floorData.RequiredElementalTypes != null && _floorData.RequiredElementalTypes.Count > 0)
             {
-                var elementalDimFunc = InventoryHelper.GetDimmedFuncByElementalTypes(_floorData.RequiredElementalTypes);
+                var elementalDimFunc = InventoryHelper.GetDimmedFuncByElementalTypes(
+                    _floorData.RequiredElementalTypes.Select(e => e.ToView()).ToList());
                 if (elementalDimFunc != null)
                 {
                     NcDebug.Log($"[InfiniteTowerPreparation] Adding elemental type dim conditions for {_floorData.RequiredElementalTypes.Count} allowed types");

@@ -10,11 +10,11 @@ using Nekoyume.Game.Battle;
 using Nekoyume.Game.Controller;
 using Nekoyume.Helper;
 using Nekoyume.L10n;
-using Nekoyume.Model.Elemental;
 using Nekoyume.Model.EnumType;
 using Nekoyume.Model.Item;
 using Nekoyume.Model.Mail;
 using Nekoyume.Model.Stat;
+using Nekoyume.SingleClient.Models.Elemental;
 using Nekoyume.State;
 using Nekoyume.TableData;
 using Nekoyume.UI.Model;
@@ -1287,7 +1287,7 @@ namespace Nekoyume.UI.Module
             var bp = Widget.Find<BattlePreparation>();
             var elementalTypes = bp.isActiveAndEnabled
                 ? bp.GetElementalTypes()
-                : ElementalTypeExtension.GetAllTypes();
+                : ElementalRules.GetAllTypes().ToList();
             return elementalTypes;
         }
     }

@@ -7,11 +7,11 @@ using Nekoyume.Battle;
 using Nekoyume.Game.Controller;
 using Nekoyume.Helper;
 using Nekoyume.L10n;
-using Nekoyume.Model.Elemental;
 using Nekoyume.Model.EnumType;
 using Nekoyume.Model.Item;
 using Nekoyume.Model.Mail;
 using Nekoyume.Model.State;
+using Nekoyume.SingleClient.Models.Elemental;
 using Nekoyume.State;
 using Nekoyume.TableData;
 using Nekoyume.TableData.Rune;
@@ -525,7 +525,7 @@ namespace Nekoyume.UI.Module
             if (elementalTypeSet != null)
             {
                 result = result
-                    .OrderByDescending(x => elementalTypeSet.Contains(x.ItemBase.ElementalType))
+                    .OrderByDescending(x => elementalTypeSet.Contains(x.ItemBase.ElementalType.ToView()))
                     .ToList();
             }
 
@@ -645,7 +645,7 @@ namespace Nekoyume.UI.Module
                 {
                     foreach (var item in pair.Value)
                     {
-                        if (!_elementalTypes.Exists(x => x.Equals(item.ItemBase.ElementalType)))
+                        if (!_elementalTypes.Exists(x => x.Equals(item.ItemBase.ElementalType.ToView())))
                         {
                             continue;
                         }
@@ -1103,7 +1103,7 @@ namespace Nekoyume.UI.Module
                     if (model.ItemBase.ItemType == ItemType.Equipment)
                     {
                         if (elementalTypes.Exists(x =>
-                            x.Equals(model.ItemBase.ElementalType)))
+                            x.Equals(model.ItemBase.ElementalType.ToView())))
                         {
                             model.Focused.Value = !model.Focused.Value;
                             if (model.Focused.Value)

@@ -5,8 +5,8 @@ using System.Linq;
 using Nekoyume.Battle;
 using Nekoyume.Helper;
 using Nekoyume.Model;
-using Nekoyume.Model.Elemental;
 using Nekoyume.Model.Item;
+using Nekoyume.SingleClient.Models.Elemental;
 using Nekoyume.State;
 using UnityEngine;
 
@@ -237,7 +237,7 @@ namespace Nekoyume.UI.Module
                     // Find the first slot of `ElementalType` that is different from `elementalTypeToIgnore`.
                     ?? (elementalTypeToIgnore != null
                         ? typeSlots.FirstOrDefault(e =>
-                            !e.Item.ElementalType.Equals(elementalTypeToIgnore))
+                            !e.Item.ElementalType.ToView().Equals(elementalTypeToIgnore))
                         : null)
                     // Find the first slot with the lowest 'CP'.
                     ?? typeSlots.OrderBy(e => CPHelper.GetCP((ItemUsable)e.Item))
@@ -322,7 +322,7 @@ namespace Nekoyume.UI.Module
                     continue;
                 }
 
-                slot.SetDim(!elementalTypes.Exists(x => x.Equals(slot.Item.ElementalType)));
+                slot.SetDim(!elementalTypes.Exists(x => x.Equals(slot.Item.ElementalType.ToView())));
             }
         }
 
