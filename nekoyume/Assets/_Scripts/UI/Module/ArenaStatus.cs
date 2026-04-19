@@ -5,7 +5,7 @@ using Nekoyume.Game;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using Nekoyume.Model.Buff;
+using Nekoyume.SingleClient.Models.Buffs;
 
 namespace Nekoyume.UI.Module
 {
@@ -73,7 +73,7 @@ namespace Nekoyume.UI.Module
         }
 
         public void SetBuff(TableSheets tableSheets, bool vfx,
-            Dictionary<int, Buff> modelBuffs = null)
+            IReadOnlyDictionary<int, BuffView> modelBuffs = null)
         {
             buffLayout.SetBuff(modelBuffs, tableSheets, vfx);
         }

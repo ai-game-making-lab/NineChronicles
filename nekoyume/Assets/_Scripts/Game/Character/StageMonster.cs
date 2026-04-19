@@ -1,3 +1,4 @@
+using Nekoyume.SingleClient.Models.Buffs;
 using Nekoyume.UI;
 using System;
 using System.Collections;
@@ -88,7 +89,7 @@ namespace Nekoyume.Game.Character
 
             var battle = Widget.Find<UI.Battle>();
             battle.BossStatus.SetHp(CurrentHp, Hp);
-            battle.BossStatus.SetBuff(CharacterModel.Buffs);
+            battle.BossStatus.SetBuff(CharacterModel.Buffs.ToViewMap());
         }
 
         public override IEnumerator CoProcessDamage(Model.BattleStatus.Skill.SkillInfo info, bool isConsiderDie,

@@ -1,3 +1,4 @@
+using Nekoyume.SingleClient.Models.Buffs;
 using Nekoyume.UI;
 using UnityEngine;
 
@@ -17,7 +18,7 @@ namespace Nekoyume.Game.Character
 
             var battle = Widget.Find<UI.Battle>();
             battle.EnemyPlayerStatus.SetHp(CurrentHp, Hp);
-            battle.EnemyPlayerStatus.SetBuff(CharacterModel.Buffs);
+            battle.EnemyPlayerStatus.SetBuff(CharacterModel.Buffs.ToViewMap());
         }
 
         public void Set(Model.CharacterBase model, Player player, bool updateCurrentHP = false)

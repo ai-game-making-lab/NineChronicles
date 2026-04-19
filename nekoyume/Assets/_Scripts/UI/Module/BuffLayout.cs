@@ -1,8 +1,8 @@
-using Nekoyume.Model.Buff;
-using Nekoyume.Model.Stat;
 using System.Collections.Generic;
 using System.Linq;
 using Nekoyume.Game;
+using Nekoyume.SingleClient.Models.Buffs;
+using Nekoyume.SingleClient.Models.Stats;
 using UnityEngine;
 
 namespace Nekoyume.UI.Module
@@ -10,36 +10,20 @@ namespace Nekoyume.UI.Module
     public class BuffLayout : MonoBehaviour
     {
         public GameObject iconPrefab;
-        private readonly HashSet<Buff> AddedBuffs = new();
-        public IReadOnlyDictionary<int, Buff> buffData = new Dictionary<int, Buff>();
+        private readonly HashSet<BuffView> AddedBuffs = new();
+        public IReadOnlyDictionary<int, BuffView> buffData = new Dictionary<int, BuffView>();
 
         private Transform _buffParent;
         [SerializeField] private List<BuffIcon> pool = new(20);
 
         public bool IsBuffAdded(StatType statType)
         {
-            return AddedBuffs.Any(buff =>
-            {
-                if (buff is not StatBuff stat)
-                {
-                    return false;
-                }
-
-                return stat.RowData.StatType == statType;
-            });
+            return AddedBuffs.Any(view => view.IsStatBuff && view.StatType == statType);
         }
 
         public bool HasBuff(StatType statType)
         {
-            return buffData.Values.Any(buff =>
-            {
-                if (buff is not StatBuff stat)
-                {
-                    return false;
-                }
-
-                return stat.RowData.StatType == statType;
-            });
+            return buffData.Values.Any(view => view.IsStatBuff && view.StatType == statType);
         }
 
         public void Awake()
@@ -55,7 +39,7 @@ namespace Nekoyume.UI.Module
             }
         }
 
-        public void SetBuff(IReadOnlyDictionary<int, Buff> buffs, TableSheets tableSheets, bool vfx)
+        public void SetBuff(IReadOnlyDictionary<int, BuffView> buffs, TableSheets tableSheets, bool vfx)
         {
             foreach (var icon in pool.Where(icon => icon.gameObject.activeSelf))
             {
@@ -70,7 +54,8 @@ namespace Nekoyume.UI.Module
             AddedBuffs.Clear();
             foreach (var buff in buffs)
             {
-                if (!buffData.ContainsKey(buff.Key) || buffData[buff.Key].RemainedDuration < buffs[buff.Key].RemainedDuration)
+                if (!buffData.ContainsKey(buff.Key) ||
+                    buffData[buff.Key].RemainedDuration < buffs[buff.Key].RemainedDuration)
                 {
                     AddedBuffs.Add(buff.Value);
                 }
@@ -80,7 +65,7 @@ namespace Nekoyume.UI.Module
 
             var ordered = buffs.Values
                 .Where(buff => buff.RemainedDuration > 0)
-                .OrderBy(buff => buff.BuffInfo.Id);
+                .OrderBy(buff => buff.Id);
 
             foreach (var buff in ordered)
             {

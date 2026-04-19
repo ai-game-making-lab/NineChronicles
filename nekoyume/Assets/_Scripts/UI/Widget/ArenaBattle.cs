@@ -6,6 +6,7 @@ using Nekoyume.Game.Controller;
 using Nekoyume.Game.VFX;
 using Nekoyume.Helper;
 using Nekoyume.Model;
+using Nekoyume.SingleClient.Models.Buffs;
 using Nekoyume.UI.Module;
 using UnityEngine;
 
@@ -87,15 +88,16 @@ namespace Nekoyume.UI
             TableSheets tableSheets,
             bool vfx)
         {
+            var buffViews = buffs.ToViewMap();
             if (isEnemy)
             {
                 enemyStatus.SetHp(currentHp, maxHp);
-                enemyStatus.SetBuff(tableSheets, vfx, buffs);
+                enemyStatus.SetBuff(tableSheets, vfx, buffViews);
             }
             else
             {
                 myStatus.SetHp(currentHp, maxHp);
-                myStatus.SetBuff(tableSheets, vfx, buffs);
+                myStatus.SetBuff(tableSheets, vfx, buffViews);
             }
         }
 

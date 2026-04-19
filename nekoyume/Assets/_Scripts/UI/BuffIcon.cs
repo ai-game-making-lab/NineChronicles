@@ -2,7 +2,7 @@ using Nekoyume.Game;
 using Nekoyume.Game.Controller;
 using Nekoyume.Game.VFX;
 using Nekoyume.Model;
-using Nekoyume.Model.Buff;
+using Nekoyume.SingleClient.Models.Buffs;
 using Nekoyume.TableData;
 using TMPro;
 using UnityEngine;
@@ -14,10 +14,10 @@ namespace Nekoyume.UI
     {
         public Image image;
         public TextMeshProUGUI remainedDurationText;
-        public Buff Data { get; set; }
+        public BuffView Data { get; set; }
         public CharacterBase character;
 
-        public void Show(Buff buff, bool isAdded, TableSheets tableSheets, bool vfx)
+        public void Show(BuffView buff, bool isAdded, TableSheets tableSheets, bool vfx)
         {
             Data = buff;
             gameObject.SetActive(true);
@@ -34,7 +34,7 @@ namespace Nekoyume.UI
             }
         }
 
-        public void UpdateStatus(Buff buff)
+        public void UpdateStatus(BuffView buff)
         {
             Data = buff;
             remainedDurationText.text = Data.RemainedDuration.ToString();

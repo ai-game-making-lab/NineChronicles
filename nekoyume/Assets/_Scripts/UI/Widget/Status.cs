@@ -4,6 +4,7 @@ using Nekoyume.Game.Character;
 using Nekoyume.Helper;
 using Nekoyume.Model.Item;
 using Nekoyume.Model.State;
+using Nekoyume.SingleClient.Models.Buffs;
 using Nekoyume.UI.Module;
 using Nekoyume.UI.Module.Timer;
 using UnityEngine;
@@ -159,7 +160,7 @@ namespace Nekoyume.UI
             }
 
             UpdateExp();
-            buffLayout.SetBuff(player.Model.Buffs, TableSheets.Instance, true);
+            buffLayout.SetBuff(player.Model.Buffs.ToViewMap(), TableSheets.Instance, true);
         }
 
         private void UpdateExp()

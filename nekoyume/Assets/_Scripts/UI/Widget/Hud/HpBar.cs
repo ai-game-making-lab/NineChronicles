@@ -2,8 +2,8 @@ using System.Collections.Generic;
 using Nekoyume.Game;
 using Nekoyume.Game.Controller;
 using Nekoyume.Game.VFX;
-using Nekoyume.Model.Buff;
-using Nekoyume.Model.Stat;
+using Nekoyume.SingleClient.Models.Buffs;
+using Nekoyume.SingleClient.Models.Stats;
 using Nekoyume.UI.Module;
 using TMPro;
 using Unity.Mathematics;
@@ -25,7 +25,7 @@ namespace Nekoyume.UI
 
         public HpBarVFX HpVFX { get; private set; }
 
-        public void SetBuffs(IReadOnlyDictionary<int, Buff> buffs, TableSheets tableSheets)
+        public void SetBuffs(IReadOnlyDictionary<int, BuffView> buffs, TableSheets tableSheets)
         {
             buffLayout.SetBuff(buffs, tableSheets, true);
 

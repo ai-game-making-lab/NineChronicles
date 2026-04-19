@@ -8,6 +8,7 @@ using Cysharp.Threading.Tasks;
 using Nekoyume.Game.Controller;
 using Nekoyume.Game.VFX;
 using Nekoyume.Game.VFX.Skill;
+using Nekoyume.SingleClient.Models.Buffs;
 using Nekoyume.UI;
 using UnityEngine;
 using UniRx;
@@ -267,7 +268,7 @@ namespace Nekoyume.Game.Character
 
             HudContainer.UpdatePosition(ActionCamera.instance.Cam, gameObject, HUDOffset);
             ActorHud.Set(CurrentHp, CharacterModel.AdditionalHP, Hp);
-            ActorHud.SetBuffs(CharacterModel.Buffs, TableSheets.Instance);
+            ActorHud.SetBuffs(CharacterModel.Buffs.ToViewMap(), TableSheets.Instance);
             ActorHud.SetLevel(Level);
 
             OnUpdateActorHud.OnNext(this);

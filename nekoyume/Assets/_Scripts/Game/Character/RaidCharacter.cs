@@ -1,3 +1,4 @@
+using Nekoyume.SingleClient.Models.Buffs;
 using Nekoyume.UI;
 using System.Collections;
 using System.Collections.Generic;
@@ -137,7 +138,7 @@ namespace Nekoyume.Game.Character
 
             _hudContainer.UpdatePosition(Game.instance.RaidStage.Camera.Cam, gameObject, HUDOffset);
             HPBar.Set(_currentHp, _characterModel.AdditionalHP, _characterModel.HP);
-            HPBar.SetBuffs(_characterModel.Buffs, TableSheets.Instance);
+            HPBar.SetBuffs(_characterModel.Buffs.ToViewMap(), TableSheets.Instance);
 
             UpdateBuffVfx();
 

@@ -2,12 +2,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using Nekoyume.Model.Buff;
 using Nekoyume.Model;
 using Nekoyume.L10n;
 using Nekoyume.Helper;
 using System;
 using Nekoyume.Game;
+using Nekoyume.SingleClient.Models.Buffs;
 
 namespace Nekoyume.UI.Module
 {
@@ -79,7 +79,7 @@ namespace Nekoyume.UI.Module
             portrait.overrideSprite = sprite;
         }
 
-        public void SetBuff(Dictionary<int, Buff> modelBuffs)
+        public void SetBuff(IReadOnlyDictionary<int, BuffView> modelBuffs)
         {
             buffLayout.SetBuff(modelBuffs, TableSheets.Instance, true);
         }

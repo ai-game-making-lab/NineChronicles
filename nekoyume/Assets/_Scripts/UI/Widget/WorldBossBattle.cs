@@ -3,6 +3,7 @@ using System.Linq;
 using Nekoyume.Battle;
 using Nekoyume.Model;
 using Nekoyume.Model.EnumType;
+using Nekoyume.SingleClient.Models.Buffs;
 using Nekoyume.State;
 using Nekoyume.UI.Module;
 using UnityEngine;
@@ -81,7 +82,7 @@ namespace Nekoyume.UI
             Dictionary<int, Nekoyume.Model.Buff.Buff> buffs)
         {
             bossStatus.SetHp(currentHp, maxHp);
-            bossStatus.SetBuff(buffs);
+            bossStatus.SetBuff(buffs.ToViewMap());
         }
 
         public void ShowComboText(bool attacked)

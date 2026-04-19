@@ -174,6 +174,37 @@ namespace Nekoyume.Helper
                 isPositive ? data.PlusIcon : data.MinusIcon;
         }
 
+        public static Sprite GetBuffIcon(
+            Nekoyume.SingleClient.Models.Buffs.BuffView view,
+            TableSheets tableSheets)
+        {
+            var id = view.Id;
+            var actionBuffIcon = GetActionBuffIcon(id, tableSheets);
+            if (actionBuffIcon != null)
+            {
+                return actionBuffIcon;
+            }
+
+            var overrideData = VFXData.OverrideDataList
+                .FirstOrDefault(x => x.Id == id);
+            if (overrideData != null)
+            {
+                return overrideData.Icon;
+            }
+
+            if (!view.IsStatBuff)
+            {
+                return VFXData.FallbackIcon;
+            }
+
+            var isPositive = view.StatValue >= 0;
+            var lib9cStatType = Nekoyume.SingleClient.Models.Buffs.BuffViewMapper.MapStatType(view.StatType);
+            var data = VFXData.DataList
+                .FirstOrDefault(x => x.StatType == lib9cStatType);
+            return data == null ? VFXData.FallbackIcon :
+                isPositive ? data.PlusIcon : data.MinusIcon;
+        }
+
         public static Sprite GetBuffOverrideIcon(int id, TableSheets tableSheets)
         {
             var actionBuffIcon = GetActionBuffIcon(id, tableSheets);

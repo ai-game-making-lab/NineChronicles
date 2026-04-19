@@ -1,7 +1,7 @@
 using UnityEngine;
 using TMPro;
 using Nekoyume.L10n;
-using Nekoyume.Model.Buff;
+using Nekoyume.SingleClient.Models.Buffs;
 
 namespace Nekoyume.UI.Module
 {
@@ -20,7 +20,7 @@ namespace Nekoyume.UI.Module
             durationFormat = L10nManager.Localize("UI_REMAININGTURN");
         }
 
-        public void UpdateText(Buff data)
+        public void UpdateText(BuffView data)
         {
             var name = data.GetLocalizedName();
             var description = data.GetLocalizedDescription();
