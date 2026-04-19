@@ -4,6 +4,7 @@ using System.Linq;
 using Cysharp.Threading.Tasks;
 using Nekoyume.L10n;
 using Nekoyume.Model.InfiniteTower;
+using Nekoyume.SingleClient.Models.Elemental;
 using static Nekoyume.LocalizationExtensions;
 
 namespace Nekoyume
@@ -62,7 +63,7 @@ namespace Nekoyume
                     var runeTypeNames = condition.ForbiddenRuneTypes.Select(r => r.GetLocalizedString()).ToList();
                     return L10nManager.Localize("UI_CONDITION_FORBIDDEN_RUNE_TYPES", string.Join(", ", runeTypeNames));
                 case BattleConditionType.RequiredElementalType:
-                    var elementalIcons = string.Join("", condition.RequiredElementalTypes.Select(GetElementalIcon));
+                    var elementalIcons = string.Join("", condition.RequiredElementalTypes.Select(t => GetElementalIcon(t.ToView())));
                     return L10nManager.Localize("UI_CONDITION_REQUIRED_ELEMENTAL_TYPE", elementalIcons);
                 case BattleConditionType.ForbiddenItemSubTypes:
                     var itemTypeNames = condition.ForbiddenItemSubTypes.Select(GetLocalizedItemSubTypeText).ToList();

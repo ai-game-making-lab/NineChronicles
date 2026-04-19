@@ -9,11 +9,11 @@ using Nekoyume.Game.Controller;
 using Nekoyume.Game.VFX;
 using Nekoyume.Game.VFX.Skill;
 using Nekoyume.SingleClient.Models.Buffs;
+using Nekoyume.SingleClient.Models.Elemental;
 using Nekoyume.UI;
 using UnityEngine;
 using UniRx;
 using Nekoyume.Model.Skill;
-using Nekoyume.Model.Elemental;
 using Nekoyume.Model.Character;
 using UnityEngine.Rendering;
 using Nekoyume.Game.Battle;
@@ -385,7 +385,7 @@ namespace Nekoyume.Game.Character
             else
             {
                 AudioController.PlayDamaged(isConsiderElementalType
-                    ? info.ElementalType
+                    ? info.ElementalType.ToView()
                     : ElementalType.Normal);
                 DamageText.Show(ActionCamera.instance.Cam, position, force, dmg, group);
                 if (info.SkillCategory == SkillCategory.NormalAttack)
@@ -738,17 +738,17 @@ namespace Nekoyume.Game.Character
             var target = info.Target;
             var copy = new Model.BattleStatus.Skill.SkillInfo(target.Id, target.IsDead, target.Thorn, info.Effect,
                 info.Critical, info.SkillCategory,
-                info.WaveTurn, ElementalType.Normal, info.SkillTargetType, info.Buff, target);
+                info.WaveTurn, ElementalType.Normal.ToLib9c(), info.SkillTargetType, info.Buff, target);
             yield return StartCoroutine(CoAnimationCast(copy));
 
             var pos = transform.position;
             yield return CoAnimationCastAttack(infos.Any(skillInfo => skillInfo.Critical));
-            if (info.ElementalType != ElementalType.Normal)
+            if (info.ElementalType.ToView() != ElementalType.Normal)
             {
                 var effect = BattleRenderer.Instance.SkillController.GetBlowCasting(
                     pos,
                     info.SkillCategory,
-                    info.ElementalType);
+                    info.ElementalType.ToView());
                 effect.Play();
             }
 
@@ -760,11 +760,11 @@ namespace Nekoyume.Game.Character
         {
             PreAnimationForTheKindOfAttack();
 
-            var sfxCode = AudioController.GetElementalCastingSFX(info.ElementalType);
+            var sfxCode = AudioController.GetElementalCastingSFX(info.ElementalType.ToView());
             AudioController.instance.PlaySfx(sfxCode);
             Animator.Cast();
             var pos = transform.position;
-            var effect = BattleRenderer.Instance.SkillController.Get(pos, info.ElementalType);
+            var effect = BattleRenderer.Instance.SkillController.Get(pos, info.ElementalType.ToView());
             effect.Play();
             yield return new WaitForSeconds(Game.DefaultSkillDelay);
 
@@ -783,7 +783,7 @@ namespace Nekoyume.Game.Character
 
             PreAnimationForTheKindOfAttack();
 
-            var sfxCode = AudioController.GetElementalCastingSFX(info.ElementalType);
+            var sfxCode = AudioController.GetElementalCastingSFX(info.ElementalType.ToView());
             AudioController.instance.PlaySfx(sfxCode);
 
 #if TEST_LOG
@@ -875,7 +875,7 @@ namespace Nekoyume.Game.Character
                     continue;
                 }
 
-                if (info.ElementalType != ElementalType.Normal)
+                if (info.ElementalType.ToView() != ElementalType.Normal)
                 {
                     var effect = BattleRenderer.Instance.SkillController.Get<SkillBlowVFX>(target, info);
                     if (effect is null)
@@ -1088,14 +1088,14 @@ namespace Nekoyume.Game.Character
                         yield return new WaitForSeconds(0.2f);
                     }
 
-                    if (info.ElementalType == ElementalType.Fire)
+                    if (info.ElementalType.ToView() == ElementalType.Fire)
                     {
                         effect.StopLoop();
                         yield return new WaitForSeconds(0.1f);
                     }
 
                     var coroutine = StartCoroutine(CoAnimationCastAttack(info.Critical));
-                    if (info.ElementalType == ElementalType.Water)
+                    if (info.ElementalType.ToView() == ElementalType.Water)
                     {
                         yield return new WaitForSeconds(0.1f);
                         effect.StopLoop();
@@ -1104,8 +1104,8 @@ namespace Nekoyume.Game.Character
                     yield return coroutine;
                     effect.Finisher();
                     ProcessAttack(target, info, true, true);
-                    if (info.ElementalType != ElementalType.Fire
-                        && info.ElementalType != ElementalType.Water)
+                    if (info.ElementalType.ToView() != ElementalType.Fire
+                        && info.ElementalType.ToView() != ElementalType.Water)
                     {
                         effect.StopLoop();
                     }

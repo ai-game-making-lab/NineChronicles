@@ -6,8 +6,8 @@ using Nekoyume.Game.Controller;
 using Nekoyume.Game.VFX;
 using Nekoyume.Game.VFX.Skill;
 using Nekoyume.Model.Buff;
-using Nekoyume.Model.Elemental;
 using Nekoyume.Model.Skill;
+using Nekoyume.SingleClient.Models.Elemental;
 using UniRx;
 using UnityEngine;
 

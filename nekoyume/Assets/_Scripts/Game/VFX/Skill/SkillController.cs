@@ -4,8 +4,8 @@ using Nekoyume.Game.Battle;
 using Nekoyume.Game.Util;
 using Nekoyume.Model.BattleStatus.Arena;
 using Nekoyume.Model.Character;
-using Nekoyume.Model.Elemental;
 using Nekoyume.Model.Skill;
+using Nekoyume.SingleClient.Models.Elemental;
 using UnityEngine;
 
 namespace Nekoyume.Game.VFX.Skill
@@ -19,9 +19,15 @@ namespace Nekoyume.Game.VFX.Skill
 #endif
 
         private IObjectPool _pool;
-        public async UniTask InitializeAsync(IObjectPool objectPool)
+
+        public void Initialize(IObjectPool objectPool)
         {
             _pool = objectPool;
+        }
+
+        public async UniTask InitializeAsync(IObjectPool objectPool)
+        {
+            Initialize(objectPool);
             // TODO: SkillVfx 상속받은 프리팹만 로드하도록 에셋 구분
             await ResourceManager.Instance.LoadAllAsync<GameObject>(ResourceManager.SkillLabel, true, assetAddress =>
             {
@@ -46,7 +52,7 @@ namespace Nekoyume.Game.VFX.Skill
 
             var position = target.transform.position;
             var size = target.SizeType == SizeType.XS ? SizeType.S : SizeType.M;
-            var elemental = skillInfo.ElementalType;
+            var elemental = skillInfo.ElementalType.ToView();
             if (skillInfo.SkillCategory == SkillCategory.AreaAttack)
             {
                 size = SizeType.L;
@@ -90,7 +96,7 @@ namespace Nekoyume.Game.VFX.Skill
 
             var position = target.transform.position;
             var size = target.SizeType == SizeType.XS ? SizeType.S : SizeType.M;
-            var elemental = skillInfo.ElementalType;
+            var elemental = skillInfo.ElementalType.ToView();
             if (skillInfo.SkillCategory == SkillCategory.AreaAttack)
             {
                 size = SizeType.L;
@@ -149,6 +155,11 @@ namespace Nekoyume.Game.VFX.Skill
         private static T GetEffect<T>(GameObject go, Character.Character target = null)
             where T : SkillVFX
         {
+            if (go is null)
+            {
+                return null;
+            }
+
             var effect = go.GetComponent<T>();
             if (effect is null)
             {

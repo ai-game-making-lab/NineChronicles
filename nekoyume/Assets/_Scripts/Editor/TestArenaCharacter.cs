@@ -15,8 +15,8 @@ using Nekoyume.Model.BattleStatus.Arena;
 using Nekoyume.UI;
 using UnityEngine;
 using Nekoyume.Model.Skill;
-using Nekoyume.Model.Elemental;
 using Nekoyume.Model.Item;
+using Nekoyume.SingleClient.Models.Elemental;
 
 namespace Nekoyume.Editor
 {
@@ -191,7 +191,7 @@ namespace Nekoyume.Editor
             else
             {
                 AudioController.PlayDamaged(isConsiderElementalType
-                    ? info.ElementalType
+                    ? info.ElementalType.ToView()
                     : ElementalType.Normal);
                 DamageText.Show(ActionCamera.instance.Cam, position, force, dmg, group);
             }
@@ -398,7 +398,7 @@ namespace Nekoyume.Editor
             var info = infos.First();
             var copy = new ArenaSkill.ArenaSkillInfo(info.Target, info.Effect,
                 info.Critical, info.SkillCategory,
-                info.Turn, ElementalType.Normal, info.SkillTargetType, info.Buff);
+                info.Turn, ElementalType.Normal.ToLib9c(), info.SkillTargetType, info.Buff);
             yield return StartCoroutine(CoAnimationCast(copy));
 
             var pos = transform.position;
@@ -409,7 +409,7 @@ namespace Nekoyume.Editor
         protected virtual IEnumerator CoAnimationCast(ArenaSkill.ArenaSkillInfo info)
         {
             ShowSpeech("PLAYER_SKILL", (int)info.ElementalType, (int)info.SkillCategory);
-            var sfxCode = AudioController.GetElementalCastingSFX(info.ElementalType);
+            var sfxCode = AudioController.GetElementalCastingSFX(info.ElementalType.ToView());
             AudioController.instance.PlaySfx(sfxCode);
             Animator.Cast();
             var pos = transform.position;
@@ -418,7 +418,7 @@ namespace Nekoyume.Editor
 
         private IEnumerator CoAnimationBuffCast(ArenaSkill.ArenaSkillInfo info)
         {
-            var sfxCode = AudioController.GetElementalCastingSFX(info.ElementalType);
+            var sfxCode = AudioController.GetElementalCastingSFX(info.ElementalType.ToView());
             AudioController.instance.PlaySfx(sfxCode);
             var pos = transform.position;
 

@@ -2,6 +2,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using Libplanet.Common;
 using Nekoyume.L10n;
+using Nekoyume.SingleClient.Models.Elemental;
 using Nekoyume.TableData;
 
 namespace Nekoyume
@@ -21,7 +22,7 @@ namespace Nekoyume
                 }
 
                 return LocalizationExtensions.GetLocalizedNonColoredName(
-                    equipmentRow.ElementalType,
+                    equipmentRow.ElementalType.ToView(),
                     equipmentRow.Id,
                     useElementalIcon);
             }
@@ -32,7 +33,7 @@ namespace Nekoyume
             }
 
             return LocalizationExtensions.GetLocalizedNonColoredName(
-                value.ElementalType, value.Id, useElementalIcon);
+                value.ElementalType.ToView(), value.Id, useElementalIcon);
         }
 
         public static string GetLocalizedDescription(this ItemSheet.Row value)

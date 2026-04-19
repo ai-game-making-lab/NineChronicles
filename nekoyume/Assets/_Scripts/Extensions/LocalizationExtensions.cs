@@ -11,8 +11,8 @@ using Nekoyume.Game.Controller;
 using Nekoyume.Helper;
 using Nekoyume.L10n;
 using Nekoyume.Model;
-using Nekoyume.Model.Elemental;
 using Nekoyume.Model.EnumType;
+using Nekoyume.SingleClient.Models.Elemental;
 using Nekoyume.Model.InfiniteTower;
 using Nekoyume.Model.Item;
 using Nekoyume.Model.Skill;
@@ -471,11 +471,6 @@ namespace Nekoyume
             return L10nManager.Localize($"STAT_TYPE_{value}");
         }
 
-        public static string GetLocalizedString(this ElementalType value)
-        {
-            return L10nManager.Localize($"ELEMENTAL_TYPE_{value.ToString().ToUpper()}");
-        }
-
         public static string GetLocalizedString(this SkillTargetType value)
         {
             return L10nManager.Localize($"SKILL_TARGET_TYPE_{value}");
@@ -499,13 +494,13 @@ namespace Nekoyume
 
         public static IEnumerable<string> GetOptions(this Player player)
         {
-            var atkOptions = player.atkElementType.GetOptions(StatType.ATK);
+            var atkOptions = player.atkElementType.ToView().GetOptions(StatType.ATK);
             foreach (var atkOption in atkOptions)
             {
                 yield return atkOption;
             }
 
-            var defOptions = player.defElementType.GetOptions(StatType.DEF);
+            var defOptions = player.defElementType.ToView().GetOptions(StatType.DEF);
             foreach (var defOption in defOptions)
             {
                 yield return defOption;
@@ -574,14 +569,14 @@ namespace Nekoyume
             if (item is Equipment equipment)
             {
                 return GetLocalizedNonColoredName(
-                    equipment.ElementalType,
+                    equipment.ElementalType.ToView(),
                     equipment.IconId,
                     useElementalIcon,
                     equipment.ByCustomCraft);
             }
 
             return GetLocalizedNonColoredName(
-                item.ElementalType,
+                item.ElementalType.ToView(),
                 item.Id,
                 item.ItemType.HasElementType() && useElementalIcon);
         }
@@ -590,7 +585,7 @@ namespace Nekoyume
             bool useElementalIcon = true)
         {
             var name = GetLocalizedNonColoredName(
-                equipmentRow.ElementalType,
+                equipmentRow.ElementalType.ToView(),
                 equipmentRow.Id,
                 useElementalIcon);
 
@@ -609,7 +604,7 @@ namespace Nekoyume
             bool hasColor = true)
         {
             var name =
-                GetLocalizedNonColoredName(consumableRow.ElementalType, consumableRow.Id, false);
+                GetLocalizedNonColoredName(consumableRow.ElementalType.ToView(), consumableRow.Id, false);
             return hasColor
                 ? $"<color=#{GetColorHexByGrade(consumableRow.Grade)}>{name}</color>"
                 : name;
@@ -667,20 +662,7 @@ namespace Nekoyume
 
         public static Color GetElementalTypeColor(this ItemBase item)
         {
-            return GetElementalTypeColor(item.ElementalType);
-        }
-
-        public static Color GetElementalTypeColor(this ElementalType elementalType)
-        {
-            return elementalType switch
-            {
-                ElementalType.Normal => Palette.GetColor(EnumType.ColorType.TextElement00),
-                ElementalType.Fire => Palette.GetColor(EnumType.ColorType.TextElement01),
-                ElementalType.Land => Palette.GetColor(EnumType.ColorType.TextElement02),
-                ElementalType.Water => Palette.GetColor(EnumType.ColorType.TextElement04),
-                ElementalType.Wind => Palette.GetColor(EnumType.ColorType.TextElement05),
-                _ => Color.white
-            };
+            return item.ElementalType.ToView().GetElementalTypeColor();
         }
 
         public static Color GetItemGradeColor(this ItemBase item)

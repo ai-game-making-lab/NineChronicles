@@ -1,22 +1,14 @@
-using System;
 using System.Collections.Generic;
 using Nekoyume.L10n;
-using Nekoyume.Model.Elemental;
 using Nekoyume.Model.Stat;
+using Nekoyume.SingleClient.Models.Elemental;
 using Nekoyume.UI;
-using UnityEngine;
 
 namespace Nekoyume
 {
     internal static class ElementalTypeUIExtensions
     {
-        private const string FireIconResourcePath = "UI/Icons/ElementalType/icon_elemental_fire";
-        private const string WaterIconResourcePath = "UI/Icons/ElementalType/icon_elemental_water";
-        private const string LandIconResourcePath = "UI/Icons/ElementalType/icon_elemental_land";
-        private const string WindIconResourcePath = "UI/Icons/ElementalType/icon_elemental_wind";
-        private const string NormalIconResourcePath = "UI/Icons/ElementalType/icon_element_normal";
-
-        private static readonly Dictionary<ElementalType, Dictionary<StatType, List<string>>> GetOptionsCache = new(ElementalTypeComparer.Instance);
+        private static readonly Dictionary<ElementalType, Dictionary<StatType, List<string>>> GetOptionsCache = new();
 
 
         public static IEnumerable<string> GetOptions(this ElementalType from, StatType statType)
@@ -57,7 +49,7 @@ namespace Nekoyume
                 if (from.TryGetWinCase(out var lose))
                 {
                     var format = L10nManager.Localize("ELEMENTAL_TYPE_OPTION_ATK_WIN_FORMAT");
-                    list.Add(string.Format(format, lose.GetLocalizedString(), ElementalTypeExtension.WinMultiplier - 1));
+                    list.Add(string.Format(format, lose.GetLocalizedString(), ElementalRules.WinMultiplier - 1));
                 }
             }
             else if (statType == StatType.DEF)
@@ -65,30 +57,11 @@ namespace Nekoyume
                 if (from.TryGetLoseCase(out var win))
                 {
                     var format = L10nManager.Localize("ELEMENTAL_TYPE_OPTION_DEF_LOSE_FORMAT");
-                    list.Add(string.Format(format, win.GetLocalizedString(), ElementalTypeExtension.WinMultiplier - 1));
+                    list.Add(string.Format(format, win.GetLocalizedString(), ElementalRules.WinMultiplier - 1));
                 }
             }
 
             return list;
-        }
-
-        public static Sprite GetSprite(this ElementalType type)
-        {
-            switch (type)
-            {
-                case ElementalType.Normal:
-                    return Resources.Load<Sprite>(NormalIconResourcePath);
-                case ElementalType.Fire:
-                    return Resources.Load<Sprite>(FireIconResourcePath);
-                case ElementalType.Water:
-                    return Resources.Load<Sprite>(WaterIconResourcePath);
-                case ElementalType.Land:
-                    return Resources.Load<Sprite>(LandIconResourcePath);
-                case ElementalType.Wind:
-                    return Resources.Load<Sprite>(WindIconResourcePath);
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
-            }
         }
     }
 }
