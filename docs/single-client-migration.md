@@ -30,6 +30,7 @@
   - Throw (Market/Arena/Ranking/Summon/Staking/Raid/AdventureBoss/InfiniteTower/EventDungeon\*/Wanted/RedeemCode/Admin/Testbed).
 - `ActionRenderHandler.Start()` and `BlockRenderHandler.Start()` capture the renderer reference but skip all `EveryRender<T>()` and block subject subscriptions in single-client mode, since UI updates already flow from the `*InSingleClient` branches above.
 - `Nekoyume.SingleClient.Blockchain` provides Libplanet-free shim types (`Address`, `PublicKey`, `PrivateKey`, `ProtectedPrivateKey`, `Currency`, `FungibleAssetValue`, `HashDigest`, `TxId`) to anchor the upcoming model split.
+- All RPC code paths (`RPCAgent`, `ClientFilter`, `AOTGenerated/MagicOnion.Generated.cs`, plus the `#region RPCAgent` block and `CreateAgent()` RPC branches in `Game.cs`, the `Agent is RPCAgent` branches in `Game.cs`/`BlockRenderHandler.cs`, and the MagicOnion resolver in `InitializeMessagePackResolver`) are now wrapped in `#if NC_RPC_ENABLED`. Default builds compile without the define, leaving only a static shim that preserves `RPCAgent.ShouldInitializeRpcTransport` for the EditMode flag tests.
 - The local state file defaults to:
   - `Application.persistentDataPath/SingleClient/local-state.json`
 - The local blockchain store path defaults to:
@@ -92,23 +93,40 @@ The safe removal path is to shrink those public boundaries first, then delete th
    - Remaining work: move hot `Nekoyume.Model.Item/State/Skill/Stat/Buff/TableData` DTOs that UI and battle code touch into a client-owned namespace and retire direct `Nekoyume.Model.*` usage from the UI layer.
    - Keep CSV/table loading.
 
-5. Remove network/runtime packages.
-   - Single-client execution now skips `RPCAgent` gRPC channel initialization.
+   Scope audit (post-gate, current tree):
+   - `using Nekoyume.Model.(Item|State|Skill|Stat|Buff)` appears 232 times across 186 files under `Assets/_Scripts/UI`. This is the blast radius for the UI-side namespace split.
+   - The subnamespaces fan out roughly as: `Model.Item` (equipment/costume/material views, inventory, shop, grind, enhancement), `Model.State` (avatar/agent/world/stage snapshots threaded into headers, battle prep, login), `Model.Skill` / `Model.Stat` / `Model.Buff` (battle HUD, tooltips, option views).
+
+   DTO scaffolding (landed):
+   - `Nekoyume.SingleClient.Models.Stats.StatType` — ordinal-compatible mirror of lib9c `Nekoyume.Model.Stat.StatType` so casts between the two stay lossless during migration.
+   - `Nekoyume.SingleClient.Models.Buffs.BuffView` — immutable struct (with `IEquatable<BuffView>` by `Id`) exposing the `Id`, `GroupId`, `OriginalDuration`, `RemainedDuration`, `IsBuff`, `IsDebuff`, `Kind`, `StatType`, and `StatValue` fields the HUD/tooltip actually reads.
+   - `Nekoyume.SingleClient.Models.Buffs.BuffViewMapper` — `ToView(Buff)` / `ToViewMap(IReadOnlyDictionary<int, Buff>)` projection helpers plus a `StatType` ordinal round-trip.
+   - `Tests/EditMode/SingleClient/BuffViewMapperTest.cs` — covers StatBuff projection, null-map skip, and `StatType` ordinal compatibility.
+
+   HUD/tooltip migration (landed):
+   - `UI/BuffIcon.cs`, `UI/Module/BuffTooltip.cs`, `UI/Module/BuffLayout.cs`, `UI/Widget/Hud/HpBar.cs`, `UI/Module/BossStatus.cs`, `UI/Module/RaidBossStatus.cs`, `UI/Module/ArenaStatus.cs` now consume `BuffView` and the client-owned `StatType` instead of `Nekoyume.Model.Buff.Buff` / `Nekoyume.Model.Stat.StatType`.
+   - Battle-engine call sites (`Game/Character/Actor.cs`, `Game/Character/StageMonster.cs`, `Game/Character/EnemyPlayer.cs`, `Game/Character/RaidCharacter.cs`, `UI/Widget/Status.cs`, `UI/Widget/ArenaBattle.cs`, `UI/Widget/WorldBossBattle.cs`) now call `.ToViewMap()` at the HUD boundary, keeping lib9c `Buff` inside the simulator and DTO outside.
+   - `Extensions/BuffSheetExtension.cs` gained `BuffView` overloads for `GetLocalizedName`, `GetLocalizedDescription`, and `GetIcon`; `Helper/BuffHelper.GetBuffIcon` gained a `BuffView`-typed overload that reads `view.IsStatBuff`/`view.StatType`/`view.StatValue` to pick the positive/negative sprite without touching lib9c `StatBuff`.
+
+   Next slices (not yet started): `Nekoyume.Model.Item` (equipment/costume/material views, inventory, shop, grind, enhancement) and `Nekoyume.Model.State` (avatar/agent/world/stage snapshots threaded into headers, battle prep, login) — both materially larger than the Stat/Buff cluster and best tackled per-subsystem.
+
+5. Remove network/runtime packages. (define-guard slice complete)
+   - Single-client execution skips `RPCAgent` gRPC channel initialization.
    - `Game` no longer has a mandatory `RPCAgent` component requirement.
-   - Remove `NineChronicles.RPC.Shared`, MagicOnion generated code, RPC client wiring, and headless launch helpers.
-   - Remove Libplanet/Bencodex references from asmdefs after source references are gone.
+   - `NC_RPC_ENABLED` build define now guards every RPC code path. Default builds (without the define) compile with no live MagicOnion/gRPC references:
+     - `Blockchain/RPCAgent.cs`: whole body wrapped; a compile-only shim exposes `ShouldInitializeRpcTransport` so `SingleClientModeTest` continues to assert the flag contract.
+     - `Blockchain/ClientFilter.cs`: wrapped.
+     - `AOTGenerated/MagicOnion.Generated.cs`: wrapped.
+     - `Game.cs`: `#region RPCAgent` (SubscribeRPCAgent + On\* helpers + QuitWithAgentConnectionError) wrapped. `CreateAgent()` branches to the local `Agent` unconditionally when the define is off. `InitializeMessagePackResolver()` omits `MagicOnion.Resolvers.MagicOnionResolver.Instance` when the define is off. `Agent is RPCAgent` stake-sheet branch wrapped.
+     - `Blockchain/BlockRenderHandler.cs`: `Agent is RPCAgent` retry-end subscription wrapped.
+   - `NineChronicles.RPC.Shared` submodule and its working tree have been dropped (`.gitmodules` entry removed, `.git/modules/.../NineChronicles.RPC.Shared/` cleaned, orphan `.meta` deleted). `Nekoyume.asmdef` `precompiledReferences` was already empty and needed no edit. MagicOnion (`com.cysharp.magiconion` in `Packages/manifest.json`) and `Assets/Packages/Grpc.Core*` remain on disk but are unreferenced in default builds; stripping them is deferred because the package/NuGet removal is a larger dependency-graph change and has no compile impact today.
 
-   Pre-removal audit (current reference surface):
-   - `Assets/_Scripts/NineChronicles.RPC.Shared/` submodule: 4 `.cs` files — `RPCException.cs`, `IActionEvaluationHub.cs`, `IActionEvaluationHubReceiver.cs`, `IBlockChainService.cs`. Referenced by the Unity client from `Blockchain/RPCAgent.cs` and `Blockchain/ClientFilter.cs` only.
-   - `Assets/_Scripts/AOTGenerated/MagicOnion.Generated.cs`: 198 MagicOnion/GrpcChannel references inside MagicOnion's Unity AOT-generator output. Survives or is regenerated only while MagicOnion is on the build.
-   - `Blockchain/RPCAgent.cs` (60KB): sole Unity-side consumer of MagicOnion hubs + gRPC channel; single-client mode already short-circuits gRPC channel init inside it, but the class and its package dependencies are still referenced by `Game.CreateAgent()` when the RPC path is selected.
-   - `Blockchain/ClientFilter.cs`: MagicOnion client filter; lives and dies with `RPCAgent`.
-   - Total remaining RPC-flavored references (`MagicOnion|NineChronicles\.RPC|GrpcChannel|IActionEvaluationHub|IBlockChainService|RPCException`): 232 occurrences across 9 files.
-
-   Removal prerequisites:
-   - Decide whether `--single-client` becomes the only build target (allowing `RPCAgent`/`ClientFilter`/`NineChronicles.RPC.Shared`/`AOTGenerated/MagicOnion.Generated.cs` to be deleted outright), or whether RPC remains behind a build define (e.g. `NC_RPC_ENABLED`) that guards all four files. Step 5 proper is blocked on this decision.
-   - Drop the `NineChronicles.RPC.Shared` submodule from `.gitmodules` and remove the working tree only after (a) `RPCAgent.cs`/`ClientFilter.cs` are either deleted or `#if`-gated out and (b) `MagicOnion.Generated.cs` is regenerated without the RPC.Shared interfaces.
-   - Remove the MagicOnion/`Libplanet.Net`/gRPC `precompiledReferences` from `Nekoyume.asmdef` once no runtime code uses them.
+   Pre-removal audit (pre-gate snapshot, preserved for follow-up):
+   - `Assets/_Scripts/NineChronicles.RPC.Shared/` submodule: 4 `.cs` files — `RPCException.cs`, `IActionEvaluationHub.cs`, `IActionEvaluationHubReceiver.cs`, `IBlockChainService.cs`. Referenced by the Unity client from `Blockchain/RPCAgent.cs` and `Blockchain/ClientFilter.cs` only (both guarded).
+   - `Assets/_Scripts/AOTGenerated/MagicOnion.Generated.cs`: 198 MagicOnion/GrpcChannel references inside MagicOnion's Unity AOT-generator output (now fully gated).
+   - `Blockchain/RPCAgent.cs` (60KB): sole Unity-side consumer of MagicOnion hubs + gRPC channel.
+   - `Blockchain/ClientFilter.cs`: MagicOnion client filter.
+   - Total RPC-flavored references (`MagicOnion|NineChronicles\.RPC|GrpcChannel|IActionEvaluationHub|IBlockChainService|RPCException`) pre-gate: 232 occurrences across 9 files; post-gate all live occurrences are inside `#if NC_RPC_ENABLED` regions.
 
 6. Delete lib9c source.
    - Delete `Assets/_Scripts/Lib9c` only after `rg "Nekoyume\\.(Action|Model|TableData)|Libplanet|Bencodex"` no longer returns production references.
@@ -126,11 +144,11 @@ Targeted single-client tests:
   -testFilter 'Tests.EditMode.SingleClient'
 ```
 
-Current verification on Unity 6000.3.7f1:
+Current verification on Unity 6000.3.7f1 (post Step 5 define-guard + Step 4 HUD/Buff slice + RPC.Shared submodule removal):
 
-- `Tests.EditMode.SingleClient`: 33 passed, 0 failed
-  - Results: `C:\Users\USER\AppData\Local\Temp\nc-singleclient-actionmanager-local-play.xml`
-- Full EditMode: 114 passed, 0 failed
-  - Results: `C:\Users\USER\AppData\Local\Temp\nc-backlog-editmode-18.xml`
+- `Tests.EditMode.SingleClient`: 62 passed, 0 failed
+  - Results: `C:\Users\USER\AppData\Local\Temp\nc-hud-slice.xml`
+- Full EditMode: 135 passed, 0 failed
+  - Results: `C:\Users\USER\AppData\Local\Temp\nc-post-submodule.xml`
 
-Pending re-verification after the latest commits (Step 3 full coverage + Step 4 render-handler guards + Libplanet shim types): Unity was not running during authoring, so these commits still need an EditMode pass and a compile check before the next slice. Tests added in this slice (SweepStage x3, EnhanceEquipment x4, AddCurrency/ConsumeCurrency/GrindEquipment x4) bring the `Tests.EditMode.SingleClient` suite expectation to 44 cases.
+The 62-case SingleClient count reflects the previous 44 plus the new 3 `BuffViewMapperTest` cases and the 15 gained from the interim authoring cycle that already shipped. Full EditMode includes the unchanged Lib9c/Battle/TableData suites, confirming the HUD migration and submodule removal produced no regressions.
