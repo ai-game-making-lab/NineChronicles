@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Numerics;
 using Nekoyume.SingleClient;
 using NUnit.Framework;
 
@@ -424,6 +425,77 @@ namespace Tests.EditMode.SingleClient
             Assert.AreEqual(3, state.HighestClearedStageId);
             CollectionAssert.AreEqual(new[] { 1, 3 }, reloaded.stage.clearedStageIds);
             Assert.AreEqual(3, reloaded.stage.highestClearedStageId);
+        }
+
+        [Test]
+        public void SweepStageConsumesCostsAndMarksCleared()
+        {
+            var path = Path.Combine(_temporaryDirectory, "state.json");
+            var runtime = new SingleClientRuntime(new SingleClientSession(
+                new FileSingleClientStateStore(path)));
+
+            runtime.Start();
+            runtime.FillActionPoint(80);
+            runtime.GrantInventoryItem("apStone", 1);
+            runtime.GrantInventoryItem("entry", 6);
+
+            var result = runtime.SweepStage(
+                stageId: 3,
+                actionPointCost: 20,
+                apStoneItemId: "apStone",
+                apStoneCount: 1,
+                entryCostItemId: "entry",
+                entryCostItemCount: 4);
+
+            Assert.AreEqual(3, result.StageId);
+            Assert.IsTrue(result.WasFirstClear);
+            Assert.AreEqual(80, result.ActionPointBefore);
+            Assert.AreEqual(60, result.ActionPointAfter);
+            Assert.AreEqual(2, result.ItemCostDeltas.Count);
+            CollectionAssert.AreEqual(new[] { 3 }, result.State.ClearedStageIds);
+        }
+
+        [Test]
+        public void GrantAndEnhanceEquipmentUpdatesBaseLevel()
+        {
+            var path = Path.Combine(_temporaryDirectory, "state.json");
+            var runtime = new SingleClientRuntime(new SingleClientSession(
+                new FileSingleClientStateStore(path)));
+
+            runtime.Start();
+            runtime.GrantEquipment("eq-base", itemSheetId: 10110000);
+            runtime.GrantEquipment("eq-mat", itemSheetId: 10110000);
+
+            var result = runtime.EnhanceEquipment(
+                baseEquipmentId: "eq-base",
+                materialEquipmentIds: new[] { "eq-mat" },
+                levelDelta: 3);
+
+            Assert.AreEqual("eq-base", result.BaseEquipmentId);
+            Assert.AreEqual(0, result.LevelBefore);
+            Assert.AreEqual(3, result.LevelAfter);
+            Assert.AreEqual(1, result.MaterialEquipmentIds.Count);
+        }
+
+        [Test]
+        public void GrindEquipmentRemovesItemsAndReturnsBalanceDelta()
+        {
+            var path = Path.Combine(_temporaryDirectory, "state.json");
+            var runtime = new SingleClientRuntime(new SingleClientSession(
+                new FileSingleClientStateStore(path)));
+
+            runtime.Start();
+            runtime.GrantEquipment("eq-1", itemSheetId: 10110000);
+            runtime.GrantEquipment("eq-2", itemSheetId: 10110000);
+
+            var result = runtime.GrindEquipment(
+                equipmentIds: new[] { "eq-1", "eq-2" },
+                crystalGained: new BigInteger(2500));
+
+            Assert.AreEqual(2, result.EquipmentIds.Count);
+            Assert.AreEqual(new BigInteger(0), result.BalanceBefore);
+            Assert.AreEqual(new BigInteger(2500), result.BalanceAfter);
+            Assert.AreEqual(new BigInteger(2500), runtime.GetCurrency("CRYSTAL"));
         }
     }
 }
