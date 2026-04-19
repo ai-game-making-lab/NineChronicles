@@ -37,6 +37,13 @@ namespace Nekoyume.SingleClient
             IEnumerable<string> materialEquipmentIds,
             int levelDelta = 1);
 
+        ClientGrindResult GrindEquipment(
+            IEnumerable<string> equipmentIds,
+            System.Numerics.BigInteger crystalGained,
+            string crystalTicker = "CRYSTAL");
+
+        System.Numerics.BigInteger GetCurrency(string ticker);
+
         ClientStagePlayPreview PreviewStagePlay(
             int stageId,
             long actionPointCost,

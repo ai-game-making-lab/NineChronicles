@@ -418,6 +418,54 @@ namespace Nekoyume.SingleClient
         }
     }
 
+    public sealed class SingleClientGrindResult
+    {
+        public SingleClientState State { get; }
+        public IReadOnlyList<string> EquipmentIds { get; }
+        public string CurrencyTicker { get; }
+        public System.Numerics.BigInteger CrystalGained { get; }
+        public System.Numerics.BigInteger BalanceBefore { get; }
+        public System.Numerics.BigInteger BalanceAfter { get; }
+
+        public SingleClientGrindResult(
+            SingleClientState state,
+            IEnumerable<string> equipmentIds,
+            string currencyTicker,
+            System.Numerics.BigInteger crystalGained,
+            System.Numerics.BigInteger balanceBefore,
+            System.Numerics.BigInteger balanceAfter)
+        {
+            State = state;
+            EquipmentIds = equipmentIds?
+                .Where(id => !string.IsNullOrWhiteSpace(id))
+                .ToArray() ?? Array.Empty<string>();
+            CurrencyTicker = currencyTicker;
+            CrystalGained = crystalGained;
+            BalanceBefore = balanceBefore;
+            BalanceAfter = balanceAfter;
+        }
+    }
+
+    public sealed class ClientGrindResult
+    {
+        public ClientRuntimeState State { get; }
+        public IReadOnlyList<string> EquipmentIds { get; }
+        public string CurrencyTicker { get; }
+        public System.Numerics.BigInteger CrystalGained { get; }
+        public System.Numerics.BigInteger BalanceBefore { get; }
+        public System.Numerics.BigInteger BalanceAfter { get; }
+
+        public ClientGrindResult(SingleClientGrindResult result)
+        {
+            State = new ClientRuntimeState(result.State);
+            EquipmentIds = result.EquipmentIds?.ToArray() ?? Array.Empty<string>();
+            CurrencyTicker = result.CurrencyTicker;
+            CrystalGained = result.CrystalGained;
+            BalanceBefore = result.BalanceBefore;
+            BalanceAfter = result.BalanceAfter;
+        }
+    }
+
     public sealed class SingleClientEnhanceResult
     {
         public SingleClientState State { get; }

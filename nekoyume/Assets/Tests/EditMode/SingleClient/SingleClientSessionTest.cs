@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Numerics;
 using Nekoyume.SingleClient;
 using NUnit.Framework;
 
@@ -182,6 +183,82 @@ namespace Tests.EditMode.SingleClient
 
             Assert.Throws<InvalidOperationException>(
                 () => session.EnhanceEquipment("eq-base", new[] { "eq-base" }));
+        }
+
+        [Test]
+        public void AddCurrencyAccumulatesBalance()
+        {
+            var path = Path.Combine(_temporaryDirectory, "state.json");
+            var session = new SingleClientSession(new FileSingleClientStateStore(path));
+
+            session.Start();
+            session.CreateOrSelectAvatar(0, "wallet");
+
+            var afterFirst = session.AddCurrency("CRYSTAL", new BigInteger(500));
+            var afterSecond = session.AddCurrency("CRYSTAL", new BigInteger(250));
+
+            Assert.AreEqual(new BigInteger(500), afterFirst);
+            Assert.AreEqual(new BigInteger(750), afterSecond);
+            Assert.AreEqual(new BigInteger(750), session.GetCurrency("CRYSTAL"));
+        }
+
+        [Test]
+        public void ConsumeCurrencyReducesBalanceAndRejectsOverspend()
+        {
+            var path = Path.Combine(_temporaryDirectory, "state.json");
+            var session = new SingleClientSession(new FileSingleClientStateStore(path));
+
+            session.Start();
+            session.CreateOrSelectAvatar(0, "wallet");
+            session.AddCurrency("CRYSTAL", new BigInteger(100));
+
+            var remaining = session.ConsumeCurrency("CRYSTAL", new BigInteger(30));
+            Assert.AreEqual(new BigInteger(70), remaining);
+
+            Assert.Throws<InvalidOperationException>(
+                () => session.ConsumeCurrency("CRYSTAL", new BigInteger(200)));
+        }
+
+        [Test]
+        public void GrindEquipmentRemovesEquipmentsAndGrantsCrystal()
+        {
+            var path = Path.Combine(_temporaryDirectory, "state.json");
+            var session = new SingleClientSession(new FileSingleClientStateStore(path));
+
+            session.Start();
+            session.CreateOrSelectAvatar(0, "grinder");
+            session.GrantEquipment("eq-1", itemSheetId: 10110000);
+            session.GrantEquipment("eq-2", itemSheetId: 10110000);
+            session.GrantEquipment("eq-keep", itemSheetId: 10110000);
+
+            var result = session.GrindEquipment(
+                new[] { "eq-1", "eq-2" },
+                new BigInteger(1500));
+
+            Assert.AreEqual(2, result.EquipmentIds.Count);
+            Assert.AreEqual(new BigInteger(0), result.BalanceBefore);
+            Assert.AreEqual(new BigInteger(1500), result.BalanceAfter);
+            Assert.AreEqual("CRYSTAL", result.CurrencyTicker);
+            Assert.IsFalse(session.State.inventory.HasEquipment("eq-1"));
+            Assert.IsFalse(session.State.inventory.HasEquipment("eq-2"));
+            Assert.IsTrue(session.State.inventory.HasEquipment("eq-keep"));
+            Assert.AreEqual(new BigInteger(1500), session.GetCurrency("CRYSTAL"));
+        }
+
+        [Test]
+        public void GrindEquipmentThrowsWhenEquipmentMissing()
+        {
+            var path = Path.Combine(_temporaryDirectory, "state.json");
+            var session = new SingleClientSession(new FileSingleClientStateStore(path));
+
+            session.Start();
+            session.CreateOrSelectAvatar(0, "grinder");
+            session.GrantEquipment("eq-1", itemSheetId: 10110000);
+
+            Assert.Throws<InvalidOperationException>(
+                () => session.GrindEquipment(
+                    new[] { "eq-1", "eq-ghost" },
+                    new BigInteger(100)));
         }
     }
 }

@@ -20,6 +20,7 @@ namespace Nekoyume.SingleClient
         public List<SingleClientAvatarState> avatars = new();
         public SingleClientInventoryState inventory = new();
         public SingleClientStageState stage = new();
+        public List<SingleClientCurrencyBalance> balances = new();
         public long blockIndex;
         public long updatedAtUnixSeconds;
 
@@ -97,6 +98,45 @@ namespace Nekoyume.SingleClient
             else
             {
                 changed |= stage.EnsureDefaults();
+            }
+
+            if (balances is null)
+            {
+                balances = new List<SingleClientCurrencyBalance>();
+                changed = true;
+            }
+            else
+            {
+                for (var i = balances.Count - 1; i >= 0; i--)
+                {
+                    var entry = balances[i];
+                    if (entry is null || string.IsNullOrWhiteSpace(entry.ticker))
+                    {
+                        balances.RemoveAt(i);
+                        changed = true;
+                        continue;
+                    }
+
+                    var trimmed = entry.ticker.Trim();
+                    if (trimmed != entry.ticker)
+                    {
+                        entry.ticker = trimmed;
+                        changed = true;
+                    }
+
+                    if (string.IsNullOrWhiteSpace(entry.rawValue))
+                    {
+                        entry.rawValue = "0";
+                        changed = true;
+                    }
+                }
+
+                var previousOrder = balances.Select(b => b.ticker).ToArray();
+                balances.Sort((a, b) => string.CompareOrdinal(a.ticker, b.ticker));
+                if (!previousOrder.SequenceEqual(balances.Select(b => b.ticker)))
+                {
+                    changed = true;
+                }
             }
 
             return changed;
@@ -528,6 +568,13 @@ namespace Nekoyume.SingleClient
         public int level;
         public bool equipped;
         public long requiredBlockIndex;
+    }
+
+    [Serializable]
+    public sealed class SingleClientCurrencyBalance
+    {
+        public string ticker;
+        public string rawValue;
     }
 
     [Serializable]

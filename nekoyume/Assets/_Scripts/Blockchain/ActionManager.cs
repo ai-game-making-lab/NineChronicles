@@ -1592,6 +1592,11 @@ namespace Nekoyume.Blockchain
             bool chargeAp,
             long gainedCrystal)
         {
+            if (SingleClientMode.IsEnabled(Game.Game.instance.CommandLineOptions))
+            {
+                return GrindingInSingleClient(equipmentList, chargeAp, gainedCrystal);
+            }
+
             var avatarAddress = States.Instance.CurrentAvatarState.address;
             var removeNonFungibleIds = new List<Guid>();
             var removeItemIds = new List<(Guid, long, int)>();
@@ -1640,6 +1645,58 @@ namespace Nekoyume.Blockchain
                 .ObserveOnMainThread()
                 .DoOnError(e => HandleException(action.Id, e))
                 .Finally(() => Analyzer.Instance.FinishTrace(sentryTrace));
+        }
+
+        private IObservable<ActionEvaluation<Grinding>> GrindingInSingleClient(
+            List<Equipment> equipmentList,
+            bool chargeAp,
+            long gainedCrystal)
+        {
+            var game = Game.Game.instance;
+            var runtime = game.ClientRuntime;
+            if (runtime is null || !runtime.IsStarted)
+            {
+                return Observable.Throw<ActionEvaluation<Grinding>>(
+                    new InvalidOperationException("Single-client runtime is not started."));
+            }
+
+            if (equipmentList is null || equipmentList.Count == 0)
+            {
+                return Observable.Throw<ActionEvaluation<Grinding>>(
+                    new ArgumentException(
+                        "At least one equipment is required.", nameof(equipmentList)));
+            }
+
+            var equipmentIds = equipmentList
+                .Where(e => e is not null)
+                .Select(e => e.NonFungibleId.ToString())
+                .ToArray();
+
+            try
+            {
+                runtime.GrindEquipment(
+                    equipmentIds,
+                    new System.Numerics.BigInteger(gainedCrystal),
+                    ClientCurrencies.Crystal.Ticker);
+            }
+            catch (Exception e)
+            {
+                return Observable.Throw<ActionEvaluation<Grinding>>(e);
+            }
+
+            if (chargeAp)
+            {
+                runtime.FillActionPoint(Action.DailyReward.ActionPointMax);
+                if (States.Instance.CurrentAvatarState is { } avatarState &&
+                    GameConfigStateSubject.ActionPointState.ContainsKey(avatarState.address))
+                {
+                    GameConfigStateSubject.ActionPointState.Remove(avatarState.address);
+                }
+            }
+
+            States.Instance.RemoveCurrentItemSlotStates(
+                equipmentList.Select(e => e.NonFungibleId).ToList());
+            return Observable.Empty<ActionEvaluation<Grinding>>();
         }
 
         public IObservable<ActionEvaluation<Synthesize>> Synthesize(

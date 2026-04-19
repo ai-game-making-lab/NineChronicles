@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Numerics;
 
 namespace Nekoyume.SingleClient
 {
@@ -188,6 +190,136 @@ namespace Nekoyume.SingleClient
                 requiredBlockIndex);
             _stateStore.Save(State);
             return entry;
+        }
+
+        public BigInteger GetCurrency(string ticker)
+        {
+            ValidateTicker(ticker);
+            EnsureStarted();
+            State.balances ??= new List<SingleClientCurrencyBalance>();
+            var entry = FindBalanceEntry(ticker);
+            return entry is null ? BigInteger.Zero : ParseBigInteger(entry.rawValue);
+        }
+
+        public BigInteger AddCurrency(string ticker, BigInteger amount)
+        {
+            ValidateTicker(ticker);
+            if (amount.Sign < 0)
+            {
+                throw new ArgumentOutOfRangeException(
+                    nameof(amount), amount, "Amount cannot be negative.");
+            }
+
+            EnsureStarted();
+            State.balances ??= new List<SingleClientCurrencyBalance>();
+            var trimmed = ticker.Trim();
+            var entry = FindBalanceEntry(trimmed);
+            if (entry is null)
+            {
+                entry = new SingleClientCurrencyBalance
+                {
+                    ticker = trimmed,
+                    rawValue = "0",
+                };
+                State.balances.Add(entry);
+                State.balances.Sort((a, b) => string.CompareOrdinal(a.ticker, b.ticker));
+            }
+
+            var next = ParseBigInteger(entry.rawValue) + amount;
+            entry.rawValue = next.ToString(CultureInfo.InvariantCulture);
+            _stateStore.Save(State);
+            return next;
+        }
+
+        public BigInteger ConsumeCurrency(string ticker, BigInteger amount)
+        {
+            ValidateTicker(ticker);
+            if (amount.Sign < 0)
+            {
+                throw new ArgumentOutOfRangeException(
+                    nameof(amount), amount, "Amount cannot be negative.");
+            }
+
+            EnsureStarted();
+            State.balances ??= new List<SingleClientCurrencyBalance>();
+            var entry = FindBalanceEntry(ticker);
+            var current = entry is null ? BigInteger.Zero : ParseBigInteger(entry.rawValue);
+            if (current < amount)
+            {
+                throw new InvalidOperationException(
+                    $"Not enough balance for '{ticker.Trim()}'.");
+            }
+
+            var next = current - amount;
+            if (entry is null)
+            {
+                return next;
+            }
+
+            entry.rawValue = next.ToString(CultureInfo.InvariantCulture);
+            _stateStore.Save(State);
+            return next;
+        }
+
+        public SingleClientGrindResult GrindEquipment(
+            IEnumerable<string> equipmentIds,
+            BigInteger crystalGained,
+            string crystalTicker = "CRYSTAL")
+        {
+            ValidateTicker(crystalTicker);
+            if (crystalGained.Sign < 0)
+            {
+                throw new ArgumentOutOfRangeException(
+                    nameof(crystalGained), crystalGained, "Crystal reward cannot be negative.");
+            }
+
+            var ids = (equipmentIds ?? Enumerable.Empty<string>())
+                .Where(id => !string.IsNullOrWhiteSpace(id))
+                .Select(id => id.Trim())
+                .Distinct(StringComparer.Ordinal)
+                .ToArray();
+            if (ids.Length == 0)
+            {
+                throw new ArgumentException(
+                    "At least one equipment is required.", nameof(equipmentIds));
+            }
+
+            EnsureStarted();
+            State.inventory ??= new SingleClientInventoryState();
+            State.inventory.EnsureDefaults();
+
+            foreach (var id in ids)
+            {
+                if (!State.inventory.HasEquipment(id))
+                {
+                    throw new InvalidOperationException(
+                        $"Equipment '{id}' not found.");
+                }
+            }
+
+            foreach (var id in ids)
+            {
+                State.inventory.RemoveEquipment(id);
+            }
+
+            var balanceBefore = GetCurrency(crystalTicker);
+            var balanceAfter = balanceBefore + crystalGained;
+            if (crystalGained.Sign > 0)
+            {
+                AddCurrency(crystalTicker, crystalGained);
+            }
+            else
+            {
+                _stateStore.Save(State);
+            }
+
+            return new SingleClientGrindResult(
+                State,
+                ids,
+                crystalTicker,
+                crystalGained,
+                balanceBefore,
+                balanceAfter);
         }
 
         public SingleClientEnhanceResult EnhanceEquipment(
@@ -534,6 +666,36 @@ namespace Nekoyume.SingleClient
             {
                 new ClientItemCost(itemId, count)
             };
+        }
+
+        private static void ValidateTicker(string ticker)
+        {
+            if (string.IsNullOrWhiteSpace(ticker))
+            {
+                throw new ArgumentException("Ticker is required.", nameof(ticker));
+            }
+        }
+
+        private SingleClientCurrencyBalance FindBalanceEntry(string ticker)
+        {
+            if (State.balances is null)
+            {
+                return null;
+            }
+
+            var trimmed = ticker.Trim();
+            return State.balances.FirstOrDefault(
+                entry => entry?.ticker == trimmed);
+        }
+
+        private static BigInteger ParseBigInteger(string rawValue)
+        {
+            if (string.IsNullOrWhiteSpace(rawValue))
+            {
+                return BigInteger.Zero;
+            }
+
+            return BigInteger.Parse(rawValue.Trim(), CultureInfo.InvariantCulture);
         }
 
         private static IReadOnlyList<ClientItemCost> CreateSweepItemCosts(

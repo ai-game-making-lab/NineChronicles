@@ -83,6 +83,22 @@ namespace Nekoyume.SingleClient
                 levelDelta));
         }
 
+        public ClientGrindResult GrindEquipment(
+            IEnumerable<string> equipmentIds,
+            System.Numerics.BigInteger crystalGained,
+            string crystalTicker = "CRYSTAL")
+        {
+            return new ClientGrindResult(_session.GrindEquipment(
+                equipmentIds,
+                crystalGained,
+                crystalTicker));
+        }
+
+        public System.Numerics.BigInteger GetCurrency(string ticker)
+        {
+            return _session.GetCurrency(ticker);
+        }
+
         public ClientStagePlayPreview PreviewStagePlay(
             int stageId,
             long actionPointCost,
