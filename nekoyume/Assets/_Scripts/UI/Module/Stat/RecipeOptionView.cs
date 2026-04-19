@@ -7,6 +7,7 @@ using Nekoyume.Game;
 using Nekoyume.Helper;
 using Nekoyume.L10n;
 using Nekoyume.Model.Stat;
+using Nekoyume.SingleClient.Models.TableData;
 using Nekoyume.TableData;
 using Nekoyume.UI.Module.Common;
 using TMPro;
@@ -112,7 +113,7 @@ namespace Nekoyume.UI.Module
                     {
                         var rect = skillView.tooltipButton.GetComponent<RectTransform>();
                         skillTooltip.transform.position = rect.GetWorldPositionOfPivot(PivotPresetType.MiddleLeft);
-                        skillTooltip.Show(skillRow, option);
+                        skillTooltip.Show(skillRow.ToView(), option.ToView());
                     });
                     if (optionIcons != null && optionIcons.Count > 0)
                     {
@@ -193,12 +194,13 @@ namespace Nekoyume.UI.Module
                 skillView.parentObject.transform.SetSiblingIndex(siblingIndex);
                 skillView.parentObject.SetActive(true);
                 skillView.tooltipButton.onClick.RemoveAllListeners();
+                var runeValueString = RuneFrontHelper.GetRuneValueString(option);
                 skillView.tooltipButton.onClick.AddListener(() =>
                 {
                     var rect = skillView.tooltipButton.GetComponent<RectTransform>();
                     skillTooltip.transform.position =
                         rect.GetWorldPositionOfPivot(PivotPresetType.MiddleLeft);
-                    skillTooltip.Show(skillRow, option);
+                    skillTooltip.Show(skillRow.ToView(), option.ToView(skillRow), runeValueString);
                 });
                 if (optionIcons != null && optionIcons.Count > 0)
                 {

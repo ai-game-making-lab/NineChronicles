@@ -9,6 +9,7 @@ using Nekoyume.L10n;
 using Nekoyume.Model.Item;
 using Nekoyume.Model.Stat;
 using Nekoyume.SingleClient.Models.Elemental;
+using Nekoyume.SingleClient.Models.Skills;
 using Nekoyume.State;
 using Nekoyume.UI.Module.Common;
 using TMPro;
@@ -356,13 +357,13 @@ namespace Nekoyume.UI.Module
 
             foreach (var skill in itemUsable.Skills)
             {
-                AddSkill(new Model.SkillView(skill));
+                AddSkill(new Model.SkillView(skill.ToSnapshot(), skill.EffectToString()));
                 skillCount++;
             }
 
             foreach (var skill in itemUsable.BuffSkills)
             {
-                AddSkill(new Model.SkillView(skill));
+                AddSkill(new Model.SkillView(skill.ToSnapshot(), skill.EffectToString()));
                 skillCount++;
             }
 

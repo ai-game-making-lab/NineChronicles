@@ -45,7 +45,7 @@ namespace Nekoyume.UI.Module
             {
                 if (!tooltip.gameObject.activeSelf)
                 {
-                    tooltip.Show(model.Skill);
+                    tooltip.Show(model.Snapshot);
                     var rect = skillDescriptionButton.GetComponent<RectTransform>();
                     tooltip.transform.position = rect.GetWorldPositionOfPivot(PivotPresetType.MiddleLeft);
                 }

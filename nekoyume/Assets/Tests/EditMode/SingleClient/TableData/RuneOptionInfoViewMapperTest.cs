@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Nekoyume.Model.Stat;
 using Nekoyume.SingleClient.Models.Stats;
 using Nekoyume.SingleClient.Models.TableData;
 using Nekoyume.TableData;

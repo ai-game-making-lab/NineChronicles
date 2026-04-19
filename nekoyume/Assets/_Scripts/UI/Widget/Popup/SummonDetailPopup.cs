@@ -4,6 +4,7 @@ using Nekoyume.Battle;
 using Nekoyume.Helper;
 using Nekoyume.Model.EnumType;
 using Nekoyume.Model.Item;
+using Nekoyume.SingleClient.Models.TableData;
 using Nekoyume.TableData;
 using Nekoyume.UI.Module;
 using Nekoyume.UI.Module.Common;
@@ -85,7 +86,7 @@ namespace Nekoyume.UI
                     skillSheet.TryGetValue(optionRow.SkillId, out skillOption));
                 if (skillOption != null)
                 {
-                    skillTooltip.Show(skillOption, skillOptionRow);
+                    skillTooltip.Show(skillOption.ToView(), skillOptionRow.ToView());
                 }
                 else
                 {
@@ -168,7 +169,8 @@ namespace Nekoyume.UI
                 if (TableSheets.Instance.SkillSheet.TryGetValue(model.RuneOptionInfo.SkillId,
                     out var skillOption))
                 {
-                    skillTooltip.Show(skillOption, model.RuneOptionInfo);
+                    var runeValueString = RuneFrontHelper.GetRuneValueString(model.RuneOptionInfo);
+                    skillTooltip.Show(skillOption.ToView(), model.RuneOptionInfo.ToView(skillOption), runeValueString);
                 }
                 else
                 {

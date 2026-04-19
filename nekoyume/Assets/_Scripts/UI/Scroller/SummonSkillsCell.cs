@@ -1,3 +1,5 @@
+using Nekoyume.Helper;
+using Nekoyume.SingleClient.Models.TableData;
 using Nekoyume.TableData;
 using Nekoyume.UI.Module.Common;
 using UnityEngine;
@@ -28,12 +30,17 @@ namespace Nekoyume.UI.Scroller
 
             if (itemData.EquipmentOptionRow is not null)
             {
-                skillView.Show(itemData.SkillRow, itemData.EquipmentOptionRow);
+                skillView.Show(itemData.SkillRow.ToView(), itemData.EquipmentOptionRow.ToView());
             }
 
             if (itemData.SummonDetailCellModel?.RuneOptionInfo is not null)
             {
-                skillView.Show(itemData.SkillRow, itemData.SummonDetailCellModel.RuneOptionInfo);
+                var runeOptionInfo = itemData.SummonDetailCellModel.RuneOptionInfo;
+                var runeValueString = RuneFrontHelper.GetRuneValueString(runeOptionInfo);
+                skillView.Show(
+                    itemData.SkillRow.ToView(),
+                    runeOptionInfo.ToView(itemData.SkillRow),
+                    runeValueString);
             }
         }
     }

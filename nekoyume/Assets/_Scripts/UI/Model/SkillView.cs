@@ -2,52 +2,37 @@ using System;
 using Nekoyume.L10n;
 using Nekoyume.SingleClient.Models.Skills;
 using UniRx;
-using Lib9cBuffSkill = Nekoyume.Model.Skill.BuffSkill;
-using Lib9cSkill = Nekoyume.Model.Skill.Skill;
-// Lib9cBuffSkill is kept so the second ctor overload can preserve the existing
-// `new Model.SkillView(buffSkill)` call shape from ItemTooltipDetail.
 
 namespace Nekoyume.UI.Model
 {
     public class SkillView : IDisposable
     {
         /// <summary>
-        /// Client-owned snapshot of the skill. Drives all display strings below.
+        /// Client-owned snapshot of the skill. Drives all display strings below and is the
+        /// single public handle callers forward into <c>SkillPositionTooltip.Show(SkillSnapshot)</c>.
         /// </summary>
         public readonly SkillSnapshot Snapshot;
-
-        /// <summary>
-        /// Retained lib9c reference used only to forward into
-        /// <see cref="Nekoyume.UI.Module.Common.SkillPositionTooltip.Show(Lib9cSkill)"/>, which
-        /// is explicitly deferred out of this migration slice because it also consumes lib9c
-        /// TableData rows (SkillSheet.Row / StatBuffSheet / BuffLimitSheet). Will be dropped
-        /// once the tooltip is ported to SkillSnapshot + client row mirrors.
-        /// </summary>
-        public readonly Lib9cSkill Skill;
 
         public readonly ReactiveProperty<string> Name = new();
         public readonly ReactiveProperty<string> Power = new();
         public readonly ReactiveProperty<string> Chance = new();
 
-        public SkillView(Lib9cSkill skill)
+        /// <summary>
+        /// Constructs a skill view from an already-projected snapshot plus the formatted power
+        /// text. Callers that still hold a lib9c <c>Skill</c> project it at the boundary via
+        /// <c>.ToSnapshot()</c> and compute the power string via
+        /// <c>Nekoyume.SkillExtensions.EffectToString(this Skill)</c> — that helper stays on
+        /// lib9c for this slice because it reads <c>SkillBuffSheet</c> / <c>StatBuffSheet</c>.
+        /// </summary>
+        public SkillView(SkillSnapshot snapshot, string effectText)
         {
-            Skill = skill;
-            Snapshot = skill.ToSnapshot();
+            Snapshot = snapshot;
 
             Name.Value = L10nManager.Localize($"SKILL_NAME_{Snapshot.Id}");
             Chance.Value = $"{L10nManager.Localize("UI_SKILL_CHANCE")}: {Snapshot.Chance}%";
 
-            // EffectToString still lives on lib9c (SkillExtensions.EffectToString(this Skill))
-            // because it consumes SkillSheet + StatBuffSheet rows; once those rows have client
-            // mirrors the lib9c dispatch can retire and the call can run straight from Snapshot.
-            var powerValue = skill.EffectToString();
             var powerKey = Snapshot.IsBuffSkill ? "UI_SKILL_EFFECT" : "UI_SKILL_POWER";
-            Power.Value = $"{L10nManager.Localize(powerKey)}: {powerValue}";
-        }
-
-        public SkillView(Lib9cBuffSkill skill)
-            : this((Lib9cSkill)skill)
-        {
+            Power.Value = $"{L10nManager.Localize(powerKey)}: {effectText}";
         }
 
         public void Dispose()

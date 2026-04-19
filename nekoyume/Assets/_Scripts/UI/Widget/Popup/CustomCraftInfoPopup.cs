@@ -3,6 +3,7 @@ using Nekoyume.Battle;
 using Nekoyume.Game;
 using Nekoyume.L10n;
 using Nekoyume.Model.Item;
+using Nekoyume.SingleClient.Models.TableData;
 using Nekoyume.State;
 using Nekoyume.UI.Module;
 using Nekoyume.UI.Module.Common;
@@ -116,7 +117,7 @@ namespace Nekoyume.UI
             skillPositionTooltip.transform.SetParent(model.Item2);
             skillPositionTooltip.transform.localPosition = Vector3.zero;
             skillPositionTooltip.transform.SetParent(transform);
-            skillPositionTooltip.Show(model.Item1.SkillRow, model.Item1.OptionRow);
+            skillPositionTooltip.Show(model.Item1.SkillRow.ToView(), model.Item1.OptionRow.ToView());
         }
     }
 }
