@@ -16,7 +16,7 @@ using UnityEngine;
 
 namespace Nekoyume.UI
 {
-    using Nekoyume.Model.Skill;
+    using Nekoyume.SingleClient.Models.Skills;
     using UniRx;
     using UnityEngine.UI;
 
@@ -207,7 +207,10 @@ namespace Nekoyume.UI
                 .FirstOrDefault(tuple => tuple.option.SkillId != 0)
                 .option;
             var skillRow = sheets.SkillSheet[skillOptionRow.SkillId];
-            var isBuffSkill = skillRow.SkillType is SkillType.Buff or SkillType.Debuff;
+            // Cross-boundary compare: lib9c row enum cast into client SkillType, matched against
+            // the client mirror so the popup stops depending on Nekoyume.Model.Skill.SkillType.
+            var clientSkillType = (SkillType)(int)skillRow.SkillType;
+            var isBuffSkill = clientSkillType is SkillType.Buff or SkillType.Debuff;
             skillName.text = L10nManager.Localize($"SKILL_NAME_{skillOptionRow.SkillId}");
 
             var effectString = SkillExtensions.EffectToString(

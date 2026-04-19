@@ -1,14 +1,12 @@
-using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using TMPro;
 using Nekoyume.L10n;
-using Nekoyume.Model.Skill;
 using UnityEngine.UI;
-using Nekoyume.Model.Stat;
 using Nekoyume.Helper;
 using Nekoyume.Game;
-using System.Linq;
+using Nekoyume.SingleClient.Models.Skills;
 
 namespace Nekoyume.UI.Model
 {
