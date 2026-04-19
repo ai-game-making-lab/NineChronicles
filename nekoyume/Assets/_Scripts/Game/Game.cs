@@ -40,6 +40,7 @@ using Nekoyume.IAPStore;
 using Nekoyume.L10n;
 using Nekoyume.Model.State;
 using Nekoyume.Pattern;
+using Nekoyume.SingleClient;
 using Nekoyume.State;
 using Nekoyume.UI;
 using Nekoyume.UI.Model;
@@ -69,7 +70,7 @@ namespace Nekoyume.Game
     using TableData;
     using UniRx;
 
-    [RequireComponent(typeof(Agent), typeof(RPCAgent))]
+    [RequireComponent(typeof(Agent))]
     public class Game : MonoSingleton<Game>
     {
         public const float DefaultTimeScale = 1.25f;
@@ -128,6 +129,10 @@ namespace Nekoyume.Game
 
         public LocalLayerActions LocalLayerActions { get; private set; }
 
+        public SingleClientSession SingleClientSession { get; private set; }
+
+        public IClientRuntime ClientRuntime { get; private set; }
+
         public IAgent Agent { get; private set; }
 
         public Analyzer Analyzer { get; private set; }
@@ -169,6 +174,8 @@ namespace Nekoyume.Game
         public bool IsGuestLogin { get; set; }
 
         private CommandLineOptions _commandLineOptions;
+        private ISingleClientStateStore _singleClientStateStore;
+        private string _singleClientStatePath;
 
         public CommandLineOptions CommandLineOptions => _commandLineOptions;
 
@@ -399,6 +406,16 @@ namespace Nekoyume.Game
                 return;
             }
 
+            if (SingleClientMode.IsEnabled(_commandLineOptions))
+            {
+                var singleClientState = GetOrCreateSingleClientStateStore().LoadOrCreate();
+                SingleClientMode.ConfigureCommandLineOptions(
+                    _commandLineOptions,
+                    SingleClientPaths.GetDefaultStorePath(),
+                    singleClientState.privateKeyHex);
+                NcDebug.Log("[Game] Single-client mode enabled");
+            }
+
             if (debugConsolePrefab != null && _commandLineOptions.IngameDebugConsole)
             {
                 NcDebug.Log("[Game] InGameDebugConsole enabled");
@@ -429,7 +446,7 @@ namespace Nekoyume.Game
             }
 
             var introScreen = FindObjectOfType<IntroScreen>();
-            if (introScreen != null)
+            if (introScreen != null && !SingleClientMode.IsEnabled(_commandLineOptions))
             {
                 introScreen.GetGuestPrivateKey();
             }
@@ -441,7 +458,20 @@ namespace Nekoyume.Game
             NcDebug.Log($"DefaultPlanetId: {_commandLineOptions.DefaultPlanetId}");
         }
 
+        private ISingleClientStateStore GetOrCreateSingleClientStateStore()
+        {
+            if (_singleClientStateStore is not null)
+            {
+                return _singleClientStateStore;
+            }
+
+            _singleClientStatePath = SingleClientPaths.GetDefaultStatePath();
+            _singleClientStateStore = new FileSingleClientStateStore(_singleClientStatePath);
+            return _singleClientStateStore;
+        }
+
 #region RPCAgent
+#if NC_RPC_ENABLED
 
         private void SubscribeRPCAgent()
         {
@@ -579,39 +609,18 @@ namespace Nekoyume.Game
                 .Forget();
         }
 
-#endregion
-
         private void QuitWithAgentConnectionError(RPCAgent rpcAgent)
         {
+            if (rpcAgent is null)
+            {
+                QuitWithAgentConnectionError();
+                return;
+            }
+
             var screen = Widget.Find<DimmedLoadingScreen>();
             if (screen.IsActive())
             {
                 screen.Close();
-            }
-
-            // FIXME 콜백 인자를 구조화 하면 타입 쿼리 없앨 수 있을 것 같네요.
-            IconAndButtonSystem popup;
-            if (Agent is Agent _)
-            {
-                var errorMsg = string.Format(L10nManager.Localize("UI_ERROR_FORMAT"),
-                    L10nManager.Localize("BLOCK_DOWNLOAD_FAIL"));
-
-                popup = Widget.Find<IconAndButtonSystem>();
-                popup.Show(L10nManager.Localize("UI_ERROR"),
-                    errorMsg,
-                    L10nManager.Localize("UI_QUIT"),
-                    false,
-                    IconAndButtonSystem.SystemType.BlockChainError);
-                popup.SetConfirmCallbackToExit(true);
-
-                return;
-            }
-
-            if (rpcAgent is null)
-            {
-                // FIXME: 최신 버전이 뭔지는 Agent.EncounrtedHighestVersion 속성에 들어있으니, 그걸 UI에서 표시해줘야 할 듯?
-                // AppProtocolVersion? newVersion = _agent is Agent agent ? agent.EncounteredHighestVersion : null;
-                return;
             }
 
             if (rpcAgent.Connected)
@@ -622,9 +631,35 @@ namespace Nekoyume.Game
                 return;
             }
 
-            popup = Widget.Find<IconAndButtonSystem>();
+            var popup = Widget.Find<IconAndButtonSystem>();
             popup.Show("UI_ERROR", "UI_ERROR_RPC_CONNECTION", "UI_QUIT");
             popup.SetConfirmCallbackToExit(true);
+        }
+#endif
+#endregion
+
+        private void QuitWithAgentConnectionError()
+        {
+            var screen = Widget.Find<DimmedLoadingScreen>();
+            if (screen.IsActive())
+            {
+                screen.Close();
+            }
+
+            // FIXME 콜백 인자를 구조화 하면 타입 쿼리 없앨 수 있을 것 같네요.
+            if (Agent is Agent _)
+            {
+                var errorMsg = string.Format(L10nManager.Localize("UI_ERROR_FORMAT"),
+                    L10nManager.Localize("BLOCK_DOWNLOAD_FAIL"));
+
+                var popup = Widget.Find<IconAndButtonSystem>();
+                popup.Show(L10nManager.Localize("UI_ERROR"),
+                    errorMsg,
+                    L10nManager.Localize("UI_QUIT"),
+                    false,
+                    IconAndButtonSystem.SystemType.BlockChainError);
+                popup.SetConfirmCallbackToExit(true);
+            }
         }
 
         /// <summary>
@@ -877,6 +912,7 @@ namespace Nekoyume.Game
                 stakeState = stakeStateV2;
             }
 
+#if NC_RPC_ENABLED
             if (Agent is RPCAgent)
             {
                 stakeRegularFixedRewardSheet = new StakeRegularFixedRewardSheet();
@@ -900,6 +936,7 @@ namespace Nekoyume.Game
                 stakeRegularRewardSheet.Set(sheets[sheetNames[1]]);
             }
             else
+#endif
             {
                 // It is local play. local genesis block not has Stake***Sheet_V*.
                 // 로컬에서 제네시스 블록을 직접 생성하는 경우엔 스테이킹 보상-V* 시트가 없기 때문에, 오리지널 시트로 대체합니다.
@@ -1409,27 +1446,47 @@ namespace Nekoyume.Game
 
         private void CreateAgent()
         {
+            var singleClient = SingleClientMode.IsEnabled(_commandLineOptions);
+#if NC_RPC_ENABLED
 #if UNITY_EDITOR && !(UNITY_ANDROID || UNITY_IOS)
             // Local Headless
-            if (useLocalHeadless && HeadlessHelper.CheckHeadlessSettings())
+            if (!singleClient && useLocalHeadless && HeadlessHelper.CheckHeadlessSettings())
             {
                 _headlessThread = new Thread(HeadlessHelper.RunLocalHeadless);
                 _headlessThread.Start();
             }
 
-            if (useLocalHeadless || _commandLineOptions.RpcClient)
+            if (!singleClient && (useLocalHeadless || _commandLineOptions.RpcClient))
             {
-                Agent = GetComponent<RPCAgent>();
+                Agent = GetOrAddAgentComponent<RPCAgent>();
                 SubscribeRPCAgent();
             }
             else
             {
-                Agent = GetComponent<Agent>();
+                Agent = GetOrAddAgentComponent<Agent>();
             }
 #else
-            Agent = GetComponent<RPCAgent>();
-            SubscribeRPCAgent();
+            if (singleClient)
+            {
+                Agent = GetOrAddAgentComponent<Agent>();
+            }
+            else
+            {
+                Agent = GetOrAddAgentComponent<RPCAgent>();
+                SubscribeRPCAgent();
+            }
 #endif
+#else
+            // Single-client only build: always use the local Agent path.
+            _ = singleClient;
+            Agent = GetOrAddAgentComponent<Agent>();
+#endif
+        }
+
+        private T GetOrAddAgentComponent<T>() where T : Component, IAgent
+        {
+            var component = GetComponent<T>();
+            return component is null ? gameObject.AddComponent<T>() : component;
         }
 
         private void PostAwake()
@@ -1437,6 +1494,15 @@ namespace Nekoyume.Game
             States = new States();
             LocalLayer = new LocalLayer();
             LocalLayerActions = new LocalLayerActions();
+            if (SingleClientMode.IsEnabled(_commandLineOptions))
+            {
+                SingleClientSession = new SingleClientSession(GetOrCreateSingleClientStateStore());
+                ClientRuntime = new SingleClientRuntime(SingleClientSession);
+                var state = ClientRuntime.Start();
+                NcDebug.Log(
+                    $"[Game] Single-client state loaded: {_singleClientStatePath} " +
+                    $"player={state.PlayerId} avatar={state.AvatarId}");
+            }
         }
 
 #endregion Initialize On Awake
@@ -1477,7 +1543,9 @@ namespace Nekoyume.Game
 #if ENABLE_IL2CPP
             // Because of strict AOT environments, use StaticCompositeResolver for IL2CPP.
             StaticCompositeResolver.Instance.Register(
+#if NC_RPC_ENABLED
                 MagicOnion.Resolvers.MagicOnionResolver.Instance,
+#endif
                 NineChroniclesResolver.Instance,
                 GeneratedResolver.Instance,
                 StandardResolver.Instance
@@ -1571,7 +1639,7 @@ namespace Nekoyume.Game
         {
             Analyzer.Instance.Track("Unity/Intro/Start/AgentInitializeFailed");
 
-            QuitWithAgentConnectionError(null);
+            QuitWithAgentConnectionError();
         }
 
         public async UniTask InitializeStage()

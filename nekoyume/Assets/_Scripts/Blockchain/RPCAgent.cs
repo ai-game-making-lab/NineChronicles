@@ -1,3 +1,4 @@
+#if NC_RPC_ENABLED
 using System;
 using System.Collections;
 using System.Collections.Async;
@@ -15,7 +16,6 @@ using Bencodex.Types;
 using Cysharp.Threading.Tasks;
 using Grpc.Core;
 using Ionic.Zlib;
-using Lib9c;
 using Lib9c.Renderers;
 using Libplanet.Action.State;
 using Libplanet.Common;
@@ -40,6 +40,7 @@ using Nekoyume.Model.Quest;
 using Nekoyume.Model.State;
 using Nekoyume.Shared.Hubs;
 using Nekoyume.Shared.Services;
+using Nekoyume.SingleClient;
 using Nekoyume.State;
 using Nekoyume.UI;
 using NineChronicles.RPC.Shared.Exceptions;
@@ -123,6 +124,14 @@ namespace Nekoyume.Blockchain
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         public static void OnRuntimeInitialize()
         {
+            if (!ShouldInitializeRpcTransport(
+                    Environment.GetCommandLineArgs(),
+                    Environment.GetEnvironmentVariable(SingleClientMode.EnvironmentVariable)))
+            {
+                NcDebug.Log("[RPC Agent] Skip gRPC channel initialization in single-client mode.");
+                return;
+            }
+
             // Initialize gRPC channel provider when the application is loaded.
             GrpcChannelProviderHost.Initialize(new LoggingGrpcChannelProvider(
                 new DefaultGrpcChannelProvider(new[]
@@ -130,6 +139,13 @@ namespace Nekoyume.Blockchain
                     new ChannelOption("grpc.max_receive_message_length", -1),
                 })
             ));
+        }
+
+        public static bool ShouldInitializeRpcTransport(
+            IEnumerable<string> commandLineArgs,
+            string singleClientEnvironmentValue)
+        {
+            return !SingleClientMode.IsEnabled(commandLineArgs, singleClientEnvironmentValue);
         }
         //
         // /// <summary>
@@ -462,7 +478,7 @@ namespace Nekoyume.Blockchain
         /// [0]: BigInteger - 유저의 지분값
         /// [1]: BigInteger - 총 지분값
         /// [2]: FungibleAssetValue - 총 위임값 (GuildGold로 표시)
-        /// 총 위임값을 NCG로 환산하려면 Lib9c.GuildModule의 ConvertCurrency를 사용하세요.
+        /// 총 위임값을 NCG로 환산하려면 guild module의 ConvertCurrency를 사용하세요.
         /// </summary>
         /// <param name="stateRootHash">stateRootHash</param>
         /// <param name="address">agentAddress</param>
@@ -851,7 +867,7 @@ namespace Nekoyume.Blockchain
                         Address,
                         await GetBalanceAsync(Address, goldCurrency)));
                 States.Instance.SetCrystalBalance(
-                    await GetBalanceAsync(Address, Currencies.Crystal));
+                    await GetBalanceAsync(Address, ClientCurrencies.Crystal));
 
                 if (await GetStateAsync(
                         ReservedAddresses.LegacyAccount,
@@ -1065,7 +1081,7 @@ namespace Nekoyume.Blockchain
                 PrivateKey,
                 _genesis?.Hash,
                 new List<IValue> { action.Item1.PlainValue },
-                FungibleAssetValue.Parse(Currencies.Mead, "0.00001"),
+                FungibleAssetValue.Parse(ClientCurrencies.Mead, "0.00001"),
                 gasLimit
             );
 
@@ -1484,3 +1500,24 @@ namespace Nekoyume.Blockchain
         }
     }
 }
+#else
+using System.Collections.Generic;
+using Nekoyume.SingleClient;
+
+namespace Nekoyume.Blockchain
+{
+    /// <summary>
+    /// Compile-only shim kept for single-client builds so existing callers and tests
+    /// can still reason about RPC transport flags without pulling in MagicOnion or gRPC.
+    /// </summary>
+    public static class RPCAgent
+    {
+        public static bool ShouldInitializeRpcTransport(
+            IEnumerable<string> commandLineArgs,
+            string singleClientEnvironmentValue)
+        {
+            return !SingleClientMode.IsEnabled(commandLineArgs, singleClientEnvironmentValue);
+        }
+    }
+}
+#endif

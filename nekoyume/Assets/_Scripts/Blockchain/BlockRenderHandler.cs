@@ -53,6 +53,7 @@ namespace Nekoyume.Blockchain
                 .ObserveOnMainThread()
                 .Subscribe(_ => UpdateWhenEveryBlockRenderBeginningAsync().Forget())
                 .AddTo(_disposables);
+#if NC_RPC_ENABLED
             if (Game.Game.instance.Agent is RPCAgent rpcAgent)
             {
                 rpcAgent.OnRetryEnded.Subscribe(_ =>
@@ -61,6 +62,7 @@ namespace Nekoyume.Blockchain
                     _avatarUpdateRequired = true;
                 }).AddTo(_disposables);
             }
+#endif
         }
 
         public void Stop()

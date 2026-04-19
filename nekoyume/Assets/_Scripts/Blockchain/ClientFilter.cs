@@ -1,3 +1,4 @@
+#if NC_RPC_ENABLED
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
@@ -42,3 +43,4 @@ namespace Nekoyume.Blockchain
         }
     }
 }
+#endif
