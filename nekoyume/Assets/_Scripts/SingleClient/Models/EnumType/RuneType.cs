@@ -1,0 +1,12 @@
+namespace Nekoyume.SingleClient.Models.EnumType
+{
+    /// <summary>
+    /// Client-owned mirror of <c>Nekoyume.Model.EnumType.RuneType</c>. Ordering matches lib9c
+    /// 1:1 for lossless <c>(int)</c> casts.
+    /// </summary>
+    public enum RuneType
+    {
+        Stat = 1,
+        Skill = 2,
+    }
+}
