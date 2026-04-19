@@ -108,7 +108,18 @@ The safe removal path is to shrink those public boundaries first, then delete th
    - Battle-engine call sites (`Game/Character/Actor.cs`, `Game/Character/StageMonster.cs`, `Game/Character/EnemyPlayer.cs`, `Game/Character/RaidCharacter.cs`, `UI/Widget/Status.cs`, `UI/Widget/ArenaBattle.cs`, `UI/Widget/WorldBossBattle.cs`) now call `.ToViewMap()` at the HUD boundary, keeping lib9c `Buff` inside the simulator and DTO outside.
    - `Extensions/BuffSheetExtension.cs` gained `BuffView` overloads for `GetLocalizedName`, `GetLocalizedDescription`, and `GetIcon`; `Helper/BuffHelper.GetBuffIcon` gained a `BuffView`-typed overload that reads `view.IsStatBuff`/`view.StatType`/`view.StatValue` to pick the positive/negative sprite without touching lib9c `StatBuff`.
 
-   Next slices (not yet started): `Nekoyume.Model.Item` (equipment/costume/material views, inventory, shop, grind, enhancement) and `Nekoyume.Model.State` (avatar/agent/world/stage snapshots threaded into headers, battle prep, login) — both materially larger than the Stat/Buff cluster and best tackled per-subsystem.
+   Additional DTO scaffolding (landed, not yet wired into production callers):
+   - `Nekoyume.SingleClient.Models.Elemental.{ElementalType, ElementalResult}` mirror lib9c; `ElementalRules` ports the deterministic rock-paper-scissors rules (`TryGetWinCase`, `TryGetLoseCase`, `GetBattleResult`, `GetMultiplier`, `GetAllTypes`) but omits `GetDamage` because that helper still needs `NumberConversionHelper` from lib9c; UI callers can add a client-side damage helper when they adopt the mirror. `ElementalTypeMapper` holds explicit `ToView`/`ToLib9c` casts. `ElementalRulesTest` verifies ordinal parity and matchup equivalence across every (from, to) pair.
+   - `Nekoyume.SingleClient.Models.Skills.{SkillType, SkillCategory, SkillTargetType}` mirror lib9c; `SkillTargetTypeExtension.GetTarget` is intentionally NOT ported because it requires the simulator's `CharacterBase`. `SkillSnapshot` is an immutable struct carrying the `SkillSheet.Row` fields plus runtime `Power/Chance/StatPowerRatio/ReferencedStatType` and an `IsBuffSkill` helper. `SkillSnapshotMapper.ToSnapshot(Skill)` projects lib9c into the snapshot; `SkillSnapshotMapperTest` covers `NormalAttack`, `BuffSkill`, and enum ordinal parity.
+   - `Nekoyume.SingleClient.Models.Items.{ItemType, ItemSubType, LockType}` mirror lib9c. Only the enums land; the polymorphic `ItemBase/Equipment/Costume/Consumable/Material` hierarchy is deferred pending a per-subtype DTO design pass. `ItemEnumMapper` holds `ToView`/`ToLib9c` helpers; `ItemEnumMapperTest` round-trips every lib9c value and asserts the Equipment (6..10) / Costume (1..5) cluster ranges so a stealth lib9c re-ordering fails fast.
+
+   Next slices (not yet started):
+   - Migrate the Skill UI cluster (`UI/Model/SkillView`, `UI/Module/Skill/SkillView`, `UI/Module/Common/SkillPositionTooltip`, `UI/Module/Stat/EnhancementSkillOptionView`, `UI/Widget/Screen/{EnhancementResult, CombinationResult}Screen`, `UI/Widget/Popup/SuperCraftPopup`) onto `SkillSnapshot`; battle-engine callers convert at the `ItemTooltipDetail.AddSkill` / enhancement-result boundaries with `.ToSnapshot()`.
+   - Migrate the Elemental UI cluster (~14 production files outside lib9c and the battle engine) onto the client-side `ElementalType` + `ElementalRules`; this mostly means swapping imports at the tooltip / character-view boundary because the lib9c extension methods have been re-implemented for the client enum.
+   - Design `ItemBase`-family DTOs (`ItemSnapshot` + per-subtype snapshots for Equipment/Costume/Consumable/Material) and migrate the inventory/shop/grind/enhancement UI. This is the largest remaining cluster because the UI relies on downcasting `ItemBase` into specific subtypes for stat rows and option views.
+   - `Nekoyume.Model.State` (avatar/agent/world/stage snapshots) — deferred until Item is stable because most State-consuming UI also touches Item.
+   - MagicOnion package + `Assets/Packages/Grpc.Core*` NuGet removal — deferred until no production file imports `MagicOnion.*` or `Grpc.*` (both are already gated behind `NC_RPC_ENABLED`, so the work is package-manifest-only, but it should land together with a `Packages/manifest.json` review).
+   - Step 6 (delete lib9c) is blocked until every `Nekoyume.Action / Model / TableData / Libplanet / Bencodex` reference under `Assets/_Scripts` (outside `Lib9c/`) is removed.
 
 5. Remove network/runtime packages. (define-guard slice complete)
    - Single-client execution skips `RPCAgent` gRPC channel initialization.
@@ -144,11 +155,11 @@ Targeted single-client tests:
   -testFilter 'Tests.EditMode.SingleClient'
 ```
 
-Current verification on Unity 6000.3.7f1 (post Step 5 define-guard + Step 4 HUD/Buff slice + RPC.Shared submodule removal):
+Current verification on Unity 6000.3.7f1 (post Step 5 define-guard + Step 4 HUD/Buff slice + RPC.Shared submodule removal + Elemental/Skills/Items scaffolding):
 
-- `Tests.EditMode.SingleClient`: 62 passed, 0 failed
-  - Results: `C:\Users\USER\AppData\Local\Temp\nc-hud-slice.xml`
-- Full EditMode: 135 passed, 0 failed
-  - Results: `C:\Users\USER\AppData\Local\Temp\nc-post-submodule.xml`
+- `Tests.EditMode.SingleClient`: 72 passed, 0 failed
+  - Results: `C:\Users\USER\AppData\Local\Temp\nc-items-scaffold.xml`
+- Full EditMode: 145 passed, 0 failed
+  - Results: `C:\Users\USER\AppData\Local\Temp\nc-items-scaffold.xml`
 
-The 62-case SingleClient count reflects the previous 44 plus the new 3 `BuffViewMapperTest` cases and the 15 gained from the interim authoring cycle that already shipped. Full EditMode includes the unchanged Lib9c/Battle/TableData suites, confirming the HUD migration and submodule removal produced no regressions.
+SingleClient case delta vs the HUD slice (62 → 72): +3 `ElementalRulesTest`, +3 `SkillSnapshotMapperTest`, +4 `ItemEnumMapperTest`. Full EditMode (135 → 145) reflects the same additions on top of the unchanged Lib9c / Battle / TableData suites, confirming the three scaffolding commits produced no regressions.
