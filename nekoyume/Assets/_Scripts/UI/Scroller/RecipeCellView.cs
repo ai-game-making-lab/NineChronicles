@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
-using Nekoyume.Model.Elemental;
 using Nekoyume.Model.Item;
+using Nekoyume.SingleClient.Models.Elemental;
 using Nekoyume.UI.Model;
 using Nekoyume.UI.Module;
 using UnityEngine;
@@ -72,6 +72,11 @@ namespace Nekoyume.UI.Scroller
 
         public bool IsLocked => lockParent.activeSelf;
         public ItemSubType ItemSubType { get; protected set; }
+        /// <summary>
+        /// Client-owned elemental type projected from lib9c's <c>ItemUsable.ElementalType</c>
+        /// at the recipe cell boundary. Stays internal to UI code so downstream widgets can
+        /// stop importing <c>Nekoyume.Model.Elemental</c>.
+        /// </summary>
         public ElementalType ElementalType { get; protected set; }
         public StatType StatType { get; protected set; }
         public EquipmentItemRecipeSheet.Row EquipmentRowData { get; private set; }
@@ -130,7 +135,7 @@ namespace Nekoyume.UI.Scroller
         protected void Set(ItemUsable itemUsable)
         {
             ItemSubType = itemUsable.ItemSubType;
-            ElementalType = itemUsable.ElementalType;
+            ElementalType = itemUsable.ElementalType.ToView();
 
             titleText.text = itemUsable.GetLocalizedNonColoredName();
 
