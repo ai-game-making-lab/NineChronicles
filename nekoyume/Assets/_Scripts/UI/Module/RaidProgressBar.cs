@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using Nekoyume.Game.Controller;
 using Nekoyume.Game.VFX;
 using Nekoyume.Helper;
@@ -227,3 +228,5 @@ namespace Nekoyume.UI.Module
         }
     }
 }
+
+#endif

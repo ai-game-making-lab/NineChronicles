@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 ﻿namespace Nekoyume
 {
     public enum TimeMachineAction
@@ -8,3 +9,5 @@
         Pause = 3
     }
 }
+
+#endif

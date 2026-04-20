@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using System.Collections.Generic;
 using Nekoyume.Action;
 using Nekoyume.Model.State;
@@ -22,3 +23,5 @@ namespace Tests.EditMode
         }
     }
 }
+
+#endif

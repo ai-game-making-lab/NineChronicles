@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using System;
 
 namespace Nekoyume.SingleClient.Models.TableData
@@ -48,3 +49,5 @@ namespace Nekoyume.SingleClient.Models.TableData
             EquipmentItemSubRecipeSheetV2OptionInfoView right) => !left.Equals(right);
     }
 }
+
+#endif

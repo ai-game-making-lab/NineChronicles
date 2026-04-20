@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using System.Collections.Generic;
 using Nekoyume.Battle;
 using Nekoyume.SingleClient.Models.Stats;
@@ -44,3 +45,5 @@ namespace Nekoyume.SingleClient.Models.Items
         }
     }
 }
+
+#endif

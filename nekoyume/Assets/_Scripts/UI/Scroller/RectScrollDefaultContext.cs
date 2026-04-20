@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using System;
 using UnityEngine.UI.Extensions;
 
@@ -13,3 +14,5 @@ namespace Nekoyume.UI.Scroller
         }
     }
 }
+
+#endif

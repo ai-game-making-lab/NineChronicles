@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using System.Collections.Generic;
 using Nekoyume.Helper;
 using Nekoyume.L10n;
@@ -175,3 +176,5 @@ namespace Nekoyume.UI
         }
     }
 }
+
+#endif

@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
@@ -75,3 +76,5 @@ namespace Nekoyume.Game.Tween
         }
     }
 }
+
+#endif

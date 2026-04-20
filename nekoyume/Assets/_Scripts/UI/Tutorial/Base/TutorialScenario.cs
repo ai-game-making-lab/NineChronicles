@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -338,3 +339,5 @@ namespace Nekoyume.UI
         }
     }
 }
+
+#endif

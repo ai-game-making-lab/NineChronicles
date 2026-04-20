@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using System.Threading.Tasks;
 using Nekoyume.Blockchain;
 using TMPro;
@@ -89,3 +90,5 @@ namespace Nekoyume.UI
         }
     }
 }
+
+#endif

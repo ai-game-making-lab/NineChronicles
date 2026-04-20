@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using System.Collections;
 using Coffee.UISoftMask;
 using DG.Tweening;
@@ -164,3 +165,5 @@ namespace Nekoyume.UI
         }
     }
 }
+
+#endif

@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using System;
 using System.Collections.Generic;
 using System.Xml;
@@ -27,3 +28,5 @@ namespace Nekoyume.UI.Model
         public int PerInterval { get; set; }
     }
 }
+
+#endif

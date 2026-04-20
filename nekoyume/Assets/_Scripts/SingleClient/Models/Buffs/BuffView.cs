@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using System;
 using Nekoyume.SingleClient.Models.Stats;
 
@@ -63,3 +64,5 @@ namespace Nekoyume.SingleClient.Models.Buffs
         public static bool operator !=(BuffView left, BuffView right) => !left.Equals(right);
     }
 }
+
+#endif

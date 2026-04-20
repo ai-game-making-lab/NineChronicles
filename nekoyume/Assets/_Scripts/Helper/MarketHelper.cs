@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 #if UNITY_EDITOR
 
 using System;
@@ -72,5 +73,7 @@ namespace Nekoyume.Helper
         }
     }
 }
+
+#endif
 
 #endif

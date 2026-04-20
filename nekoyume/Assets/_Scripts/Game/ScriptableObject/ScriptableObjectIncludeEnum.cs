@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -13,3 +14,5 @@ public class ScriptableObjectIncludeEnum<T> : ScriptableObject where T : Enum
         set => enums = value;
     }
 }
+
+#endif

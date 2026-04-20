@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -72,3 +73,5 @@ public class CenteredGridLayout : GridLayoutGroup
         }
     }
 }
+
+#endif

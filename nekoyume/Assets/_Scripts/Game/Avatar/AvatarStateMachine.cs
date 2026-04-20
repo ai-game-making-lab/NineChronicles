@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 ﻿using Spine.Unity;
 using UnityEngine;
 using UnityEngine.Animations;
@@ -44,3 +45,5 @@ namespace Nekoyume.Game.Avatar
         }
     }
 }
+
+#endif

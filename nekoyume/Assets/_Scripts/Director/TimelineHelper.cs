@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using Spine.Unity;
 using Spine.Unity.Playables;
 using UnityEngine;
@@ -42,3 +43,5 @@ namespace Nekoyume.Director
         }
     }
 }
+
+#endif

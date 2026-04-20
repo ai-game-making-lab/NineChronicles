@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 namespace Nekoyume.SingleClient.Models.EnumType
 {
     /// <summary>
@@ -31,3 +32,5 @@ namespace Nekoyume.SingleClient.Models.EnumType
         Transcendent = 8,
     }
 }
+
+#endif

@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using UnityEngine;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -753,3 +754,5 @@ namespace UberLogger
         }
     }
 }
+
+#endif

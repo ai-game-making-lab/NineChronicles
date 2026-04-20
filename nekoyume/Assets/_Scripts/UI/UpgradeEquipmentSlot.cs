@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using Nekoyume.Model.Item;
 using UnityEngine;
 using UnityEngine.Events;
@@ -44,3 +45,5 @@ namespace Nekoyume.UI
         }
     }
 }
+
+#endif

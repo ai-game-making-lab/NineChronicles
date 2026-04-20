@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using Nekoyume.Game.Character;
 using Nekoyume.Model.State;
 using TMPro;
@@ -46,3 +47,5 @@ namespace Nekoyume.UI.Module
         }
     }
 }
+
+#endif

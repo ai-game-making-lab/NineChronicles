@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using System;
 using UnityEngine;
 
@@ -31,3 +32,5 @@ namespace Nekoyume.Game.ScriptableObject
         public int Grade => grade;
     }
 }
+
+#endif

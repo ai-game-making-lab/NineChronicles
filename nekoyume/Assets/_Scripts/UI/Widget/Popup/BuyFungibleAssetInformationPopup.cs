@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 ﻿using System.Linq;
 using Coffee.UIEffects;
 using Libplanet.Types.Assets;
@@ -100,3 +101,5 @@ namespace Nekoyume.UI
         }
     }
 }
+
+#endif

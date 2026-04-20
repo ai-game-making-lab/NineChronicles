@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 //
 //   PlistCS Property List (plist) serialization and parsing library.
 //
@@ -993,3 +994,5 @@ namespace NekoyumeEditor
         }
     }
 }
+
+#endif

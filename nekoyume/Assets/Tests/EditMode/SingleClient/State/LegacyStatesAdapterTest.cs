@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using Nekoyume.SingleClient.State;
 using NUnit.Framework;
 using Lib9cStates = Nekoyume.State.States;
@@ -77,3 +78,5 @@ namespace Tests.EditMode.SingleClient.State
         }
     }
 }
+
+#endif

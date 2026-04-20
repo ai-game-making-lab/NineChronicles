@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using Libplanet.Crypto;
 using System;
 using System.Globalization;
@@ -221,3 +222,5 @@ namespace Editor
         }
     }
 }
+
+#endif

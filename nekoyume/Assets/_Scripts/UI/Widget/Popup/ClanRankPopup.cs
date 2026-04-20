@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using Cysharp.Threading.Tasks;
 using Nekoyume.L10n;
 using Nekoyume.UI.Scroller;
@@ -93,3 +94,5 @@ namespace Nekoyume.UI
         }
     }
 }
+
+#endif

@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using System.Collections.Generic;
 using Nekoyume.Model.Buff;
 using Nekoyume.SingleClient.Models.Buffs;
@@ -67,3 +68,5 @@ namespace Tests.EditMode.SingleClient
         }
     }
 }
+
+#endif

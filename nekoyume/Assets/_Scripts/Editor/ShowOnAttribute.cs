@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 #if UNITY_EDITOR
 using System;
 using UnityEngine;
@@ -24,4 +25,6 @@ namespace Nekoyume.Editor
         }
     }
 }
+#endif
+
 #endif

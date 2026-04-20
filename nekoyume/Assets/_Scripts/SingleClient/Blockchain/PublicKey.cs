@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using System;
 using System.Text;
 
@@ -119,3 +120,5 @@ namespace Nekoyume.SingleClient.Blockchain
         public static bool operator !=(PublicKey left, PublicKey right) => !left.Equals(right);
     }
 }
+
+#endif

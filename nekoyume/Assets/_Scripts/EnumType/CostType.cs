@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 public enum CostType
 {
     None,
@@ -19,3 +20,5 @@ public enum CostType
     ApPotion = 500000,
     CatalystPotion = 500001,
 }
+
+#endif

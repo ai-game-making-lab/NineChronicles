@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using System.Collections.Generic;
 using Lib9cBuff = Nekoyume.Model.Buff.Buff;
 using Lib9cStatBuff = Nekoyume.Model.Buff.StatBuff;
@@ -79,3 +80,5 @@ namespace Nekoyume.SingleClient.Models.Buffs
         }
     }
 }
+
+#endif

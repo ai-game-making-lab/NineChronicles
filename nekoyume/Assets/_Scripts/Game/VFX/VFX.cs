@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using System.Collections;
 using NUnit.Framework;
 using UnityEngine;
@@ -176,3 +177,5 @@ namespace Nekoyume.Game.VFX
         }
     }
 }
+
+#endif

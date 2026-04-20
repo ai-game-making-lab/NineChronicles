@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using Nekoyume.ActionExtensions;
 using Nekoyume.Game;
 using Nekoyume.Helper;
@@ -45,3 +46,5 @@ namespace Nekoyume
         }
     }
 }
+
+#endif

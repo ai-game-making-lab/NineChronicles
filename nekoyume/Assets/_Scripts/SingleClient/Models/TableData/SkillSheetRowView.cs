@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using System;
 using Nekoyume.Helper;
 using Nekoyume.SingleClient.Models.Elemental;
@@ -90,3 +91,5 @@ namespace Nekoyume.SingleClient.Models.TableData
         public static bool operator !=(SkillSheetRowView left, SkillSheetRowView right) => !left.Equals(right);
     }
 }
+
+#endif

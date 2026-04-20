@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using Nekoyume.Model.Skill;
 using Nekoyume.TableData.Crystal;
 using System;
@@ -29,3 +30,5 @@ namespace Nekoyume.Game.ScriptableObject
         public Sprite SmallBgSprite => smallBgSprite;
     }
 }
+
+#endif

@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -230,3 +231,5 @@ namespace Nekoyume.UI
         public float delay;
     }
 }
+
+#endif

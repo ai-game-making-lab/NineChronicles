@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using System;
 using Nekoyume.SingleClient.Blockchain;
 
@@ -21,3 +22,5 @@ namespace Nekoyume.SingleClient.Models.Market
         public Address SellerAgentAddress { get; set; }
     }
 }
+
+#endif

@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using System;
 using System.Collections.Generic;
 using Nekoyume.SingleClient.Models.Elemental;
@@ -163,3 +164,5 @@ namespace Nekoyume.SingleClient.Models.Items
         public static bool operator !=(EquipmentSnapshot left, EquipmentSnapshot right) => !left.Equals(right);
     }
 }
+
+#endif

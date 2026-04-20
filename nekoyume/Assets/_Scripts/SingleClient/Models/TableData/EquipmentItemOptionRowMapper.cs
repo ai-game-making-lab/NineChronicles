@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using Nekoyume.SingleClient.Models.Buffs;
 using Lib9cEquipmentItemOptionSheet = Nekoyume.TableData.EquipmentItemOptionSheet;
 
@@ -32,3 +33,5 @@ namespace Nekoyume.SingleClient.Models.TableData
         }
     }
 }
+
+#endif

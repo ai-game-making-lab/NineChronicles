@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using Unity.Mathematics;
 
 namespace Nekoyume.Game.Util
@@ -15,3 +16,5 @@ namespace Nekoyume.Game.Util
         public static readonly float2 OneOne = new(1f, 1f);
     }
 }
+
+#endif

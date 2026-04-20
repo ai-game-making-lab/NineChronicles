@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using System.Collections.Generic;
 using Nekoyume.SingleClient.Models.Buffs;
 using Lib9cRuneOptionInfo = Nekoyume.TableData.RuneOptionSheet.Row.RuneOptionInfo;
@@ -74,3 +75,5 @@ namespace Nekoyume.SingleClient.Models.TableData
         }
     }
 }
+
+#endif

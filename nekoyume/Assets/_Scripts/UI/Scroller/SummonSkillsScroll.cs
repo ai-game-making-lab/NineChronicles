@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using UnityEngine;
 using UnityEngine.UI.Extensions;
 
@@ -19,3 +20,5 @@ namespace Nekoyume.UI.Scroller
         protected override FancyCell<SummonSkillsCell.Model, ContextModel> CellTemplate => cellPrefab;
     }
 }
+
+#endif

@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using System;
 using Nekoyume.Model.Mail;
 using Nekoyume.Model.EnumType;
@@ -266,3 +267,5 @@ namespace Nekoyume.Helper
         }
     }
 }
+
+#endif

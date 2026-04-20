@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using Lib9cSubRecipeV2OptionInfo = Nekoyume.TableData.EquipmentItemSubRecipeSheetV2.OptionInfo;
 
 namespace Nekoyume.SingleClient.Models.TableData
@@ -19,3 +20,5 @@ namespace Nekoyume.SingleClient.Models.TableData
         }
     }
 }
+
+#endif

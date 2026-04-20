@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 namespace Nekoyume.SingleClient.Models.Mail
 {
     /// Projection of <c>MaterialCraftMail</c> — workshop material-delivery mail. Carries the
@@ -11,3 +12,5 @@ namespace Nekoyume.SingleClient.Models.Mail
         public override MailType MailType => MailType.Workshop;
     }
 }
+
+#endif

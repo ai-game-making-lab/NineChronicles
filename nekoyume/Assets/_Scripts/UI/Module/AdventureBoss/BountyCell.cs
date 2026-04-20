@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using Nekoyume.Action.AdventureBoss;
 using Nekoyume.Helper;
 using Nekoyume.Model.AdventureBoss;
@@ -49,3 +50,5 @@ namespace Nekoyume
         }
     }
 }
+
+#endif

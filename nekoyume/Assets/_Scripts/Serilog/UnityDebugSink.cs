@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using Serilog.Core;
 using Serilog.Events;
 
@@ -18,3 +19,5 @@ namespace Nekoyume.Serilog
         }
     }
 }
+
+#endif

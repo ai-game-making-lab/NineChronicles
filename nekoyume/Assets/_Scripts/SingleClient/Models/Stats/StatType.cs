@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 namespace Nekoyume.SingleClient.Models.Stats
 {
     /// <summary>
@@ -20,3 +21,5 @@ namespace Nekoyume.SingleClient.Models.Stats
         Thorn,
     }
 }
+
+#endif

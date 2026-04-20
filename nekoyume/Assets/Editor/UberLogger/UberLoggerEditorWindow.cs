@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
@@ -1014,3 +1015,5 @@ public class UberLoggerEditorWindow : EditorWindow, UberLoggerEditor.ILoggerWind
     private float LogListLineHeight = 0;
     private float CollapseBadgeMaxWidth = 0;
 }
+
+#endif

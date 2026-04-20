@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using Libplanet.Types.Assets;
 using Nekoyume.EnumType;
 using Nekoyume.TableData;
@@ -90,3 +91,5 @@ namespace Nekoyume
         }
     }
 }
+
+#endif

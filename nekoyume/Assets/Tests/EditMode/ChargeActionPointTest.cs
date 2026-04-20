@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using Bencodex.Types;
 using Libplanet.Crypto;
 using Nekoyume.Action;
@@ -27,3 +28,5 @@ namespace Tests.EditMode
         }
     }
 }
+
+#endif

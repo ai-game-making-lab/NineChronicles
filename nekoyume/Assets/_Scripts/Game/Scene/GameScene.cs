@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using Cysharp.Threading.Tasks;
 
 namespace Nekoyume.Game.Scene
@@ -20,3 +21,5 @@ namespace Nekoyume.Game.Scene
         }
     }
 }
+
+#endif

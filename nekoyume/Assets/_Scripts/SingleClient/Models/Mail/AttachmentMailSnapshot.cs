@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using Nekoyume.SingleClient.Models.Items;
 
 namespace Nekoyume.SingleClient.Models.Mail
@@ -10,3 +11,5 @@ namespace Nekoyume.SingleClient.Models.Mail
         public IItemSnapshot Attachment { get; set; }
     }
 }
+
+#endif

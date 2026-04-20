@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 ﻿using System.Globalization;
 using TMPro;
 using UnityEngine;
@@ -43,3 +44,5 @@ namespace Nekoyume.UI.Module.Arena.Board
         }
     }
 }
+
+#endif

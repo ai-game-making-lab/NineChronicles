@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 #if LIB9C_TOOLS
 using System;
 using System.IO;
@@ -95,4 +96,6 @@ namespace NekoyumeEditor
         }
     }
 }
+#endif
+
 #endif

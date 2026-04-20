@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 namespace Nekoyume.EnumType
 {
     public enum WidgetType
@@ -15,3 +16,5 @@ namespace Nekoyume.EnumType
         Development // SystemUI : 10
     }
 }
+
+#endif

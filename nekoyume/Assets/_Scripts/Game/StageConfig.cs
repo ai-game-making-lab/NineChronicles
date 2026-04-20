@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 ﻿using System;
 using Nekoyume.Pattern;
 using UnityEngine;
@@ -38,3 +39,5 @@ namespace Nekoyume.Game
         public DropItemOptions droopItemOptions = new();
     }
 }
+
+#endif

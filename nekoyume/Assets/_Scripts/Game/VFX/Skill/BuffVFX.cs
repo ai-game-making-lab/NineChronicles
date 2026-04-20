@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using UnityEngine;
 using Nekoyume.Game.Character;
 using Nekoyume.Model.BattleStatus;
@@ -31,3 +32,5 @@ namespace Nekoyume.Game.VFX.Skill
         }
     }
 }
+
+#endif

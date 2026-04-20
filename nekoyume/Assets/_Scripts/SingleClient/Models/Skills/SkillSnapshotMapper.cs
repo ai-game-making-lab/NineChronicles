@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using Nekoyume.SingleClient.Models.Buffs;
 using Nekoyume.SingleClient.Models.Elemental;
 using Lib9cSkill = Nekoyume.Model.Skill.Skill;
@@ -34,3 +35,5 @@ namespace Nekoyume.SingleClient.Models.Skills
         }
     }
 }
+
+#endif

@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 namespace Nekoyume.UI
 {
     public class CollectionItemFilterPopup : ItemFilterPopupBase
@@ -12,3 +13,5 @@ namespace Nekoyume.UI
         }
     }
 }
+
+#endif

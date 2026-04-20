@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using System;
 using Nekoyume.Helper;
 
@@ -28,3 +29,5 @@ namespace Nekoyume.ApiClient
         public ThorSchedule Others { get; set; }
     }
 }
+
+#endif

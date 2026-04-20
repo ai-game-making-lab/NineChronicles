@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using System;
 using Libplanet.Types.Assets;
 using Nekoyume.Model.Stake;
@@ -62,3 +63,5 @@ namespace Nekoyume.State.Subjects
         }
     }
 }
+
+#endif

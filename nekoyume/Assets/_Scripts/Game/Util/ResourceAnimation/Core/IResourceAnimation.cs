@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 ﻿using System.Collections;
 
 namespace Nekoyume.Game.Util
@@ -8,3 +9,5 @@ namespace Nekoyume.Game.Util
         void Stop();
     }
 }
+
+#endif

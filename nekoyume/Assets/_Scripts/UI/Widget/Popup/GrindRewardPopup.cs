@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using System.Linq;
 using Libplanet.Types.Assets;
 using Nekoyume.Model.Item;
@@ -36,3 +37,5 @@ namespace Nekoyume.UI
         }
     }
 }
+
+#endif

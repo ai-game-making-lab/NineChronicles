@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 #if !ENABLE_UBERLOGGING && (DEVELOPMENT_BUILD || DEBUG || UNITY_EDITOR)
 #define ENABLE_UBERLOGGING
 #endif
@@ -131,3 +132,5 @@ public static class UberDebug
 #endif
     }
 }
+
+#endif

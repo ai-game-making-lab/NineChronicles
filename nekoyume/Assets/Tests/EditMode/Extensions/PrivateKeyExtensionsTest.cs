@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using System;
 using Libplanet.Common;
 using Libplanet.Crypto;
@@ -21,3 +22,5 @@ namespace Tests.EditMode.Extensions
         }
     }
 }
+
+#endif

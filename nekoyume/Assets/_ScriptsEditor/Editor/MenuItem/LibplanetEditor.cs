@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using System.Collections.Generic;
 using System.IO;
 using Libplanet.Crypto;
@@ -94,3 +95,5 @@ namespace NekoyumeEditor
         }
     }
 }
+
+#endif

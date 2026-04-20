@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using DG.Tweening;
 using Nekoyume.Helper;
 using TMPro;
@@ -74,3 +75,5 @@ namespace Nekoyume.UI.Tween
         #endregion
     }
 }
+
+#endif

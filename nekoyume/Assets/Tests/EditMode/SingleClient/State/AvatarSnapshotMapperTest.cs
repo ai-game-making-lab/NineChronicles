@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using Nekoyume.Model.Item;
 using Nekoyume.Model.Quest;
 using Nekoyume.SingleClient.Models.Items;
@@ -148,3 +149,5 @@ namespace Tests.EditMode.SingleClient.State
         }
     }
 }
+
+#endif

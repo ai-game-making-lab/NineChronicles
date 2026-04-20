@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 #if NC_RPC_ENABLED
 using System;
 using System.Diagnostics;
@@ -43,4 +44,6 @@ namespace Nekoyume.Blockchain
         }
     }
 }
+#endif
+
 #endif

@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using Nekoyume.Model.Quest;
 using Nekoyume.SingleClient.Blockchain;
 using Nekoyume.SingleClient.State;
@@ -229,3 +230,5 @@ namespace Nekoyume.UI
         }
     }
 }
+
+#endif

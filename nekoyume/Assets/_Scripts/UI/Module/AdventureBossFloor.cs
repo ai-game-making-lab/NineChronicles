@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Nekoyume.Game;
@@ -132,3 +133,5 @@ namespace Nekoyume.UI.Module
         }
     }
 }
+
+#endif

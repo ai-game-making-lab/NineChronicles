@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using Nekoyume.L10n;
 using Nekoyume.Multiplanetary;
 using Nekoyume.UI.Module;
@@ -66,3 +67,5 @@ namespace Nekoyume.UI.Scroller
         }
     }
 }
+
+#endif

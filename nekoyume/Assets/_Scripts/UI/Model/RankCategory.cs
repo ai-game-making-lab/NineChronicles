@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 namespace Nekoyume.UI.Model
 {
     public enum RankCategory
@@ -15,3 +16,5 @@ namespace Nekoyume.UI.Model
         EquipmentGrimoire,
     }
 }
+
+#endif

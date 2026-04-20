@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using System.Threading.Tasks;
 using Nekoyume.GraphQL;
 using UnityEditor;
@@ -38,3 +39,5 @@ namespace NekoyumeEditor
         }
     }
 }
+
+#endif

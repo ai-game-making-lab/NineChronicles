@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 ﻿using System;
 
 namespace Nekoyume.Helper
@@ -16,3 +17,5 @@ namespace Nekoyume.Helper
         public static readonly ReactiveProperty<bool> ClaimGifts = new();
     }
 }
+
+#endif

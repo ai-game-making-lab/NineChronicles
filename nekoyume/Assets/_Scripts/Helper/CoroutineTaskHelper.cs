@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 // 출처: https://techcommunity.microsoft.com/t5/windows-dev-appconsult/asynchronous-programming-in-unity-using-coroutine-and-tap/ba-p/316851#
 
 using System.Collections;
@@ -150,3 +151,5 @@ namespace Nekoyume.Helper
         }
     }
 }
+
+#endif

@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using System.Collections;
 using System.Text;
 using System.Text.Json;
@@ -143,3 +144,5 @@ namespace Nekoyume.Game.OAuth
         }
     }
 }
+
+#endif

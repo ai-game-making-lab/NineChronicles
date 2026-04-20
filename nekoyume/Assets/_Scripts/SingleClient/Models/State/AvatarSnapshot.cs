@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using System;
 using System.Collections.Generic;
 using Nekoyume.SingleClient.Blockchain;
@@ -145,3 +146,5 @@ namespace Nekoyume.SingleClient.Models.State
         public static bool operator !=(AvatarSnapshot left, AvatarSnapshot right) => !left.Equals(right);
     }
 }
+
+#endif

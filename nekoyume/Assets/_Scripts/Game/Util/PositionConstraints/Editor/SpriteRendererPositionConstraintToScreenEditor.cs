@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using UnityEditor;
 
 namespace Nekoyume.Game.Util
@@ -7,3 +8,5 @@ namespace Nekoyume.Game.Util
     {
     }
 }
+
+#endif

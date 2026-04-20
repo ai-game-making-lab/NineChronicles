@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 namespace Nekoyume.EnumType
 {
     public enum ColorSelectType
@@ -13,3 +14,5 @@ namespace Nekoyume.EnumType
         Light2
     }
 }
+
+#endif

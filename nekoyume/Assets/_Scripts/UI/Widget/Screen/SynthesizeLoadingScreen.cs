@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using Nekoyume.Game.Character;
 using Nekoyume.UI.Tween;
 using System.Collections;
@@ -191,3 +192,5 @@ namespace Nekoyume.UI
         }
     }
 }
+
+#endif

@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using Nekoyume.Game.Character;
 using Nekoyume.Game.VFX;
 using Nekoyume.Helper;
@@ -90,3 +91,5 @@ namespace Nekoyume.Game.Factory
         }
     }
 }
+
+#endif

@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using System.Text;
 using Nekoyume.Game.VFX.Skill;
 using UnityEditor;
@@ -58,3 +59,5 @@ public static class ResourceEditor
         Debug.Log(sb.ToString());
     }
 }
+
+#endif

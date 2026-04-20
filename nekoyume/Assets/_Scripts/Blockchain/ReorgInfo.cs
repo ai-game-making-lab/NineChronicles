@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using System.Security.Cryptography;
 using Libplanet.Common;
 
@@ -23,3 +24,5 @@ namespace Nekoyume.Blockchain
         public HashDigest<SHA256> NewTipHash { get; }
     }
 }
+
+#endif

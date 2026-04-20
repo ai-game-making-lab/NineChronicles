@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using System;
 using System.Collections.Generic;
 using System.Numerics;
@@ -83,3 +84,5 @@ namespace Nekoyume.SingleClient.Models.State
         public static bool operator !=(AgentSnapshot left, AgentSnapshot right) => !left.Equals(right);
     }
 }
+
+#endif

@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using DG.Tweening;
 using NUnit.Framework;
 using Unity.Mathematics;
@@ -144,3 +145,5 @@ namespace Nekoyume.UI.Tween
         }
     }
 }
+
+#endif

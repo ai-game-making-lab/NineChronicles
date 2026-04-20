@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 
@@ -25,3 +26,5 @@ namespace Nekoyume
         }
     }
 }
+
+#endif

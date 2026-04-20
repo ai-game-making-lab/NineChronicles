@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using System;
 using Nekoyume.SingleClient.Models.Elemental;
 using Nekoyume.SingleClient.Models.Items;
@@ -60,3 +61,5 @@ namespace Nekoyume.SingleClient.Models.TableData
             !left.Equals(right);
     }
 }
+
+#endif

@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using Nekoyume.Helper;
 using TMPro;
 using UnityEditor;
@@ -75,3 +76,5 @@ namespace NekoyumeEditor
         }
     }
 }
+
+#endif

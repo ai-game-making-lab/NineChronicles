@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 namespace Nekoyume.UI.Module
 {
     public interface IToggleable
@@ -11,3 +12,5 @@ namespace Nekoyume.UI.Module
         void SetToggledOff();
     }
 }
+
+#endif

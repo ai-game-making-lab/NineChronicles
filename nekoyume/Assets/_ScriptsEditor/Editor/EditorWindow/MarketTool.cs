@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
@@ -28,3 +29,5 @@ namespace NekoyumeEditor
         }
     }
 }
+
+#endif

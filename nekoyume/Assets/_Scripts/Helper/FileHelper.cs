@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using System.IO;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -37,3 +38,5 @@ namespace Nekoyume.Helper
         }
     }
 }
+
+#endif

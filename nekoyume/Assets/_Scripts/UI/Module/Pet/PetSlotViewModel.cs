@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 ﻿using Nekoyume.TableData;
 using UniRx;
 
@@ -19,3 +20,5 @@ namespace Nekoyume.UI.Module.Pet
         }
     }
 }
+
+#endif

@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 ﻿using System;
 using Nekoyume.Model.Mail;
 
@@ -31,3 +32,5 @@ namespace Nekoyume.UI.Model
 #pragma warning restore LAA1002
     }
 }
+
+#endif

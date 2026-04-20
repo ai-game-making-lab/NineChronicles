@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 // #define TEST_LOG
 
 using System;
@@ -730,3 +731,5 @@ namespace Nekoyume.L10n
         }
     }
 }
+
+#endif

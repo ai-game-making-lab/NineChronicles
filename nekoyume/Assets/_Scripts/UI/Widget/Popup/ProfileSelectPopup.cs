@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 ﻿using Nekoyume.Game;
 using Nekoyume.SingleClient.State;
 using Nekoyume.State;
@@ -80,3 +81,5 @@ namespace Nekoyume.UI
         }
     }
 }
+
+#endif

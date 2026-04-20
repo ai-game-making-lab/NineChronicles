@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using Nekoyume.TableData;
 using NUnit.Framework;
 using BuffSkill = Nekoyume.Model.Skill.BuffSkill;
@@ -101,3 +102,5 @@ namespace Tests.EditMode.SingleClient
         }
     }
 }
+
+#endif

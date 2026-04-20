@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using Nekoyume.SingleClient.Models.Elemental;
 using Nekoyume.SingleClient.Models.Skills;
 using Nekoyume.SingleClient.Models.TableData;
@@ -81,3 +82,5 @@ namespace Tests.EditMode.SingleClient.TableData
         }
     }
 }
+
+#endif

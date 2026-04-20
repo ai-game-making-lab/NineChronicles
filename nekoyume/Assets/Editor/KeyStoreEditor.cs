@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 ﻿using Libplanet.Crypto;
 using Nekoyume.Blockchain;
 using Nekoyume.Helper;
@@ -60,3 +61,5 @@ namespace Editor
         }
     }
 }
+
+#endif

@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using Nekoyume.L10n;
 using Nekoyume.UI.Model;
 using TMPro;
@@ -27,3 +28,5 @@ namespace Nekoyume.UI.Module
         }
     }
 }
+
+#endif

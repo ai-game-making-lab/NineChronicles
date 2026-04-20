@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using Libplanet.Action;
 
 namespace Tests.EditMode
@@ -11,3 +12,5 @@ namespace Tests.EditMode
         public int Seed => throw new System.NotImplementedException();
     }
 }
+
+#endif

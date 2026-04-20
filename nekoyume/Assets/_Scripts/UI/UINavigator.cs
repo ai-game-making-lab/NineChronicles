@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 namespace Nekoyume.UI
 {
     public class UINavigator
@@ -23,3 +24,5 @@ namespace Nekoyume.UI
         }
     }
 }
+
+#endif

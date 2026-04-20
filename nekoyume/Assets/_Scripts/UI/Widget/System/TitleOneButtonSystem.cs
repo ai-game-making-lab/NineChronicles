@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using System.Collections.Generic;
 using Nekoyume.EnumType;
 using mixpanel;
@@ -56,3 +57,5 @@ namespace Nekoyume.UI
         }
     }
 }
+
+#endif

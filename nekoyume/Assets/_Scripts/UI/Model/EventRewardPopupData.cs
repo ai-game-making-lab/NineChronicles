@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using System;
 using Nekoyume.Helper;
 using UnityEngine;
@@ -47,3 +48,5 @@ namespace Nekoyume.UI.Model
         public bool HasEvent => EnableEventRewardPopup && (EventRewards?.Length ?? 0) > 0;
     }
 }
+
+#endif

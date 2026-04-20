@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using System.Linq;
 using Nekoyume;
 using Nekoyume.Battle;
@@ -28,3 +29,5 @@ namespace Tests.EditMode.Battle
         }
     }
 }
+
+#endif

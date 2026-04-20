@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using Nekoyume.Helper;
 using Nekoyume.SingleClient.Models.TableData;
 using Nekoyume.UI.Module.Common;
@@ -54,3 +55,5 @@ namespace Nekoyume.UI.Scroller
         }
     }
 }
+
+#endif

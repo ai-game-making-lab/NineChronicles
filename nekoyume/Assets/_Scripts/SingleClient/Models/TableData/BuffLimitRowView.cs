@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using System;
 
 namespace Nekoyume.SingleClient.Models.TableData
@@ -33,3 +34,5 @@ namespace Nekoyume.SingleClient.Models.TableData
         public static bool operator !=(BuffLimitRowView left, BuffLimitRowView right) => !left.Equals(right);
     }
 }
+
+#endif

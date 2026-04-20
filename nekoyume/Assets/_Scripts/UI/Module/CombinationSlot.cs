@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 #nullable enable
 
 using System;
@@ -671,3 +672,5 @@ namespace Nekoyume.UI.Module
         }
     }
 }
+
+#endif

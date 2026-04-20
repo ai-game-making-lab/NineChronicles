@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using Nekoyume.Game;
 using TMPro;
 using UnityEngine;
@@ -47,3 +48,5 @@ namespace Nekoyume.UI
         }
     }
 }
+
+#endif

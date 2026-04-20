@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 ﻿/*
  * reference: https://gitlab.com/-/snippets/2077829
  */
@@ -1088,3 +1089,5 @@ namespace Nekoyume.L10n.Editor
         }
     }
 }
+
+#endif

@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using System.Collections.Generic;
 using Bencodex.Types;
 using Lib9cWorld = Nekoyume.Model.WorldInformation.World;
@@ -93,3 +94,5 @@ namespace Nekoyume.SingleClient.Models.State
         }
     }
 }
+
+#endif

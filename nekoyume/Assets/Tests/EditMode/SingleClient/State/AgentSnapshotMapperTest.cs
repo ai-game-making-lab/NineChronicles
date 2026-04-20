@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using System.Numerics;
 using Nekoyume.SingleClient.Models.State;
 using NUnit.Framework;
@@ -64,3 +65,5 @@ namespace Tests.EditMode.SingleClient.State
         }
     }
 }
+
+#endif

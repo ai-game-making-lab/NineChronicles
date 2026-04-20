@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using Cysharp.Threading.Tasks;
 using Spine.Unity;
 
@@ -20,3 +21,5 @@ namespace Nekoyume.Game.Character
         }
     }
 }
+
+#endif

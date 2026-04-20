@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using Nekoyume.Model.Item;
 using UniRx;
 
@@ -10,3 +11,5 @@ namespace Nekoyume.UI.Model
         }
     }
 }
+
+#endif

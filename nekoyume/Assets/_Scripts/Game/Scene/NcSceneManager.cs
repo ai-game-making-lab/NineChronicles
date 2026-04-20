@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using System;
 using Cysharp.Threading.Tasks;
 using Object = UnityEngine.Object;
@@ -86,3 +87,5 @@ namespace Nekoyume.Game.Scene
         }
     }
 }
+
+#endif

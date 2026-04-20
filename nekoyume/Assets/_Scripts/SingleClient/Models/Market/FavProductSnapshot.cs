@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using Nekoyume.SingleClient.Blockchain;
 
 namespace Nekoyume.SingleClient.Models.Market
@@ -8,3 +9,5 @@ namespace Nekoyume.SingleClient.Models.Market
         public FungibleAssetValue Asset { get; set; }
     }
 }
+
+#endif

@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 namespace Nekoyume.SingleClient.Models.Market
 {
     /// Mirror of <c>Nekoyume.Model.Market.ProductType</c>. Ordering matches lib9c.
@@ -19,3 +20,5 @@ namespace Nekoyume.SingleClient.Models.Market
         FungibleAssetValue,
     }
 }
+
+#endif

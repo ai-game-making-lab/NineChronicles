@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using Nekoyume.SingleClient.Models.TableData;
 using Nekoyume.TableData;
 using NUnit.Framework;
@@ -40,3 +41,5 @@ namespace Tests.EditMode.SingleClient.TableData
         }
     }
 }
+
+#endif

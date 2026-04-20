@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using Nekoyume.SingleClient.Blockchain;
@@ -19,3 +20,5 @@ namespace Nekoyume.SingleClient.Models.Mail
         public override MailType MailType => MailType.Auction;
     }
 }
+
+#endif

@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using System;
 using Spine;
 using Spine.Unity;
@@ -99,3 +100,5 @@ namespace Nekoyume.Game.Character
         }
     }
 }
+
+#endif

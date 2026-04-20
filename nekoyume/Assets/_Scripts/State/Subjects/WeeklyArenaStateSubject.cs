@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using System;
 using Nekoyume.Model.State;
 using UniRx;
@@ -38,3 +39,5 @@ namespace Nekoyume.State.Subjects
         }
     }
 }
+
+#endif

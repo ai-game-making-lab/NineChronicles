@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 namespace Nekoyume.SingleClient.Models.Items
 {
     /// <summary>
@@ -76,3 +77,5 @@ namespace Nekoyume.SingleClient.Models.Items
         }
     }
 }
+
+#endif

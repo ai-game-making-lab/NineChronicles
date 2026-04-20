@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 namespace Nekoyume.SingleClient.Models.Quest
 {
     /// Mirror of <c>Nekoyume.Model.Quest.QuestType</c> (ordinal-preserving).
@@ -17,3 +18,5 @@ namespace Nekoyume.SingleClient.Models.Quest
         Currency,
     }
 }
+
+#endif

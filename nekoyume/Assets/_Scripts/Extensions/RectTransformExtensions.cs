@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using System;
 using DG.Tweening;
 using Nekoyume.EnumType;
@@ -397,3 +398,5 @@ namespace Nekoyume
         }
     }
 }
+
+#endif

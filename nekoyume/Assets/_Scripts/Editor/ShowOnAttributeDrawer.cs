@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 #if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
@@ -85,4 +86,6 @@ namespace Nekoyume.Editor
         }
     }
 }
+#endif
+
 #endif

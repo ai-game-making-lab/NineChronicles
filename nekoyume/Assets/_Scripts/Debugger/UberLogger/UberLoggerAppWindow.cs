@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using UnityEngine;
 using System.Collections.Generic;
 using System;
@@ -502,3 +503,5 @@ public class UberLoggerAppWindow : MonoBehaviour, UberLogger.ILogger
     private bool ShowMessages = true;
     private int SelectedCallstackFrame = 0;
 }
+
+#endif

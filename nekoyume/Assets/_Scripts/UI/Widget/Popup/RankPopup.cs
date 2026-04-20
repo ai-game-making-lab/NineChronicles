@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using Cysharp.Threading.Tasks;
 using Nekoyume.EnumType;
 using Nekoyume.L10n;
@@ -358,3 +359,5 @@ namespace Nekoyume.UI
         }
     }
 }
+
+#endif

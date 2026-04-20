@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using System.Collections.Generic;
 using Nekoyume.SingleClient.Blockchain;
 using Nekoyume.SingleClient.Models.Items;
@@ -152,3 +153,5 @@ namespace Nekoyume.SingleClient.Models.State
             new Dictionary<ItemSubType, int>(0);
     }
 }
+
+#endif

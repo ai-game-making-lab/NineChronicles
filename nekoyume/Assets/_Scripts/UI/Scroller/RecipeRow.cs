@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using System;
 using Nekoyume.UI.Module;
 using System.Collections.Generic;
@@ -42,3 +43,5 @@ namespace Nekoyume.UI.Scroller
         private Sprite consumableGradeSprite;
     }
 }
+
+#endif

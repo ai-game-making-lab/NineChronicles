@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using System;
 using DG.Tweening;
 using DG.Tweening.Core;
@@ -95,3 +96,5 @@ namespace Nekoyume.UI.Tween
         }
     }
 }
+
+#endif

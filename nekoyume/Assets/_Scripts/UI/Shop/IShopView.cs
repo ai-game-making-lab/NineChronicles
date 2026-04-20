@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 ﻿using System;
 using System.Collections.Generic;
 using MarketService.Response;
@@ -14,3 +15,5 @@ namespace Nekoyume.UI.Module
             Action<ShopItem> clickItem);
     }
 }
+
+#endif

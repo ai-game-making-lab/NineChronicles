@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using System;
 using UniRx;
 
@@ -19,3 +20,5 @@ namespace Nekoyume.UI.Scroller
         public IObservable<ExpRankCell> OnClick => Context.OnClick;
     }
 }
+
+#endif

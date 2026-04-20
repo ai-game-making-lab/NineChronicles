@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using Lib9cItemSubType = Nekoyume.Model.Item.ItemSubType;
 using Lib9cItemType = Nekoyume.Model.Item.ItemType;
 using Lib9cLockType = Nekoyume.Model.Item.LockType;
@@ -26,3 +27,5 @@ namespace Nekoyume.SingleClient.Models.Items
         public static Lib9cLockType ToLib9c(this LockType source) => (Lib9cLockType)(int)source;
     }
 }
+
+#endif

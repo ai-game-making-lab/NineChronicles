@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 #if UNITY_EDITOR
 using UnityEngine;
 using System.Collections.Generic;
@@ -162,5 +163,7 @@ public class UberLoggerEditor : ScriptableObject, UberLogger.ILogger
         }
     }
 }
+
+#endif
 
 #endif

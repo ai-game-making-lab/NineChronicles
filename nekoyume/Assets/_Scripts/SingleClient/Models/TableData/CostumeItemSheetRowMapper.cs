@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using Nekoyume.SingleClient.Models.Elemental;
 using Nekoyume.SingleClient.Models.Items;
 using Lib9cCostumeItemSheet = Nekoyume.TableData.CostumeItemSheet;
@@ -26,3 +27,5 @@ namespace Nekoyume.SingleClient.Models.TableData
         }
     }
 }
+
+#endif

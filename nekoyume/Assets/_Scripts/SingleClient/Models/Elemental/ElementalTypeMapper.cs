@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using Lib9cElementalResult = Nekoyume.Model.Elemental.ElementalResult;
 using Lib9cElementalType = Nekoyume.Model.Elemental.ElementalType;
 using SingleClientElementalResult = Nekoyume.SingleClient.Models.Elemental.ElementalResult;
@@ -33,3 +34,5 @@ namespace Nekoyume.SingleClient.Models.Elemental
         }
     }
 }
+
+#endif

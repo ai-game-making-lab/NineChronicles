@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using Nekoyume.TableData.Crystal;
 using TMPro;
 using UnityEngine;
@@ -35,3 +36,5 @@ namespace Nekoyume.UI.Scroller
         }
     }
 }
+
+#endif

@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 #if LIB9C_TOOLS
 using System.IO;
 using System.Text;
@@ -176,4 +177,6 @@ public class TestbedTool : EditorWindow
         AssetDatabase.Refresh();
     }
 }
+#endif
+
 #endif

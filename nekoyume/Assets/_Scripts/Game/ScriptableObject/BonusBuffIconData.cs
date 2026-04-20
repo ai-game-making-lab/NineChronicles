@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using Nekoyume.Model.Skill;
 using System;
 using Nekoyume.Editor;
@@ -23,3 +24,5 @@ namespace Nekoyume.Game.ScriptableObject
         public Sprite IconSprite => iconSprite;
     }
 }
+
+#endif

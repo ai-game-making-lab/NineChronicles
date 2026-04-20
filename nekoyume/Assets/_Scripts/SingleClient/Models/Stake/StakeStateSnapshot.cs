@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using System.Collections.Generic;
 
 namespace Nekoyume.SingleClient.Models.Stake
@@ -17,3 +18,5 @@ namespace Nekoyume.SingleClient.Models.Stake
         public IReadOnlyList<int> Achievements { get; set; }
     }
 }
+
+#endif

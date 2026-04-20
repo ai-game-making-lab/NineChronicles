@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using CommandLine;
 using System;
 using System.IO;
@@ -138,3 +139,5 @@ namespace Nekoyume.ApiClient
         }
     }
 }
+
+#endif

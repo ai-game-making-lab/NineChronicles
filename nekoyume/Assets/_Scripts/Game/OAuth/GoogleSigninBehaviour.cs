@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 ﻿using System.Threading.Tasks;
 using Google;
 using Libplanet.Crypto;
@@ -116,3 +117,5 @@ namespace Nekoyume.Game.OAuth
         }
     }
 }
+
+#endif

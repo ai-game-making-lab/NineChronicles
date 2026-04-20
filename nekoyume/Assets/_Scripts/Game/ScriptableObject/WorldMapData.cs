@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using System;
 using System.Linq;
 using UnityEngine;
@@ -53,3 +54,5 @@ namespace Nekoyume
         public BossMarkIcon[] bossMarkIcons;
     }
 }
+
+#endif

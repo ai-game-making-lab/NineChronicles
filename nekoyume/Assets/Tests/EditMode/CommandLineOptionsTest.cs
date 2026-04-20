@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using System;
 using NUnit.Framework;
 using UnityEngine;
@@ -56,3 +57,5 @@ namespace Tests.EditMode
         }
     }
 }
+
+#endif

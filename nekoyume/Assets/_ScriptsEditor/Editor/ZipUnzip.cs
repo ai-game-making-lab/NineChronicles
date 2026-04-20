@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 ﻿using System.IO;
 using Ionic.Zip;
 using UnityEditor;
@@ -35,3 +36,5 @@ namespace NekoyumeEditor
         }
     }
 }
+
+#endif

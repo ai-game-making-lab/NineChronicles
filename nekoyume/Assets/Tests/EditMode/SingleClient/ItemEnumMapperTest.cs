@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using NUnit.Framework;
 using ItemEnumMapper = Nekoyume.SingleClient.Models.Items.ItemEnumMapper;
 using ItemSubType = Nekoyume.SingleClient.Models.Items.ItemSubType;
@@ -67,3 +68,5 @@ namespace Tests.EditMode.SingleClient
         }
     }
 }
+
+#endif

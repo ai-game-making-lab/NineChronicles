@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 ﻿using Nekoyume.UI.Module.Arena.Emblems;
 using TMPro;
 using UnityEngine;
@@ -54,3 +55,5 @@ namespace Nekoyume.UI.Module.Arena.Join
         }
     }
 }
+
+#endif

@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using System;
 using Nekoyume.EnumType;
 using Nekoyume.Game;
@@ -120,3 +121,5 @@ namespace Nekoyume.UI.Module
         }
     }
 }
+
+#endif

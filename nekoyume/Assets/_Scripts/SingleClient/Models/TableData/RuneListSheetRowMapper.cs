@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using Lib9cRuneListSheet = Nekoyume.TableData.Rune.RuneListSheet;
 
 namespace Nekoyume.SingleClient.Models.TableData
@@ -25,3 +26,5 @@ namespace Nekoyume.SingleClient.Models.TableData
         }
     }
 }
+
+#endif

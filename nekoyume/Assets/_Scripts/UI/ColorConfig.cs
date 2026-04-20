@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 ﻿using Nekoyume.Helper;
 using UnityEngine;
 
@@ -17,3 +18,5 @@ namespace Nekoyume.UI
         public static readonly Color ColorForGrade5 = ColorHelper.HexToColorRGB(ColorHexForGrade5);
     }
 }
+
+#endif

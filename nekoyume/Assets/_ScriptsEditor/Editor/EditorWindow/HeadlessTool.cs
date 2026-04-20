@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 // See also: HeadlessHelper.cs
 
 using System;
@@ -212,3 +213,5 @@ namespace NekoyumeEditor
         }
     }
 }
+
+#endif

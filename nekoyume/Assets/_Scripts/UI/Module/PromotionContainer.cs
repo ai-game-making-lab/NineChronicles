@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using System;
 using System.Globalization;
 using System.Linq;
@@ -167,3 +168,5 @@ namespace Nekoyume.UI.Module
         }
     }
 }
+
+#endif

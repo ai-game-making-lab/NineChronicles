@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -43,3 +44,5 @@ namespace Nekoyume.SingleClient.Models.Quest
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 }
+
+#endif

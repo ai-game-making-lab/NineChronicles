@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 namespace Nekoyume.SingleClient.Models.Skills
 {
     /// <summary>
@@ -54,3 +55,5 @@ namespace Nekoyume.SingleClient.Models.Skills
         Ally = 3,
     }
 }
+
+#endif

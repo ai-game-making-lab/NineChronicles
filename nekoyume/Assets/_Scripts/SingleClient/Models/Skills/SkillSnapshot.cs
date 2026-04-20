@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using Nekoyume.SingleClient.Models.Elemental;
 using Nekoyume.SingleClient.Models.Stats;
 
@@ -53,3 +54,5 @@ namespace Nekoyume.SingleClient.Models.Skills
             SkillType == SkillType.Debuff;
     }
 }
+
+#endif

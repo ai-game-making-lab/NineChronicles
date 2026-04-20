@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using System.Collections.Generic;
 using Nekoyume.SingleClient.Models.Buffs;
 using Lib9cDecimalStat = Nekoyume.Model.Stat.DecimalStat;
@@ -68,3 +69,5 @@ namespace Nekoyume.SingleClient.Models.Stats
         }
     }
 }
+
+#endif

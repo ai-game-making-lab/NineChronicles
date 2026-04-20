@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using IngameDebugConsole;
 using UnityEngine;
 using Cysharp.Threading.Tasks;
@@ -146,3 +147,5 @@ namespace Nekoyume.Game.Util
         }
     }
 }
+
+#endif

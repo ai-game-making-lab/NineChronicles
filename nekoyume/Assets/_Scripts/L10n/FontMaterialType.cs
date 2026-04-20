@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 namespace Nekoyume.L10n
 {
     public enum FontMaterialType
@@ -47,3 +48,5 @@ namespace Nekoyume.L10n
         WorldmapUnlock
     }
 }
+
+#endif

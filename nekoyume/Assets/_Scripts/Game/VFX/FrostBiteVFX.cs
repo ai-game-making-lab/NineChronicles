@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using Nekoyume.Game.VFX.Skill;
 using Nekoyume.Model.Buff;
 using UnityEngine;
@@ -169,3 +170,5 @@ namespace Nekoyume.Game.VFX
         }
     }
 }
+
+#endif

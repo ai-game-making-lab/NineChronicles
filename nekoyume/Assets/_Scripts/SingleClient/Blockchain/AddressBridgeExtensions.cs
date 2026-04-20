@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using LibplanetAddress = Libplanet.Crypto.Address;
 
 namespace Nekoyume.SingleClient.Blockchain
@@ -23,3 +24,5 @@ namespace Nekoyume.SingleClient.Blockchain
         }
     }
 }
+
+#endif

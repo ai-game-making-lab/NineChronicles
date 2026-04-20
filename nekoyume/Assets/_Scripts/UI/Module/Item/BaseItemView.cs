@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using Coffee.UIEffects;
 using Nekoyume.Blockchain;
 using Nekoyume.Game;
@@ -385,3 +386,5 @@ namespace Nekoyume
         }
     }
 }
+
+#endif

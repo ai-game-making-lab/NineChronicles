@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using System;
 
 namespace Nekoyume.SingleClient.Models.Stats
@@ -54,3 +55,5 @@ namespace Nekoyume.SingleClient.Models.Stats
         public static bool operator !=(StatView left, StatView right) => !left.Equals(right);
     }
 }
+
+#endif

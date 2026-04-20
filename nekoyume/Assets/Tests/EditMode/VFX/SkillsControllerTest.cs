@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using System;
 using Nekoyume.Game.Util;
 using Nekoyume.Game.VFX.Skill;
@@ -95,3 +96,5 @@ namespace Tests.EditMode.VFX
         }
     }
 }
+
+#endif

@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using System.Linq;
 using Libplanet.Crypto;
 using Nekoyume.Helper;
@@ -26,3 +27,5 @@ namespace Tests.EditMode
         }
     }
 }
+
+#endif

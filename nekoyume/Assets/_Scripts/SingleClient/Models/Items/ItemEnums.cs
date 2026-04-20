@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using System;
 
 namespace Nekoyume.SingleClient.Models.Items
@@ -73,3 +74,5 @@ namespace Nekoyume.SingleClient.Models.Items
         Order,
     }
 }
+
+#endif

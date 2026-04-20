@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using TMPro;
 using Unity.Mathematics;
 using UnityEngine;
@@ -109,3 +110,5 @@ namespace Nekoyume.UI.Module
         }
     }
 }
+
+#endif

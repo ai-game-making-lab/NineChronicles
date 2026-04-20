@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using System;
 using Nekoyume.UI.Model;
 using UniRx;
@@ -33,3 +34,5 @@ namespace Nekoyume.UI.Scroller
         public IObservable<(Model, int)> OnChangeCount => Context.OnChangeCount;
     }
 }
+
+#endif
