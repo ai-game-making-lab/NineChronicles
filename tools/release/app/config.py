@@ -9,8 +9,13 @@ load_dotenv(".env")
 
 
 class Config(NamedTuple):
+    github_token: Optional[str] = None
+    key_passphrase: Optional[str] = None
+    key_address: Optional[str] = None
     # Slack Bot API Token
     slack_token: Optional[str] = None
+    runtime_url: str = "https://pipelines.actions.githubusercontent.com"
+    runtime_token: Optional[str] = None
     # esigner path
     esigner_path: Optional[str] = None
     signing_secrets: Optional[dict] = None
@@ -18,26 +23,18 @@ class Config(NamedTuple):
     env: Env = "test"
 
     @classmethod
-    def init(self):
-        _env = os.environ["ENV"]
+    def init(cls):
+        _env = os.environ.get("ENV", "test")
 
         env_map = {v: v for v in get_args(Env)}
         try:
-            self.env = env_map[_env]
+            env = env_map[_env]
         except KeyError:
             raise ValueError(f"Env should in {get_args(Env)}")
 
-        for v in [
-            "SLACK_TOKEN",
-            "ESIGNER_PATH",
-        ]:
-            try:
-                setattr(self, v.lower(), os.environ[v])
-            except KeyError:
-                pass
-
+        signing_secrets = None
         try:
-            self.signing_secrets = {
+            signing_secrets = {
                 "credential_id": os.environ["ESIGNER_CREDENTIAL_ID"],
                 "username": os.environ["ESIGNER_USERNAME"],
                 "password": os.environ["ESIGNER_PASSWORD"],
@@ -46,8 +43,20 @@ class Config(NamedTuple):
         except KeyError:
             pass
 
-
-        return self
+        return cls(
+            github_token=os.environ.get("GITHUB_TOKEN", ""),
+            key_passphrase=os.environ.get("KEY_PASSPHRASE", ""),
+            key_address=os.environ.get("KEY_ADDRESS", ""),
+            slack_token=os.environ.get("SLACK_TOKEN", ""),
+            runtime_url=os.environ.get(
+                "ACTIONS_RUNTIME_URL",
+                "https://pipelines.actions.githubusercontent.com",
+            ),
+            runtime_token=os.environ.get("ACTIONS_RUNTIME_TOKEN", ""),
+            esigner_path=os.environ.get("ESIGNER_PATH", ""),
+            signing_secrets=signing_secrets,
+            env=env,
+        )
 
 
 config = Config.init()

@@ -18,3 +18,15 @@ class CliError(Exception):
 
 class EsignerError(CliError):
     pass
+
+
+class DockerImageNotFoundError(Exception):
+    pass
+
+
+class TagNotFoundError(Exception):
+    pass
+
+
+class PlanetError(Exception):
+    pass

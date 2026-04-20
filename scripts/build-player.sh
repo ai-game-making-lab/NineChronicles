@@ -11,13 +11,26 @@ fi
 
 build_target="$1"
 
-if [ "$build_target" == "macOS" ]; then
-  build_target="MacOS"
-fi
-
-if [ "$build_target" == "Linux" ]; then
-  build_target="Linux"
-fi
+case "$build_target" in
+  macOS|MacOS|OSX|StandaloneOSX)
+    build_method="BuildStandaloneOSX"
+    ;;
+  Windows|StandaloneWindows|StandaloneWindows64)
+    build_method="BuildStandaloneWindows"
+    ;;
+  Linux|StandaloneLinux|StandaloneLinux64)
+    build_method="BuildStandaloneLinux64"
+    ;;
+  Android)
+    build_method="BuildAndroid"
+    ;;
+  iOS|IOS)
+    build_method="BuildiOS"
+    ;;
+  *)
+    build_method="Build$build_target"
+    ;;
+esac
 
 # shellcheck disable=SC1090
 source "$(dirname "$0")/_common.sh"
@@ -35,4 +48,4 @@ title "Build binary"
   -password "$UNITY_PASSWORD" \
   -serial "$UNITY_SERIAL" \
   -projectPath nekoyume \
-  -executeMethod "Editor.Builder.Build""$build_target"
+  -executeMethod "NekoyumeEditor.Builder.$build_method"
