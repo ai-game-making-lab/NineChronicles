@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 // ============================================================================
 // Lib9cStubs.cs — Post-Lib9c-removal compile stubs
 // ============================================================================
@@ -173,6 +174,7 @@ namespace Nekoyume.Action.Garages { public class LoadIntoMyGarages { } public cl
 namespace Nekoyume.Model.Item
 {
     public enum ItemType { Consumable, Costume, Equipment, Material }
+    public enum LockType { None, Time, Sale }
     public enum ItemSubType
     {
         FoodA, FoodB, FoodC, FoodD,
@@ -244,6 +246,14 @@ namespace Nekoyume.Model.Item
 namespace Nekoyume.Model.Elemental
 {
     public enum ElementalType { Normal, Fire, Water, Land, Wind }
+    public enum ElementalResult { Win, Lose, Draw }
+}
+
+namespace Nekoyume.EnumType { }
+namespace Nekoyume.Game.Controller { }
+namespace Nekoyume.L10n
+{
+    public static class L10nManager { public static string Localize(string key) => key; }
 }
 
 // ============================================================================
@@ -312,6 +322,8 @@ namespace Nekoyume.Model.Stat
         public IEnumerable<(StatType, long)> GetStats(bool withAdditional) => Array.Empty<(StatType, long)>();
         public IEnumerable<(StatType, long)> GetAdditionalStats(bool b) => Array.Empty<(StatType, long)>();
     }
+
+    public class StatMap { public StatType StatType; public decimal Value; }
 
     public class StatsCollection { }
 }
@@ -387,6 +399,7 @@ namespace Nekoyume.Model.State
     public class ItemSlotState { }
     public class AdventureBossGameData { }
     public class PetState { public int PetId; public int Level; }
+    public class CollectionState : Nekoyume.Model.Collection.CollectionState { }
     public class StakeStateV2View { }
 }
 
@@ -482,6 +495,11 @@ namespace Nekoyume.Model.EnumType
     public enum ArenaType { Season, Championship }
     public enum RuneType { Stat, Skill }
     public enum StatReferenceType { Caster, Target }
+    public enum TradeType { Sell, Buy, Cancel }
+    public enum RuneSlotType { Stat, Skill }
+    public enum CraftType { Recipe, CustomEquipment }
+    public enum RuneUsePlace { Adventure, Arena }
+    public enum Grade { Normal, Rare, Epic, Unique, Legendary }
 }
 
 // ============================================================================
@@ -498,6 +516,12 @@ namespace Nekoyume.Model
     public class Enemy { }
     public class RaidBoss { public long HP; public int Level; }
     public class CharacterBase { public int Level; public long HP; public int CharacterId; }
+    public class WorldInformation
+    {
+        public class World { public int Id; public int StageClearedId; }
+        public bool TryGetWorld(int id, out World world) { world = new World(); return true; }
+        public System.Collections.Generic.Dictionary<int, World> world = new();
+    }
 }
 
 // Nekoyume.Model sub-namespaces expected by many consumers
@@ -678,7 +702,7 @@ namespace Nekoyume.TableData
     public class StageSheet : Sheet<int, StageSheet.Row> { public class Row { } }
     public class WorldSheet : Sheet<int, WorldSheet.Row> { public class Row { public int Id; public int StageBegin; public int StageEnd; public string Name; } }
     public class RuneListSheet : Sheet<int, RuneListSheet.Row> { public class Row { public int Id; public int Grade; public Nekoyume.Model.EnumType.RuneType RuneType; } }
-    public class RuneOptionSheet : Sheet<int, RuneOptionSheet.Row> { public class Row { public int Id; } }
+    public class RuneOptionSheet : Sheet<int, RuneOptionSheet.Row> { public class Row { public int Id; public class RuneOptionInfo { public int LevelRange; } } }
     public class RuneCostSheet : Sheet<int, RuneCostSheet.Row> { public class Row { public int RuneId; } }
     public class PetSheet : Sheet<int, PetSheet.Row> { public class Row { } }
     public class PetCostSheet : Sheet<int, PetCostSheet.Row> { public class Row { } }
@@ -755,6 +779,27 @@ namespace Nekoyume.TableData.CustomEquipmentCraft
 namespace Nekoyume.TableData.Stake
 {
     public class StakePolicySheet : Nekoyume.TableData.Sheet<int, StakePolicySheet.Row> { public class Row { } }
+}
+
+namespace Nekoyume.TableData
+{
+    public class BuffLimitSheet : Sheet<int, BuffLimitSheet.Row> { public class Row { } }
+    public class ArenaParticipantsSheet : Sheet<int, ArenaParticipantsSheet.Row> { public class Row { } }
+    public class StatBuffSheet : Sheet<int, StatBuffSheet.Row> { public class Row { } }
+    public class ActionBuffSheet : Sheet<int, ActionBuffSheet.Row> { public class Row { } }
+}
+
+namespace Nekoyume.State
+{
+    public class ReactiveAvatarState
+    {
+        public static UniRx.IReadOnlyReactiveProperty<Nekoyume.Model.State.AvatarState> ObservableAvatarState => null;
+    }
+
+    public class PetStates
+    {
+        public bool TryGetPetState(int id, out Nekoyume.Model.State.PetState state) { state = null; return false; }
+    }
 }
 
 // ============================================================================
@@ -910,3 +955,5 @@ namespace Nekoyume.Helper
         public string PrivateKey;
     }
 }
+
+#endif
