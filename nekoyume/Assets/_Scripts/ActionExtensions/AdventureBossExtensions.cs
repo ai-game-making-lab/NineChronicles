@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using Nekoyume.Model.AdventureBoss;
 using Nekoyume.SingleClient;
 using System.Text.RegularExpressions;
@@ -64,3 +65,5 @@ namespace Nekoyume.ActionExtensions
         }
     }
 }
+
+#endif

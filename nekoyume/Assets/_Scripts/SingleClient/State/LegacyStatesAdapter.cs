@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using System;
 using System.Collections.Generic;
 using Nekoyume.SingleClient.Models.Items;
@@ -339,3 +340,5 @@ namespace Nekoyume.SingleClient.State
             new Dictionary<int, AvatarSnapshot>(0);
     }
 }
+
+#endif

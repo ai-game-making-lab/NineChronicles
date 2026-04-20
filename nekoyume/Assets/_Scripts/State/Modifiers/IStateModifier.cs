@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 ﻿namespace Nekoyume.State.Modifiers
 {
     /// <summary>
@@ -57,3 +58,5 @@
         void Remove(IAccumulatableStateModifier<T> modifier);
     }
 }
+
+#endif

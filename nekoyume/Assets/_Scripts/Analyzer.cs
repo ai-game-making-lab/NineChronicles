@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 #if !UNITY_EDITOR && (UNITY_ANDROID || UNITY_IOS)
 #define ENABLE_FIREBASE
 #endif
@@ -337,3 +338,5 @@ namespace Nekoyume
 #endif
     }
 }
+
+#endif

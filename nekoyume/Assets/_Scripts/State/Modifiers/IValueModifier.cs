@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 namespace Nekoyume.State.Modifiers
 {
     public interface IValueModifier<T> where T : struct
@@ -12,3 +13,5 @@ namespace Nekoyume.State.Modifiers
         void Remove(IAccumulatableValueModifier<T> modifier);
     }
 }
+
+#endif

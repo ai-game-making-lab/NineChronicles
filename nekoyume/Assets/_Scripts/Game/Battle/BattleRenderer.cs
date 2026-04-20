@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 ﻿#nullable enable
 
 using Nekoyume.Model.BattleStatus;
@@ -126,3 +127,5 @@ namespace Nekoyume.Game.Battle
 #endregion AssetLoad
     }
 }
+
+#endif

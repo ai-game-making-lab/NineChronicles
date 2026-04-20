@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using System;
 using Nekoyume.Model.State;
 
@@ -13,3 +14,5 @@ namespace Nekoyume.State.Modifiers
         public abstract void Remove(IAccumulatableStateModifier<WeeklyArenaState> modifier);
     }
 }
+
+#endif

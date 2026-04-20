@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using System;
 using System.Text;
 using Newtonsoft.Json;
@@ -533,3 +534,5 @@ public static class ArenaServiceExtentions
         return round;
     }
 }
+
+#endif

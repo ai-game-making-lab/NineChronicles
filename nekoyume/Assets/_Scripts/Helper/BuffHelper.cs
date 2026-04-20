@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using Nekoyume.Model.Buff;
 using Nekoyume.Model.Stat;
 using System.Linq;
@@ -273,3 +274,5 @@ namespace Nekoyume.Helper
         }
     }
 }
+
+#endif

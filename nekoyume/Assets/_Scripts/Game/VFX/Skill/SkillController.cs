@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using Cysharp.Threading.Tasks;
 using JetBrains.Annotations;
 using Nekoyume.Game.Battle;
@@ -225,3 +226,5 @@ namespace Nekoyume.Game.VFX.Skill
         }
     }
 }
+
+#endif

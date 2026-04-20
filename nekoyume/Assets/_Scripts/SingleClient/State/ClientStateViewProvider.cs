@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using Lib9cStates = Nekoyume.State.States;
 
 namespace Nekoyume.SingleClient.State
@@ -63,3 +64,5 @@ namespace Nekoyume.SingleClient.State
         }
     }
 }
+
+#endif

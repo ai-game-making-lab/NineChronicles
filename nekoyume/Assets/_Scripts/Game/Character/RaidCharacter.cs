@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using Nekoyume.SingleClient.Models.Buffs;
 using Nekoyume.UI;
 using System.Collections;
@@ -858,3 +859,5 @@ namespace Nekoyume.Game.Character
         }
     }
 }
+
+#endif

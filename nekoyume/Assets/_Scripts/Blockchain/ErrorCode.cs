@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 ﻿using System;
 using Cysharp.Threading.Tasks;
 using Libplanet.Action.State;
@@ -336,3 +337,5 @@ namespace Nekoyume.Blockchain
         }
     }
 }
+
+#endif

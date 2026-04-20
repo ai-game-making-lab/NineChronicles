@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using Lib9cArenaType = Nekoyume.Model.EnumType.ArenaType;
 using Lib9cBattleType = Nekoyume.Model.EnumType.BattleType;
 using Lib9cCraftType = Nekoyume.Model.EnumType.CraftType;
@@ -72,3 +73,5 @@ namespace Nekoyume.SingleClient.Models.EnumType
             (Lib9cTradeType)(int)source;
     }
 }
+
+#endif

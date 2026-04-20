@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using UnityEngine;
 using Cysharp.Threading.Tasks;
 using Nekoyume.Model.Item;
@@ -428,3 +429,5 @@ namespace Nekoyume.UI
         }
     }
 }
+
+#endif

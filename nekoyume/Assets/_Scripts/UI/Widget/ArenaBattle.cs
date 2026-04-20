@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using System.Collections.Generic;
 using Libplanet.Crypto;
 using Nekoyume.Battle;
@@ -115,3 +116,5 @@ namespace Nekoyume.UI
         }
     }
 }
+
+#endif

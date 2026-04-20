@@ -1,3 +1,4 @@
+#if LIB9C_RESTORED // stubbed out after lib9c deletion
 #if !UNITY_EDITOR && (UNITY_ANDROID || UNITY_IOS)
 #define RUN_ON_MOBILE
 #define ENABLE_FIREBASE
@@ -783,3 +784,5 @@ namespace Nekoyume.IAPStore
         }
     }
 }
+
+#endif
