@@ -50,11 +50,20 @@ namespace Nekoyume.Tests.PlayMode.SingleClient
             var entry = SingleClientEntryPoint.Instance;
             Assert.IsNotNull(entry);
 
-            var startingAp = entry.Runtime.State.ActionPoint;
+            // Reset to 0 first so the test is order-independent (play-mode session
+            // retains state across tests; an earlier GrantStartingLoadout may have
+            // already brought AP up to 120).
+            var current = entry.Runtime.State.ActionPoint;
+            if (current > 0)
+            {
+                entry.Runtime.ConsumeActionPoint(current);
+            }
+
+            Assert.AreEqual(0L, entry.Runtime.State.ActionPoint);
             entry.GrantStartingLoadout();
             var afterAp = entry.Runtime.State.ActionPoint;
 
-            Assert.Greater(afterAp, startingAp, $"ActionPoint did not increase: {startingAp} → {afterAp}");
+            Assert.GreaterOrEqual(afterAp, 120L, $"ActionPoint not filled to 120: {afterAp}");
         }
 
         [UnityTest]
