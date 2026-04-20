@@ -6,6 +6,7 @@ using Nekoyume.Game;
 using Nekoyume.Game.Battle;
 using Nekoyume.Helper;
 using Nekoyume.Model.Mail;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.UI.Model;
 using Nekoyume.UI.Module;
@@ -548,7 +549,7 @@ namespace Nekoyume.UI
             costText.text = cost.ToString();
             costIcon.overrideSprite = costIconData.GetIcon(CostType.ActionPoint);
 
-            var inventory = States.Instance.CurrentAvatarState.inventory;
+            var inventory = ClientStateViewProvider.Current.CurrentAvatarStateRaw.inventory;
             var apPotionCount = inventory.GetUsableItemCount(CostType.ApPotion, Game.Game.instance.Agent.BlockIndex);
             var enoughBalance = apPotionCount >= 1;
             var content = L10nManager.Localize("UI_CHECK_ACTION_POINT", apPotionCount);
@@ -626,8 +627,8 @@ namespace Nekoyume.UI
 #region Attract
         private bool CheckClearRequiredStage(int requireStage)
         {
-            if (States.Instance.CurrentAvatarState.worldInformation == null ||
-                !States.Instance.CurrentAvatarState.worldInformation
+            if (ClientStateViewProvider.Current.CurrentAvatarStateRaw.worldInformation == null ||
+                !ClientStateViewProvider.Current.CurrentAvatarStateRaw.worldInformation
                     .TryGetUnlockedWorldByStageClearedBlockIndex(out var world))
             {
                 return false;

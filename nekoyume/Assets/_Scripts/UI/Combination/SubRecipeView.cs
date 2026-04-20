@@ -7,6 +7,7 @@ using System.Linq;
 using TMPro;
 using UnityEngine;
 using System;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using System.Numerics;
 using Coffee.UIEffects;
@@ -15,8 +16,8 @@ using Nekoyume.Game;
 using Nekoyume.Model.Mail;
 using Nekoyume.UI.Scroller;
 using Nekoyume.L10n;
-using Nekoyume.Model.EnumType;
 using Nekoyume.Model.State;
+using Nekoyume.SingleClient.Models.EnumType;
 using Nekoyume.TableData.Event;
 using UnityEngine.UI;
 using Toggle = Nekoyume.UI.Module.Toggle;
@@ -490,7 +491,7 @@ namespace Nekoyume.UI
 
                     var isMimisbrunnrSubRecipe = index == MimisbrunnrRecipeIndex &&
                         (subRecipe.IsMimisbrunnrSubRecipe ?? true);
-                    var hammerPointStates = States.Instance.HammerPointStates;
+                    var hammerPointStates = ClientStateViewProvider.Current.HammerPointStatesRaw;
                     var showHammerPoint = hammerPointStates is not null &&
                         hammerPointStates.TryGetValue(
                             recipeInfo.RecipeId, out _hammerPointState) &&
@@ -673,7 +674,7 @@ namespace Nekoyume.UI
         private static Dictionary<int, int> GetReplacedMaterials(Dictionary<int, int> required)
         {
             var replacedMaterialMap = new Dictionary<int, int>();
-            var inventory = States.Instance.CurrentAvatarState.inventory;
+            var inventory = ClientStateViewProvider.Current.CurrentAvatarStateRaw.inventory;
 
             foreach (var (id, count) in required)
             {
@@ -756,7 +757,7 @@ namespace Nekoyume.UI
         private void UpdateButtonForConsumable()
         {
             var submittable = CheckNCGAndSlotIsEnough();
-            var inventory = States.Instance.CurrentAvatarState.inventory;
+            var inventory = ClientStateViewProvider.Current.CurrentAvatarStateRaw.inventory;
             foreach (var material in _selectedRecipeInfo.Materials)
             {
                 if (!TableSheets.Instance.MaterialItemSheet.TryGetValue(material.Key, out var row))
@@ -799,7 +800,7 @@ namespace Nekoyume.UI
 
         private bool CheckNCGAndSlotIsEnough()
         {
-            if (_selectedRecipeInfo.CostNCG > States.Instance.GoldBalanceState.Gold.MajorUnit)
+            if (_selectedRecipeInfo.CostNCG > ClientStateViewProvider.Current.CurrentGoldBalanceStateRaw.Gold.MajorUnit)
             {
                 return false;
             }
@@ -817,7 +818,7 @@ namespace Nekoyume.UI
         {
             slotIndex = -1;
 
-            var inventory = States.Instance.CurrentAvatarState.inventory;
+            var inventory = ClientStateViewProvider.Current.CurrentAvatarStateRaw.inventory;
             foreach (var material in _selectedRecipeInfo.Materials)
             {
                 if (!TableSheets.Instance.MaterialItemSheet.TryGetValue(material.Key, out var row))
@@ -839,19 +840,19 @@ namespace Nekoyume.UI
                 }
             }
 
-            if (States.Instance.AgentState is null)
+            if (ClientStateViewProvider.Current.CurrentAgentStateRaw is null)
             {
                 errorMessage = L10nManager.Localize("FAILED_TO_GET_AGENTSTATE");
                 return false;
             }
 
-            if (States.Instance.CurrentAvatarState is null)
+            if (ClientStateViewProvider.Current.CurrentAvatarStateRaw is null)
             {
                 errorMessage = L10nManager.Localize("FAILED_TO_GET_AVATARSTATE");
                 return false;
             }
 
-            if (States.Instance.GoldBalanceState.Gold.MajorUnit < _selectedRecipeInfo.CostNCG)
+            if (ClientStateViewProvider.Current.CurrentGoldBalanceStateRaw.Gold.MajorUnit < _selectedRecipeInfo.CostNCG)
             {
                 errorMessage = L10nManager.Localize("UI_NOT_ENOUGH_NCG");
                 return false;
@@ -929,8 +930,8 @@ namespace Nekoyume.UI
 
             var costNCG = equipmentRow.RequiredGold + subRecipe.RequiredGold;
             var isCostEnough =
-                States.Instance.GoldBalanceState.Gold.MajorUnit >= costNCG &&
-                States.Instance.CrystalBalance.MajorUnit >= costCrystal.MajorUnit &&
+                ClientStateViewProvider.Current.CurrentAgentGoldBalanceMajorUnit >= costNCG &&
+                ClientStateViewProvider.Current.CurrentAgentCrystalBalanceMajorUnit >= costCrystal.MajorUnit &&
                 replaceableMaterials;
 
             return isCostEnough;

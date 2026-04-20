@@ -5,6 +5,7 @@ using Nekoyume.Game.Controller;
 using Nekoyume.Game.VFX;
 using Nekoyume.L10n;
 using Nekoyume.Model.Mail;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.UI.Module;
 using Nekoyume.UI.Scroller;
@@ -136,7 +137,7 @@ namespace Nekoyume.UI
             _stageType = stageType;
 
             var canAccel =
-                States.Instance.CurrentAvatarState.worldInformation.IsStageCleared(
+                ClientStateViewProvider.Current.CurrentAvatarStateRaw.worldInformation.IsStageCleared(
                     RequiredStageForAccelButton);
             accelerationToggleLockButton.gameObject.SetActive(!canAccel);
             accelerationToggle.gameObject.SetActive(canAccel);
@@ -147,13 +148,13 @@ namespace Nekoyume.UI
                 SetAccelToggle(accelerationToggle.isOn);
             }
 
-            var canExit = States.Instance.CurrentAvatarState.worldInformation
+            var canExit = ClientStateViewProvider.Current.CurrentAvatarStateRaw.worldInformation
                 .IsStageCleared(RequiredStageForExitButton);
             exitToggle.gameObject.SetActive(canExit);
 
             // tutorial code for accel button
             if (stageId == RequiredStageForAccelButton + 1 &&
-                !States.Instance.CurrentAvatarState.worldInformation
+                !ClientStateViewProvider.Current.CurrentAvatarStateRaw.worldInformation
                     .IsStageCleared(stageId))
             {
                 accelerationToggle.isOn = true;
@@ -179,7 +180,7 @@ namespace Nekoyume.UI
                 case StageType.HackAndSlash:
                 case StageType.Mimisbrunnr:
                 case StageType.EventDungeon:
-                    guidedQuest.Show(States.Instance.CurrentAvatarState, () =>
+                    guidedQuest.Show(ClientStateViewProvider.Current.CurrentAvatarStateRaw, () =>
                     {
                         switch (_stageType)
                         {
@@ -240,7 +241,7 @@ namespace Nekoyume.UI
                         }
 
                         guidedQuest.UpdateList(
-                            States.Instance.CurrentAvatarState,
+                            ClientStateViewProvider.Current.CurrentAvatarStateRaw,
                             () => onComplete(true));
                     });
                     break;
@@ -254,7 +255,7 @@ namespace Nekoyume.UI
                         }
 
                         guidedQuest.UpdateList(
-                            States.Instance.CurrentAvatarState,
+                            ClientStateViewProvider.Current.CurrentAvatarStateRaw,
                             () => onComplete(true));
                     });
                     break;

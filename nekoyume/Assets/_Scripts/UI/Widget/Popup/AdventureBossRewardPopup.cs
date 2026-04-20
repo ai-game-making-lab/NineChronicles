@@ -1,6 +1,7 @@
 using Cysharp.Threading.Tasks;
 using Nekoyume.Blockchain;
 using Nekoyume.Model.AdventureBoss;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.UI.Module;
 using System.Collections.Generic;
@@ -141,7 +142,7 @@ namespace Nekoyume.UI
                 return;
             }
 
-            _endedClaimableSeasonInfo = adventureBossData.EndedSeasonInfos.Values.Where(seasonInfo => seasonInfo.EndBlockIndex + States.Instance.GameConfigState.AdventureBossClaimInterval > Game.instance.Agent.BlockIndex).OrderBy(seasonInfo => seasonInfo.EndBlockIndex).ToList();
+            _endedClaimableSeasonInfo = adventureBossData.EndedSeasonInfos.Values.Where(seasonInfo => seasonInfo.EndBlockIndex + ClientStateViewProvider.Current.CurrentGameConfigStateRaw.AdventureBossClaimInterval > Game.instance.Agent.BlockIndex).OrderBy(seasonInfo => seasonInfo.EndBlockIndex).ToList();
 
             var claimableInfo = adventureBossData.EndedBountyBoards.Values.Where(bountyBoard => _endedClaimableSeasonInfo.Any(seasondata => seasondata.Season == bountyBoard.Season) &&
                 bountyBoard.Investors.Any(inv => inv.AvatarAddress == Game.instance.States.CurrentAvatarState.address && !inv.Claimed)).ToList();
@@ -191,7 +192,7 @@ namespace Nekoyume.UI
 
             foreach (var seasonInfo in _endedClaimableSeasonInfo)
             {
-                if (seasonInfo.EndBlockIndex + States.Instance.GameConfigState.AdventureBossClaimInterval <= Game.instance.Agent.BlockIndex)
+                if (seasonInfo.EndBlockIndex + ClientStateViewProvider.Current.CurrentGameConfigStateRaw.AdventureBossClaimInterval <= Game.instance.Agent.BlockIndex)
                 {
                     continue;
                 }
@@ -208,7 +209,7 @@ namespace Nekoyume.UI
                     Game.instance.AdventureBossData.EndedExploreBoards[seasonInfo.Season] = exploreBoard;
                 }
 
-                var exploreInfo = await Game.instance.Agent.GetExploreInfoAsync(States.Instance.CurrentAvatarState.address, seasonInfo.Season);
+                var exploreInfo = await Game.instance.Agent.GetExploreInfoAsync(ClientStateViewProvider.Current.CurrentAvatarStateRaw.address, seasonInfo.Season);
 
                 var investor = bountyBoard.Investors.FirstOrDefault(
                     inv => inv.AvatarAddress == Game.instance.States.CurrentAvatarState.address);
@@ -221,7 +222,7 @@ namespace Nekoyume.UI
                             bountyBoard,
                             Game.instance.States.CurrentAvatarState.address,
                             TableSheets.Instance.AdventureBossNcgRewardRatioSheet,
-                            States.Instance.GameConfigState.AdventureBossNcgRuneRatio,
+                            ClientStateViewProvider.Current.CurrentGameConfigStateRaw.AdventureBossNcgRuneRatio,
                             out var wantedReward);
                         if (_lastSeasonId < seasonInfo.Season)
                         {
@@ -238,8 +239,8 @@ namespace Nekoyume.UI
                             exploreInfo,
                             Game.instance.States.CurrentAvatarState.address,
                             TableSheets.Instance.AdventureBossNcgRewardRatioSheet,
-                            States.Instance.GameConfigState.AdventureBossNcgApRatio,
-                            States.Instance.GameConfigState.AdventureBossNcgRuneRatio,
+                            ClientStateViewProvider.Current.CurrentGameConfigStateRaw.AdventureBossNcgApRatio,
+                            ClientStateViewProvider.Current.CurrentGameConfigStateRaw.AdventureBossNcgRuneRatio,
                             false,
                             out var explorerReward);
                         if (_lastSeasonId < seasonInfo.Season)
@@ -393,7 +394,7 @@ namespace Nekoyume.UI
 
             if (bountyBoard != null)
             {
-                var bountyInfo = bountyBoard.Investors.Where(i => i.AvatarAddress.Equals(States.Instance.CurrentAvatarState.address)).FirstOrDefault();
+                var bountyInfo = bountyBoard.Investors.Where(i => i.AvatarAddress.Equals(ClientStateViewProvider.Current.CurrentAvatarStateRaw.address)).FirstOrDefault();
                 if (bountyInfo != null)
                 {
                     bountyCost.text = $"{bountyInfo.Price.ToCurrencyNotation()}";

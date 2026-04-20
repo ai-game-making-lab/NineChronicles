@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using JetBrains.Annotations;
 using Nekoyume.Game;
 using Nekoyume.Game.Controller;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.UI.Model;
 using UnityEngine;
@@ -137,7 +138,7 @@ namespace Nekoyume.UI
             UpdateNotification();
             base.Show(ignoreShowAnimation);
 
-            if (States.Instance.CurrentAvatarState.worldInformation.TryGetLastClearedStageId(
+            if (ClientStateViewProvider.Current.CurrentAvatarStateRaw.worldInformation.TryGetLastClearedStageId(
                 out var lastClearedStageId))
             {
                 foreach (var lockObj in lockObjects)
@@ -166,7 +167,7 @@ namespace Nekoyume.UI
 
             // rune
             runeNotificationImage.enabled = false;
-            var allRuneState = States.Instance.AllRuneState;
+            var allRuneState = ClientStateViewProvider.Current.AllRuneStateRaw;
             var runeListSheet = Game.Game.instance.TableSheets.RuneListSheet;
             foreach (var runeRow in runeListSheet)
             {

@@ -1,5 +1,6 @@
 using System;
 using Libplanet.Types.Assets;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.State.Subjects;
 using Nekoyume.UI.Module.Common;
@@ -53,12 +54,12 @@ namespace Nekoyume.UI.Module
         private void UpdateGold()
         {
             if (States.Instance is null ||
-                States.Instance.GoldBalanceState is null)
+                ClientStateViewProvider.Current.CurrentGoldBalanceStateRaw is null)
             {
                 return;
             }
 
-            SetGold(States.Instance.GoldBalanceState.Gold);
+            SetGold(ClientStateViewProvider.Current.CurrentGoldBalanceStateRaw.Gold);
         }
 
         private void SetGold(FungibleAssetValue gold)

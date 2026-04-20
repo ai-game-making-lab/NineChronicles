@@ -3,6 +3,8 @@ using Nekoyume.Game;
 using Nekoyume.Game.Controller;
 using Nekoyume.L10n;
 using Nekoyume.Model.Mail;
+using Nekoyume.SingleClient.Blockchain;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.UI.Module.WorldBoss;
 using UnityEngine;
@@ -27,7 +29,7 @@ namespace Nekoyume.UI
             characterSelectEventSubject.GetEvent("Click")
                 .Subscribe(_ =>
                 {
-                    var address = States.Instance.CurrentAvatarState.address;
+                    var address = ClientStateViewProvider.Current.CurrentAvatar?.Address.ToLibplanet() ?? default;
                     if (WorldBossStates.IsReceivingGradeRewards(address))
                     {
                         OneLineSystem.Push(

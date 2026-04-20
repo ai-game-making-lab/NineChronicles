@@ -13,6 +13,7 @@ using Nekoyume.ApiClient;
 using Nekoyume.Blockchain;
 using Nekoyume.Helper;
 using Nekoyume.L10n;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.UI;
 using Unity.Services.Core;
@@ -53,13 +54,13 @@ namespace Nekoyume.IAPStore
             }
 
             _initializedCategorySchema = await ApiClients.Instance.IAPServiceManager.GetProductsAsync(
-                States.Instance.AgentState.address, Game.Game.instance.CurrentPlanetId.ToString());
+                ClientStateViewProvider.Current.CurrentAgentStateRaw.address, Game.Game.instance.CurrentPlanetId.ToString());
 
             if (_initializedCategorySchema is null)
             {
                 // TODO: not initialized case handling
                 NcDebug.LogError(
-                    $"IAPServiceManager.GetProductsAsync({States.Instance.AgentState.address}): Product Catagorys is null.");
+                    $"IAPServiceManager.GetProductsAsync({ClientStateViewProvider.Current.CurrentAgentStateRaw.address}): Product Catagorys is null.");
                 return;
             }
 
@@ -109,7 +110,7 @@ namespace Nekoyume.IAPStore
                     return true;
                 }
 
-                if (item.Value.RequiredLevel.Value < States.Instance.CurrentAvatarState.level)
+                if (item.Value.RequiredLevel.Value < ClientStateViewProvider.Current.CurrentAvatarStateRaw.level)
                 {
                     return true;
                 }
@@ -142,7 +143,7 @@ namespace Nekoyume.IAPStore
 
         public bool TryGetCategoryName(int itemId, out string categoryName)
         {
-            var level = States.Instance.CurrentAvatarState.level;
+            var level = ClientStateViewProvider.Current.CurrentAvatarStateRaw.level;
             var categoryInMobileShop = _initializedCategorySchema?
                 .Where(c => c.Active && c.Name != "NoShow")
                 .OrderBy(c => c.Order)
@@ -168,8 +169,8 @@ namespace Nekoyume.IAPStore
                 Analyzer.Instance.Track(
                     "Unity/Shop/IAP/OnPurchaseClicked",
                     ("product-id", productId),
-                    ("agent-address", States.Instance.AgentState.address.ToHex()),
-                    ("avatar-address", States.Instance.CurrentAvatarState.address.ToHex()),
+                    ("agent-address", ClientStateViewProvider.Current.CurrentAgentStateRaw.address.ToHex()),
+                    ("avatar-address", ClientStateViewProvider.Current.CurrentAvatarStateRaw.address.ToHex()),
                     ("planet-id", Game.Game.instance.CurrentPlanetId.ToString()));
             }
             catch (Exception error)

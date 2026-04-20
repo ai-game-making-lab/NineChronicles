@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Nekoyume.Game.Controller;
 using Nekoyume.Helper;
+using Nekoyume.SingleClient.Blockchain;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.UI.Module;
 using Nekoyume.UI.Module.WorldBoss;
@@ -83,7 +85,7 @@ namespace Nekoyume.UI
                 return;
             }
 
-            var avatarAddress = States.Instance.CurrentAvatarState.address;
+            var avatarAddress = ClientStateViewProvider.Current.CurrentAvatar?.Address.ToLibplanet() ?? default;
             WorldBossStates.SetHasGradeRewards(avatarAddress, false);
             worldBossReward.ShowAsync(false);
         }

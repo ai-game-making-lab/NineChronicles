@@ -1,3 +1,4 @@
+#if LIB9C_TOOLS
 using System.IO;
 using System.Text;
 using Editor;
@@ -175,3 +176,4 @@ public class TestbedTool : EditorWindow
         AssetDatabase.Refresh();
     }
 }
+#endif

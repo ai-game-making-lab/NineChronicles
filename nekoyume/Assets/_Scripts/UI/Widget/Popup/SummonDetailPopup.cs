@@ -2,8 +2,8 @@ using System;
 using System.Linq;
 using Nekoyume.Battle;
 using Nekoyume.Helper;
-using Nekoyume.Model.EnumType;
 using Nekoyume.Model.Item;
+using Nekoyume.SingleClient.Models.EnumType;
 using Nekoyume.SingleClient.Models.TableData;
 using Nekoyume.TableData;
 using Nekoyume.UI.Module;
@@ -184,7 +184,7 @@ namespace Nekoyume.UI
         private static void SetCostume(CostumeItemSheet.Row costumeRow)
         {
             var game = Game.Game.instance;
-            var (equipments, costumes) = game.States.GetEquippedItems(BattleType.Adventure);
+            var (equipments, costumes) = game.States.GetEquippedItems(BattleType.Adventure.ToLib9c());
             costumes.RemoveAll(costume => costume.ItemSubType == ItemSubType.FullCostume);
             var resultItem = ItemFactory.CreateCostume(costumeRow, Guid.NewGuid());
             costumes.Add(resultItem);
@@ -195,7 +195,7 @@ namespace Nekoyume.UI
         private static void SetCharacter(EquipmentItemSheet.Row equipmentRow)
         {
             var game = Game.Game.instance;
-            var (equipments, costumes) = game.States.GetEquippedItems(BattleType.Adventure);
+            var (equipments, costumes) = game.States.GetEquippedItems(BattleType.Adventure.ToLib9c());
 
             if (equipmentRow is not null)
             {

@@ -9,6 +9,7 @@ using Nekoyume.Extensions;
 using Nekoyume.Helper;
 using Nekoyume.L10n;
 using Nekoyume.Model.Item;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.TableData;
 using TMPro;
@@ -196,7 +197,7 @@ namespace Nekoyume.UI
         {
             var equipment =
                 (Equipment)ItemFactory.CreateItemUsable(row, random.GenerateRandomGuid(), 0);
-            var agentState = States.Instance.AgentState;
+            var agentState = ClientStateViewProvider.Current.CurrentAgentStateRaw;
             // Action.CombinationEquipment.AddAndUnlockOption(
             //     agentState,
             //     equipment,

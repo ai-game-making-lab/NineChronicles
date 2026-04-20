@@ -1,3 +1,4 @@
+using Nekoyume.SingleClient.State;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
@@ -59,7 +60,7 @@ namespace Nekoyume.State
             }
 
             var fav = new FungibleAssetValue(
-                States.Instance.GoldBalanceState.Gold.Currency,
+                ClientStateViewProvider.Current.CurrentGoldBalanceStateRaw.Gold.Currency,
                 gold,
                 0);
             ModifyAgentGoldAsync(agentAddress, fav).Forget();
@@ -73,7 +74,7 @@ namespace Nekoyume.State
             }
 
             var fav = new FungibleAssetValue(
-                States.Instance.GoldBalanceState.Gold.Currency,
+                ClientStateViewProvider.Current.CurrentGoldBalanceStateRaw.Gold.Currency,
                 gold,
                 0);
 
@@ -541,9 +542,9 @@ namespace Nekoyume.State
         public static void AddWorld(Address avatarAddress, int worldId)
         {
             var modifier = new AvatarWorldInformationAddWorldModifier(worldId);
-            if (avatarAddress.Equals(States.Instance.CurrentAvatarState.address))
+            if (avatarAddress.Equals(ClientStateViewProvider.Current.CurrentAvatarStateRaw.address))
             {
-                modifier.Modify(States.Instance.CurrentAvatarState);
+                modifier.Modify(ClientStateViewProvider.Current.CurrentAvatarStateRaw);
             }
 
             LocalLayer.Instance.Add(avatarAddress, modifier);
@@ -565,7 +566,7 @@ namespace Nekoyume.State
             out int outKey,
             out bool isCurrentAvatarState)
         {
-            var agentState = States.Instance.AgentState;
+            var agentState = ClientStateViewProvider.Current.CurrentAgentStateRaw;
             if (agentState is null ||
                 !agentState.avatarAddresses.ContainsValue(avatarAddress))
             {
@@ -575,7 +576,7 @@ namespace Nekoyume.State
                 return false;
             }
 
-            foreach (var pair in States.Instance.AvatarStates)
+            foreach (var pair in ClientStateViewProvider.Current.AvatarStatesRaw)
             {
                 if (!pair.Value.address.Equals(avatarAddress))
                 {
@@ -584,7 +585,7 @@ namespace Nekoyume.State
 
                 outAvatarState = pair.Value;
                 outKey = pair.Key;
-                isCurrentAvatarState = outKey.Equals(States.Instance.CurrentAvatarKey);
+                isCurrentAvatarState = outKey.Equals(ClientStateViewProvider.Current.CurrentAvatarKey);
                 return true;
             }
 

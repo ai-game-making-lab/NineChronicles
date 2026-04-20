@@ -7,6 +7,7 @@ using Nekoyume.Game.Controller;
 using Nekoyume.L10n;
 using Nekoyume.Model.Pet;
 using Nekoyume.Model.State;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.TableData.Pet;
 using Nekoyume.UI;
@@ -89,7 +90,7 @@ namespace Nekoyume.Helper
         public static bool HasNotification(int id)
         {
             var nextLevel = 1;
-            if (States.Instance.PetStates.TryGetPetState(id, out var pet))
+            if (ClientStateViewProvider.Current.PetStatesRaw.TryGetPetState(id, out var pet))
             {
                 nextLevel = pet.Level + 1;
             }
@@ -101,12 +102,12 @@ namespace Nekoyume.Helper
                 return false;
             }
 
-            var ncgCost = States.Instance.GoldBalanceState.Gold.Currency * nextCost.NcgQuantity;
+            var ncgCost = ClientStateViewProvider.Current.CurrentGoldBalanceStateRaw.Gold.Currency * nextCost.NcgQuantity;
             var soulStoneCost =
                 PetHelper.GetSoulstoneCurrency(TableSheets.Instance.PetSheet[id].SoulStoneTicker) *
                 nextCost.SoulStoneQuantity;
-            return States.Instance.GoldBalanceState.Gold >= ncgCost &&
-                States.Instance.CurrentAvatarBalances.TryGetValue(
+            return ClientStateViewProvider.Current.CurrentGoldBalanceStateRaw.Gold >= ncgCost &&
+                ClientStateViewProvider.Current.CurrentAvatarBalancesRaw.TryGetValue(
                     soulStoneCost.Currency.Ticker,
                     out var soulStone) &&
                 soulStone >= soulStoneCost;
@@ -263,7 +264,7 @@ namespace Nekoyume.Helper
         {
             if (currentOption.OptionType == PetOptionType.IncreaseBlockPerHourglass)
             {
-                var originalValue = States.Instance.GameConfigState.HourglassPerBlock;
+                var originalValue = ClientStateViewProvider.Current.CurrentGameConfigStateRaw.HourglassPerBlock;
                 var optionValue = currentOption.OptionValue;
                 var currentOptionValueText = $"{originalValue + optionValue} ({originalValue}+{optionValue})";
                 var targetOptionValue = targetOption.OptionValue;

@@ -6,6 +6,7 @@ using Nekoyume.Game;
 using Nekoyume.Helper;
 using Nekoyume.L10n;
 using Nekoyume.Model.Item;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using TMPro;
 using UnityEngine;
@@ -171,7 +172,7 @@ namespace Nekoyume.UI.Module
                                     false,
                                     TableSheets.Instance.CrystalEquipmentGrindingSheet,
                                     TableSheets.Instance.CrystalMonsterCollectionMultiplierSheet,
-                                    States.Instance.StakingLevel).DivRem((BigInteger)x.Product.Price)
+                                    ClientStateViewProvider.Current.StakingLevel).DivRem((BigInteger)x.Product.Price)
                                 .Quotient
                                 .MajorUnit
                             : 0).ToList();

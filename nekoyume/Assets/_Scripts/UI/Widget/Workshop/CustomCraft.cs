@@ -13,8 +13,9 @@ using Nekoyume.Game;
 using Nekoyume.Game.Controller;
 using Nekoyume.Helper;
 using Nekoyume.L10n;
-using Nekoyume.Model.EnumType;
 using Nekoyume.Model.Item;
+using Nekoyume.SingleClient.Models.EnumType;
+using Nekoyume.SingleClient.State;
 using Nekoyume.Model.Mail;
 using Nekoyume.State;
 using Nekoyume.TableData;
@@ -150,15 +151,15 @@ namespace Nekoyume.UI
                 var (ncgCost, materialCosts) = CustomCraftHelper.CalculateCraftCost(
                     0, (int)ReactiveAvatarState.Relationship, tableSheets.MaterialItemSheet, recipeRow,
                     relationshipRow,
-                    States.Instance.GameConfigState.CustomEquipmentCraftIconCostMultiplier
+                    ClientStateViewProvider.Current.CurrentGameConfigStateRaw.CustomEquipmentCraftIconCostMultiplier
                 );
 
-                if (States.Instance.GoldBalanceState.Gold.MajorUnit < ncgCost)
+                if (ClientStateViewProvider.Current.CurrentGoldBalanceStateRaw.Gold.MajorUnit < ncgCost)
                 {
                     return false;
                 }
 
-                var inventory = States.Instance.CurrentAvatarState.inventory;
+                var inventory = ClientStateViewProvider.Current.CurrentAvatarStateRaw.inventory;
                 foreach (var material in materialCosts)
                 {
                     if (!tableSheets.MaterialItemSheet.TryGetValue(material.Key, out var row))
@@ -447,7 +448,7 @@ namespace Nekoyume.UI
                 tableSheets.MaterialItemSheet,
                 customEquipmentCraftRecipeRow,
                 relationshipRow,
-                States.Instance.GameConfigState.CustomEquipmentCraftIconCostMultiplier
+                ClientStateViewProvider.Current.CurrentGameConfigStateRaw.CustomEquipmentCraftIconCostMultiplier
             );
 
             var additionalCost = CustomCraftHelper.CalculateAdditionalCost((int) ReactiveAvatarState.Relationship,
@@ -528,12 +529,12 @@ namespace Nekoyume.UI
                 return SubmittableState.FullSlot;
             }
 
-            if (States.Instance.GoldBalanceState.Gold.MajorUnit < ncgAmount)
+            if (ClientStateViewProvider.Current.CurrentGoldBalanceStateRaw.Gold.MajorUnit < ncgAmount)
             {
                 return SubmittableState.InsufficientBalance;
             }
 
-            var inventory = States.Instance.CurrentAvatarState.inventory;
+            var inventory = ClientStateViewProvider.Current.CurrentAvatarStateRaw.inventory;
             foreach (var material in materials)
             {
                 if (!TableSheets.Instance.MaterialItemSheet.TryGetValue(material.Id, out var row))
@@ -557,7 +558,7 @@ namespace Nekoyume.UI
         private void SetCharacter(ItemSheet.Row equipmentRow, int iconId)
         {
             var game = Game.Game.instance;
-            var (equipments, costumes) = game.States.GetEquippedItems(BattleType.Adventure);
+            var (equipments, costumes) = game.States.GetEquippedItems(BattleType.Adventure.ToLib9c());
             costumes.Clear();
             var maxLevel = game.TableSheets.EnhancementCostSheetV3.Values
                 .Where(row =>

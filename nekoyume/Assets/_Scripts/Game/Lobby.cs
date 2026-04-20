@@ -5,7 +5,8 @@ using Cysharp.Threading.Tasks;
 using Nekoyume.ApiClient;
 using Nekoyume.Blockchain;
 using Nekoyume.Game.Character;
-using Nekoyume.Model.EnumType;
+using Nekoyume.SingleClient.Models.EnumType;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.UI;
 using Nekoyume.UI.Module;
@@ -74,8 +75,8 @@ namespace Nekoyume.Game
         {
             Widget.Find<HeaderMenuStatic>().Close(true);
 
-            var avatarState = States.Instance.CurrentAvatarState;
-            var (equipments, costumes) = States.Instance.GetEquippedItems(BattleType.Adventure);
+            var avatarState = ClientStateViewProvider.Current.CurrentAvatarStateRaw;
+            var (equipments, costumes) = ClientStateViewProvider.Current.GetEquippedItems(BattleType.Adventure.ToLib9c());
             var onFinish = false;
             Character.Set(avatarState, equipments, costumes, () => onFinish = true);
 
@@ -115,7 +116,7 @@ namespace Nekoyume.Game
         private void OnLobbyPopup()
         {
             const int requiredStage = LiveAsset.GameConfig.RequiredStage.ShowPopupLobbyEntering;
-            if (!States.Instance.CurrentAvatarState.worldInformation.IsStageCleared(requiredStage))
+            if (!ClientStateViewProvider.Current.CurrentAvatarStateRaw.worldInformation.IsStageCleared(requiredStage))
             {
                 return;
             }

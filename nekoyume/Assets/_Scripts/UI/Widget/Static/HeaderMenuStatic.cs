@@ -11,6 +11,7 @@ using Nekoyume.Model.Item;
 using Nekoyume.Model.Mail;
 using Nekoyume.Model.Quest;
 using Nekoyume.Model.State;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using TMPro;
 using UnityEngine;
@@ -290,7 +291,7 @@ namespace Nekoyume.UI.Module
                                 {
                                     confirm.SubmitCallback = () =>
                                     {
-                                        var address = States.Instance.CurrentAvatarState.address;
+                                        var address = ClientStateViewProvider.Current.CurrentAvatarStateRaw.address;
                                         if (WorldBossStates.IsReceivingGradeRewards(address))
                                         {
                                             OneLineSystem.Push(
@@ -346,7 +347,7 @@ namespace Nekoyume.UI.Module
                             {
                                 if (_toggleUnlockStages.TryGetValue(toggleInfo.Type, out var requiredStage) &&
                                     requiredStage != 0 &&
-                                    !States.Instance.CurrentAvatarState.worldInformation.IsStageCleared(requiredStage))
+                                    !ClientStateViewProvider.Current.CurrentAvatarStateRaw.worldInformation.IsStageCleared(requiredStage))
                                 {
                                     OneLineSystem.Push(MailType.System,
                                         L10nManager.Localize("UI_STAGE_LOCK_FORMAT", requiredStage),
@@ -406,7 +407,7 @@ namespace Nekoyume.UI.Module
 
                     var requiredStage = _toggleUnlockStages[toggleInfo.Type];
                     var isLock = requiredStage != 0 &&
-                        !States.Instance.CurrentAvatarState.worldInformation
+                        !ClientStateViewProvider.Current.CurrentAvatarStateRaw.worldInformation
                             .IsStageCleared(requiredStage);
                     toggleInfo.Lock.SetActive(isLock);
                     toggleInfo.LockText.text = L10nManager.Localize("UI_STAGE") + requiredStage;
@@ -598,7 +599,7 @@ namespace Nekoyume.UI.Module
                 {
                     var costType = enabledMaterials[i];
                     var icon = costIconData.GetIcon(costType);
-                    var count = States.Instance.CurrentAvatarState.inventory
+                    var count = ClientStateViewProvider.Current.CurrentAvatarStateRaw.inventory
                         .GetMaterialCount((int)costType);
 
                     MaterialAssets[i].SetMaterial(icon, count, costType);
@@ -651,26 +652,26 @@ namespace Nekoyume.UI.Module
         private void SubscribeInventory(Nekoyume.Model.Item.Inventory inventory)
         {
             var blockIndex = Game.instance.Agent.BlockIndex;
-            var avatarLevel = States.Instance.CurrentAvatarState?.level ?? 0;
+            var avatarLevel = ClientStateViewProvider.Current.CurrentAvatarStateRaw?.level ?? 0;
             var sheets = Game.instance.TableSheets;
             var hasNotification = inventory?.HasNotification(avatarLevel, blockIndex,
                 sheets.ItemRequirementSheet,
                 sheets.EquipmentItemRecipeSheet,
                 sheets.EquipmentItemSubRecipeSheetV2,
                 sheets.EquipmentItemOptionSheet,
-                States.Instance.GameConfigState) ?? false;
+                ClientStateViewProvider.Current.CurrentGameConfigStateRaw) ?? false;
             UpdateInventoryNotification(hasNotification);
         }
 
         private void UpdateCombinationNotification(long currentBlockIndex)
         {
-            var avatarState = States.Instance.CurrentAvatarState;
+            var avatarState = ClientStateViewProvider.Current.CurrentAvatarStateRaw;
             if (avatarState is null)
             {
                 return;
             }
 
-            var states = States.Instance.GetUsedCombinationSlotState(avatarState, currentBlockIndex);
+            var states = ClientStateViewProvider.Current.GetUsedCombinationSlotState(avatarState, currentBlockIndex);
             var hasNotification = states?.Any(state =>
                 HasCombinationNotification(state.Value, currentBlockIndex)) ?? false;
             _toggleNotifications[ToggleType.CombinationSlots].Value = hasNotification;
@@ -693,11 +694,11 @@ namespace Nekoyume.UI.Module
             var diff = state.RequiredBlockIndex - currentBlockIndex;
             int cost;
             if (state.PetId.HasValue &&
-                States.Instance.PetStates.TryGetPetState(state.PetId.Value, out var petState))
+                ClientStateViewProvider.Current.PetStatesRaw.TryGetPetState(state.PetId.Value, out var petState))
             {
                 cost = PetHelper.CalculateDiscountedHourglass(
                     diff,
-                    States.Instance.GameConfigState.HourglassPerBlock,
+                    ClientStateViewProvider.Current.CurrentGameConfigStateRaw.HourglassPerBlock,
                     petState,
                     TableSheets.Instance.PetOptionSheet);
             }
@@ -709,7 +710,7 @@ namespace Nekoyume.UI.Module
             var row = Game.instance.TableSheets.MaterialItemSheet.Values.First(r =>
                 r.ItemSubType == ItemSubType.Hourglass);
             var isEnough =
-                States.Instance.CurrentAvatarState.inventory.HasFungibleItem(row.ItemId, currentBlockIndex, cost);
+                ClientStateViewProvider.Current.CurrentAvatarStateRaw.inventory.HasFungibleItem(row.ItemId, currentBlockIndex, cost);
             return isEnough;
         }
 

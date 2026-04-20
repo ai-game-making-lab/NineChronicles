@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Nekoyume.Model.AdventureBoss;
 using Cysharp.Threading.Tasks;
 using Libplanet.Types.Assets;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.Helper;
 using static Nekoyume.Data.AdventureBossGameData;
@@ -98,9 +99,9 @@ namespace Nekoyume.UI.Model
                     EndedExploreBoards[endedSeasonIndex] = endedExploreBoard;
                 }
 
-                if (States.Instance.CurrentAvatarState.address != null)
+                if (ClientStateViewProvider.Current.CurrentAvatarStateRaw.address != null)
                 {
-                    var endedExploreInfo = await Game.Game.instance.Agent.GetExploreInfoAsync(States.Instance.CurrentAvatarState.address, endedSeasonIndex, stateRootHash, blockIndex);
+                    var endedExploreInfo = await Game.Game.instance.Agent.GetExploreInfoAsync(ClientStateViewProvider.Current.CurrentAvatarStateRaw.address, endedSeasonIndex, stateRootHash, blockIndex);
                     if (!EndedExploreInfos.ContainsKey(endedSeasonIndex))
                     {
                         EndedExploreInfos.Add(endedSeasonIndex, endedExploreInfo);
@@ -112,7 +113,7 @@ namespace Nekoyume.UI.Model
                 }
 
                 //보상수령기간이 지날경우 더이상 가져오지않음.
-                if (endedSeasonInfo.EndBlockIndex + States.Instance.GameConfigState.AdventureBossClaimInterval < Game.Game.instance.Agent.BlockIndex)
+                if (endedSeasonInfo.EndBlockIndex + ClientStateViewProvider.Current.CurrentGameConfigStateRaw.AdventureBossClaimInterval < Game.Game.instance.Agent.BlockIndex)
                 {
                     break;
                 }
@@ -169,7 +170,7 @@ namespace Nekoyume.UI.Model
 
                         if (!EndedExploreInfos.TryGetValue(endedSeasonIndex, out var endedExploreInfo) && Game.Game.instance.States.CurrentAvatarState != null)
                         {
-                            endedExploreInfo = await Game.Game.instance.Agent.GetExploreInfoAsync(States.Instance.CurrentAvatarState.address, endedSeasonIndex, stateRootHash, blockIndex);
+                            endedExploreInfo = await Game.Game.instance.Agent.GetExploreInfoAsync(ClientStateViewProvider.Current.CurrentAvatarStateRaw.address, endedSeasonIndex, stateRootHash, blockIndex);
                             EndedExploreInfos.Add(endedSeasonIndex, endedExploreInfo);
                         }
 
@@ -186,7 +187,7 @@ namespace Nekoyume.UI.Model
 
 
                             //보상수령기간이 지날경우 더이상 가져오지않음.
-                            if (endedSeasonInfo.EndBlockIndex + States.Instance.GameConfigState.AdventureBossClaimInterval < Game.Game.instance.Agent.BlockIndex)
+                            if (endedSeasonInfo.EndBlockIndex + ClientStateViewProvider.Current.CurrentGameConfigStateRaw.AdventureBossClaimInterval < Game.Game.instance.Agent.BlockIndex)
                             {
                                 break;
                             }
@@ -290,7 +291,7 @@ namespace Nekoyume.UI.Model
 
         public FungibleAssetValue GetCurrentBountyPrice()
         {
-            var total = new FungibleAssetValue(States.Instance.GoldBalanceState.Gold.Currency, 0, 0);
+            var total = new FungibleAssetValue(ClientStateViewProvider.Current.CurrentGoldBalanceStateRaw.Gold.Currency, 0, 0);
             if (BountyBoard.Value == null || BountyBoard.Value.Investors == null)
             {
                 return total;
@@ -401,8 +402,8 @@ namespace Nekoyume.UI.Model
                         ExploreInfo.Value,
                         ExploreInfo.Value.AvatarAddress,
                         TableSheets.Instance.AdventureBossNcgRewardRatioSheet,
-                        States.Instance.GameConfigState.AdventureBossNcgApRatio,
-                        States.Instance.GameConfigState.AdventureBossNcgRuneRatio,
+                        ClientStateViewProvider.Current.CurrentGameConfigStateRaw.AdventureBossNcgApRatio,
+                        ClientStateViewProvider.Current.CurrentGameConfigStateRaw.AdventureBossNcgRuneRatio,
                         false,
                         out var ncgReward);
                 }
@@ -412,7 +413,7 @@ namespace Nekoyume.UI.Model
                         BountyBoard.Value,
                         Game.Game.instance.States.CurrentAvatarState.address,
                         TableSheets.Instance.AdventureBossNcgRewardRatioSheet,
-                        States.Instance.GameConfigState.AdventureBossNcgRuneRatio,
+                        ClientStateViewProvider.Current.CurrentGameConfigStateRaw.AdventureBossNcgRuneRatio,
                         out var wantedReward);
                 }
             }
@@ -442,7 +443,7 @@ namespace Nekoyume.UI.Model
                 BountyBoard.Value,
                 Game.Game.instance.States.CurrentAvatarState.address,
                 TableSheets.Instance.AdventureBossNcgRewardRatioSheet,
-                States.Instance.GameConfigState.AdventureBossNcgRuneRatio,
+                ClientStateViewProvider.Current.CurrentGameConfigStateRaw.AdventureBossNcgRuneRatio,
                 out var wantedReward);
             return myReward;
         }
@@ -462,7 +463,7 @@ namespace Nekoyume.UI.Model
             }
 
             var fav = new FungibleAssetValue(
-                States.Instance.GoldBalanceState.Gold.Currency,
+                ClientStateViewProvider.Current.CurrentGoldBalanceStateRaw.Gold.Currency,
                 additionalAmount,
                 0);
             var copyedBoad = new BountyBoard((Bencodex.Types.List)BountyBoard.Value.Bencoded);
@@ -480,7 +481,7 @@ namespace Nekoyume.UI.Model
                 copyedBoad,
                 Game.Game.instance.States.CurrentAvatarState.address,
                 TableSheets.Instance.AdventureBossNcgRewardRatioSheet,
-                States.Instance.GameConfigState.AdventureBossNcgRuneRatio,
+                ClientStateViewProvider.Current.CurrentGameConfigStateRaw.AdventureBossNcgRuneRatio,
                 out var wantedReward);
             return myReward;
         }
@@ -501,8 +502,8 @@ namespace Nekoyume.UI.Model
                     ExploreInfo.Value,
                     ExploreInfo.Value.AvatarAddress,
                     TableSheets.Instance.AdventureBossNcgRewardRatioSheet,
-                    States.Instance.GameConfigState.AdventureBossNcgApRatio,
-                    States.Instance.GameConfigState.AdventureBossNcgRuneRatio,
+                    ClientStateViewProvider.Current.CurrentGameConfigStateRaw.AdventureBossNcgApRatio,
+                    ClientStateViewProvider.Current.CurrentGameConfigStateRaw.AdventureBossNcgRuneRatio,
                     false,
                     out var ncgReward);
             }

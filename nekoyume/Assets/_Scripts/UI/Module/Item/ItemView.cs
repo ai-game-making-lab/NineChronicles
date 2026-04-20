@@ -11,6 +11,7 @@ using UnityEngine.UI;
 using Coffee.UIEffects;
 using Nekoyume.Helper;
 using Nekoyume.Model.Item;
+using Nekoyume.SingleClient.Models.Items;
 
 #if UNITY_EDITOR
 using Nekoyume.Editor;
@@ -207,12 +208,13 @@ namespace Nekoyume.UI.Module
                 return;
             }
 
-            if (!(itemBase is Equipment equipment))
+            if (itemBase.ToPolySnapshot() is not EquipmentSnapshot eqSnap)
             {
                 return;
             }
 
-            if (equipment.GetOptionCountFromCombination() <= 0)
+            var optionInfo = eqSnap.ToItemOptionInfoSnapshot();
+            if (optionInfo.OptionCountFromCombination <= 0)
             {
                 return;
             }
@@ -227,11 +229,9 @@ namespace Nekoyume.UI.Module
             optionTagBg.hue = data.GradeHsvHue;
             optionTagBg.saturation = data.GradeHsvSaturation;
             optionTagBg.value = data.GradeHsvValue;
-            var optionInfo = new ItemOptionInfo(equipment);
 
-            var optionCount = optionInfo.StatOptions.Sum(x => x.count);
             var index = 0;
-            for (var i = 0; i < optionCount; ++i)
+            for (var i = 0; i < optionInfo.StatOptionTotalCount; ++i)
             {
                 var image = optionTagImages[index];
                 image.gameObject.SetActive(true);
@@ -239,7 +239,7 @@ namespace Nekoyume.UI.Module
                 ++index;
             }
 
-            for (var i = 0; i < optionInfo.SkillOptions.Count; ++i)
+            for (var i = 0; i < optionInfo.SkillOptionCount; ++i)
             {
                 var image = optionTagImages[index];
                 image.gameObject.SetActive(true);

@@ -7,6 +7,8 @@ using Nekoyume.Game;
 using Nekoyume.Game.Controller;
 using Nekoyume.L10n;
 using Nekoyume.Model.Item;
+using Nekoyume.SingleClient.Models.Items;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.TableData;
 using Nekoyume.TableData.Event;
@@ -134,7 +136,7 @@ namespace Nekoyume.UI
             long exp, bool ignoreShowAnimation = false)
         {
             _stageRow = stageRow;
-            _fixedApStonePlayCount = States.Instance.GameConfigState.ActionPointMax / stageRow.CostAP;
+            _fixedApStonePlayCount = ClientStateViewProvider.Current.CurrentGameConfigStateRaw.ActionPointMax / stageRow.CostAP;
             _apPlayCount = apPlayCount;
             _apStonePlayCount = apStonePlayCount;
 
@@ -263,7 +265,9 @@ namespace Nekoyume.UI
             foreach (var pair in bundle)
             {
                 items[index].gameObject.SetActive(true);
-                items[index].Set(pair.Key, pair.Value);
+                // SweepItem/SweepItemView now consume IItemSnapshot; project the lib9c reward
+                // dictionary key at the call site via ItemSnapshotMapper.ToPolySnapshot().
+                items[index].Set(pair.Key.ToPolySnapshot(), pair.Value);
                 index++;
             }
 

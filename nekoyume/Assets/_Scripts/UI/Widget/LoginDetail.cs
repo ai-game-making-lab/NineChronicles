@@ -1,4 +1,6 @@
 using System;
+using System.Linq;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.Game.Controller;
 using Nekoyume.Model;
@@ -13,7 +15,8 @@ using System.Collections.Generic;
 using Nekoyume.Game;
 using Nekoyume.Helper;
 using Nekoyume.L10n;
-using Nekoyume.Model.EnumType;
+using Nekoyume.SingleClient;
+using Nekoyume.SingleClient.Models.EnumType;
 
 namespace Nekoyume.UI
 {
@@ -94,6 +97,11 @@ namespace Nekoyume.UI
             Find<LoadingScreen>().Show(
                 LoadingScreen.LoadingType.Entering,
                 L10nManager.Localize("UI_IN_MINING_A_BLOCK"));
+            if (TryCreateAndLoginSingleClient(nickName))
+            {
+                return;
+            }
+
             var (earIndex, tailIndex, hairIndex, eyeIndex) = loginDetailCostume.GetCostumeId();
             Game.Game.instance.ActionManager
                 .CreateAvatar(_selectedIndex, nickName, hairIndex, eyeIndex, earIndex, tailIndex)
@@ -130,6 +138,11 @@ namespace Nekoyume.UI
             var loadingScreen = Find<LoadingScreen>();
             loadingScreen.Show(
                 LoadingScreen.LoadingType.Entering, L10nManager.Localize("UI_IN_MINING_A_BLOCK"));
+            if (TryLoginSingleClient(loadingScreen))
+            {
+                return;
+            }
+
             await RxProps.SelectAvatarAsync(_selectedIndex, Game.Game.instance.Agent.BlockTipStateRootHash);
             loadingScreen.Close();
             OnDidAvatarStateLoaded();
@@ -146,8 +159,13 @@ namespace Nekoyume.UI
         private async void Init(int index)
         {
             _selectedIndex = index;
+            if (TryInitSingleClient(index))
+            {
+                return;
+            }
+
             Player player;
-            _isCreateMode = !States.Instance.AvatarStates.ContainsKey(index);
+            _isCreateMode = !ClientStateViewProvider.Current.AvatarStatesRaw.ContainsKey(index);
             var tableSheets = Game.Game.instance.TableSheets;
 
             if (_isCreateMode)
@@ -161,26 +179,26 @@ namespace Nekoyume.UI
                 loadingScreen.Show(
                     LoadingScreen.LoadingType.JustModule,
                     L10nManager.Localize("UI_LOADING_BOOTSTRAP_START"));
-                await States.Instance.SelectAvatarAsync(_selectedIndex, Game.Game.instance.Agent.BlockTipStateRootHash);
+                await ClientStateViewProvider.Current.SelectAvatarAsync(_selectedIndex, Game.Game.instance.Agent.BlockTipStateRootHash);
                 Game.Event.OnUpdateAddresses.Invoke();
                 loadingScreen.Close();
                 player = new Player(
-                    States.Instance.CurrentAvatarState,
+                    ClientStateViewProvider.Current.CurrentAvatarStateRaw,
                     tableSheets.CharacterSheet,
                     tableSheets.CharacterLevelSheet,
                     tableSheets.EquipmentItemSetEffectSheet
                 );
 
-                var runeStates = States.Instance.GetEquippedRuneStates(BattleType.Adventure);
+                var runeStates = ClientStateViewProvider.Current.GetEquippedRuneStates(BattleType.Adventure.ToLib9c());
 
-                var allRuneState = States.Instance.AllRuneState;
+                var allRuneState = ClientStateViewProvider.Current.AllRuneStateRaw;
                 var runeListSheet = tableSheets.RuneListSheet;
                 var runeLevelBonusSheet = tableSheets.RuneLevelBonusSheet;
                 var runeLevelBonus = RuneHelper.CalculateRuneLevelBonus(
                     allRuneState, runeListSheet, runeLevelBonusSheet);
 
                 var costumeStatSheet = Game.Game.instance.TableSheets.CostumeStatSheet;
-                var collectionState = States.Instance.CollectionState;
+                var collectionState = ClientStateViewProvider.Current.CollectionStateRaw;
                 var collectionSheet = Game.Game.instance.TableSheets.CollectionSheet;
                 player.ConfigureStats(
                     costumeStatSheet,
@@ -204,7 +222,7 @@ namespace Nekoyume.UI
             if (!_isCreateMode)
             {
                 var level = player.Level;
-                var name = States.Instance.CurrentAvatarState.NameWithHash;
+                var name = ClientStateViewProvider.Current.CurrentAvatarStateRaw.NameWithHash;
                 levelAndNameInfo.text = $"LV. {level} {name}";
                 SetInformation(player);
             }
@@ -221,6 +239,99 @@ namespace Nekoyume.UI
             }
 
             Show();
+        }
+
+        private bool TryInitSingleClient(int index)
+        {
+            if (!TryGetSingleClientRuntime(out var runtime) ||
+                runtime.State is not { } state)
+            {
+                return false;
+            }
+
+            var avatar = state.Avatars.FirstOrDefault(candidate => candidate.SlotIndex == index);
+            _isCreateMode = avatar is null;
+            var tableSheets = Game.Game.instance.TableSheets;
+            var level = _isCreateMode ? 1 : Math.Max(1, avatar.Level);
+            var player = new Player(
+                level,
+                tableSheets.CharacterSheet,
+                tableSheets.CharacterLevelSheet,
+                tableSheets.EquipmentItemSetEffectSheet);
+
+            btnCreate.SetActive(_isCreateMode);
+            loginDetailCostume.SetActive(_isCreateMode);
+            btnLogin.SetActive(!_isCreateMode);
+            jobInfoContainer.SetActive(!_isCreateMode);
+            levelAndNameInfo.gameObject.SetActive(!_isCreateMode);
+            statusContainer.SetActive(!_isCreateMode);
+            if (!_isCreateMode)
+            {
+                levelAndNameInfo.text = $"LV. {player.Level} {avatar.AvatarName}";
+                SetInformation(player);
+            }
+
+            backButtonText.text = _isCreateMode ? L10nManager.Localize("UI_CHARACTER_CREATE") : "";
+            SubmitWidget = _isCreateMode ? CreateClick : LoginClick;
+            Show();
+            return true;
+        }
+
+        private bool TryCreateAndLoginSingleClient(string nickName)
+        {
+            if (!TryGetSingleClientRuntime(out var runtime))
+            {
+                return false;
+            }
+
+            try
+            {
+                runtime.CreateOrSelectAvatar(_selectedIndex, nickName);
+                OnRenderCreateAvatar();
+            }
+            catch (Exception e)
+            {
+                Game.Game.PopupError(e).Forget();
+                Find<LoadingScreen>().Close();
+            }
+
+            return true;
+        }
+
+        private bool TryLoginSingleClient(LoadingScreen loadingScreen)
+        {
+            if (!TryGetSingleClientRuntime(out var runtime))
+            {
+                return false;
+            }
+
+            try
+            {
+                runtime.SelectAvatar(_selectedIndex);
+                loadingScreen.Close();
+                OnDidAvatarStateLoaded();
+            }
+            catch (Exception e)
+            {
+                Game.Game.PopupError(e).Forget();
+                loadingScreen.Close();
+                btnLogin.SetActive(true);
+            }
+
+            return true;
+        }
+
+        private static bool TryGetSingleClientRuntime(out IClientRuntime runtime)
+        {
+            runtime = null;
+            var game = Game.Game.instance;
+            if (game is null || !SingleClientMode.IsEnabled(game.CommandLineOptions))
+            {
+                return false;
+            }
+
+            runtime = game.ClientRuntime;
+            return runtime is not null;
         }
 
         private void SetInformation(Player player)

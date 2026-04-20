@@ -2,8 +2,8 @@
 
 using System;
 using Nekoyume.L10n;
-using Nekoyume.Model.EnumType;
 using Nekoyume.Model.Mail;
+using Nekoyume.SingleClient.Models.EnumType;
 using Nekoyume.UI.Model;
 using Nekoyume.UI.Module;
 using TMPro;

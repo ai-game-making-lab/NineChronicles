@@ -9,6 +9,7 @@ using TMPro;
 using UnityEngine.UI;
 using UniRx;
 using Nekoyume.Model.Stat;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.Game.VFX;
 using Nekoyume.L10n;
@@ -211,7 +212,7 @@ namespace Nekoyume.UI.Scroller
             {
                 unlockConditionText.enabled = true;
 
-                if (States.Instance.CurrentAvatarState.worldInformation.TryGetLastClearedStageId(
+                if (ClientStateViewProvider.Current.CurrentAvatarStateRaw.worldInformation.TryGetLastClearedStageId(
                     out var stageId))
                 {
                     var diff = unlockStage - stageId;

@@ -6,6 +6,7 @@ using Nekoyume.Game.Battle;
 using Nekoyume.Action;
 using Nekoyume.L10n;
 using Nekoyume.Model.Mail;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.State.Subjects;
 using Nekoyume.UI.Module.Common;
@@ -85,14 +86,14 @@ namespace Nekoyume.UI.Module
             GameConfigStateSubject.ActionPointState
                 .ObserveAdd()
                 .ObserveOnMainThread()
-                .Where(x => x.Key == States.Instance.CurrentAvatarState.address)
+                .Where(x => x.Key == ClientStateViewProvider.Current.CurrentAvatarStateRaw.address)
                 .Subscribe(x => Charger(true))
                 .AddTo(gameObject);
 
             GameConfigStateSubject.ActionPointState
                 .ObserveRemove()
                 .ObserveOnMainThread()
-                .Where(x => x.Key == States.Instance.CurrentAvatarState.address)
+                .Where(x => x.Key == ClientStateViewProvider.Current.CurrentAvatarStateRaw.address)
                 .Subscribe(x => Charger(false)).AddTo(gameObject);
 
             button.onClick.AddListener(ShowMaterialNavigationPopup);
@@ -105,7 +106,7 @@ namespace Nekoyume.UI.Module
             sliderAnimator.SetMaxValue(DailyReward.ActionPointMax);
             dailyBonus.sliderAnimator.SetMaxValue(DailyReward.DailyRewardInterval);
 
-            var avatarState = States.Instance.CurrentAvatarState;
+            var avatarState = ClientStateViewProvider.Current.CurrentAvatarStateRaw;
             if (avatarState is not null)
             {
                 SetActionPoint(ReactiveAvatarState.ActionPoint, false);
@@ -126,13 +127,13 @@ namespace Nekoyume.UI.Module
             OnSliderChange();
             OnDailyBonusSliderChange();
 
-            if (States.Instance.CurrentAvatarState is null)
+            if (ClientStateViewProvider.Current.CurrentAvatarStateRaw is null)
             {
                 Charger(false);
             }
             else
             {
-                var address = States.Instance.CurrentAvatarState.address;
+                var address = ClientStateViewProvider.Current.CurrentAvatarStateRaw.address;
                 Charger(
                     GameConfigStateSubject.ActionPointState.TryGetValue(address, out var value) &&
                     value);
@@ -221,7 +222,7 @@ namespace Nekoyume.UI.Module
         public void ShowMaterialNavigationPopup()
         {
             const int requiredStage = Game.LiveAsset.GameConfig.RequiredStage.ChargeAP;
-            if (!States.Instance.CurrentAvatarState.worldInformation.IsStageCleared(requiredStage) &&
+            if (!ClientStateViewProvider.Current.CurrentAvatarStateRaw.worldInformation.IsStageCleared(requiredStage) &&
                 IsRemained)
             {
                 OneLineSystem.Push(
@@ -267,7 +268,7 @@ namespace Nekoyume.UI.Module
 
             Game.Game.instance.ActionManager.DailyReward().Subscribe();
 
-            var address = States.Instance.CurrentAvatarState.address;
+            var address = ClientStateViewProvider.Current.CurrentAvatarStateRaw.address;
             if (GameConfigStateSubject.ActionPointState.ContainsKey(address))
             {
                 GameConfigStateSubject.ActionPointState.Remove(address);

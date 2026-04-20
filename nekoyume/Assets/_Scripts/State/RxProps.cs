@@ -1,3 +1,4 @@
+using Nekoyume.SingleClient.State;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -75,7 +76,7 @@ namespace Nekoyume.State
             AvatarState avatarState,
             bool forceNewSelection = false)
         {
-            await States.Instance.SelectAvatarAsync(
+            await ClientStateViewProvider.Current.SelectAvatarAsync(
                 avatarIndexToSelect,
                 stateRootHash,
                 avatarState,
@@ -86,8 +87,8 @@ namespace Nekoyume.State
                     stateRootHash,
                     _agent.BlockIndex,
                     _states.CurrentAvatarState.address),
-                UniTask.RunOnThreadPool(States.Instance.InitAvatarBalancesAsync).ToObservable().ObserveOnMainThread().ToUniTask(),
-                States.Instance.InitItemSlotStates());
+                UniTask.RunOnThreadPool(ClientStateViewProvider.Current.InitAvatarBalancesAsync).ToObservable().ObserveOnMainThread().ToUniTask(),
+                ClientStateViewProvider.Current.InitItemSlotStates());
 
             // 아레나서비스에 등록하는시점에 cp계산이 필요해서 ItemSlot States까지 전부 갱신된다음 아레나데이터 초기화
             await InitializeArena();
@@ -98,7 +99,7 @@ namespace Nekoyume.State
             HashDigest<SHA256> stateRootHash,
             bool forceNewSelection = false)
         {
-            await States.Instance.SelectAvatarAsync(
+            await ClientStateViewProvider.Current.SelectAvatarAsync(
                 avatarIndexToSelect,
                 stateRootHash,
                 forceNewSelection: forceNewSelection);
@@ -108,8 +109,8 @@ namespace Nekoyume.State
                     stateRootHash,
                     _agent.BlockIndex,
                     _states.CurrentAvatarState.address),
-                UniTask.RunOnThreadPool(States.Instance.InitAvatarBalancesAsync).ToObservable().ObserveOnMainThread().ToUniTask(),
-                States.Instance.InitItemSlotStates());
+                UniTask.RunOnThreadPool(ClientStateViewProvider.Current.InitAvatarBalancesAsync).ToObservable().ObserveOnMainThread().ToUniTask(),
+                ClientStateViewProvider.Current.InitItemSlotStates());
 
             // 아레나서비스에 등록하는시점에 cp계산이 필요해서 ItemSlot States까지 전부 갱신된다음 아레나데이터 초기화
             await InitializeArena();

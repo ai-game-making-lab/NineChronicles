@@ -41,6 +41,7 @@ using Nekoyume.L10n;
 using Nekoyume.Model.State;
 using Nekoyume.Pattern;
 using Nekoyume.SingleClient;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.UI;
 using Nekoyume.UI.Model;
@@ -356,7 +357,7 @@ namespace Nekoyume.Game
 
             Event.OnUpdateAddresses.AsObservable().Subscribe(_ =>
             {
-                var petList = States.Instance.PetStates.GetPetStatesAll()
+                var petList = ClientStateViewProvider.Current.PetStatesRaw.GetPetStatesAll()
                     .Where(petState => petState != null)
                     .Select(petState => petState.PetId)
                     .ToList();
@@ -886,14 +887,14 @@ namespace Nekoyume.Game
             var stakeAddr = Model.Stake.StakeState.DeriveAddress(Agent.Address);
             var stakeStateIValue = await Agent.GetStateAsync(ReservedAddresses.LegacyAccount, stakeAddr);
             var balance = await Agent.GetStakedByStateRootHashAsync(Agent.BlockTipStateRootHash,
-                States.Instance.AgentState.address);
+                ClientStateViewProvider.Current.CurrentAgentStateRaw.address);
             StakeRegularFixedRewardSheet stakeRegularFixedRewardSheet;
             StakeRegularRewardSheet stakeRegularRewardSheet;
             Model.Stake.StakeState? stakeState = null;
             List<string> sheetNames;
             if (!StakeStateUtilsForClient.TryMigrate(
                 stakeStateIValue,
-                States.Instance.GameConfigState,
+                ClientStateViewProvider.Current.CurrentGameConfigStateRaw,
                 out var stakeStateV2))
             {
                 sheetNames = new List<string>
@@ -1335,9 +1336,9 @@ namespace Nekoyume.Game
         {
             var prevPushIdentifier =
                 PlayerPrefs.GetString(WorldbossTicketPushIdentifierKey, string.Empty);
-            var interval = States.Instance.GameConfigState.DailyWorldBossInterval;
-            var raiderState = States.Instance.CurrentAvatarState != null
-                ? WorldBossStates.GetRaiderState(States.Instance.CurrentAvatarState.address)
+            var interval = ClientStateViewProvider.Current.CurrentGameConfigStateRaw.DailyWorldBossInterval;
+            var raiderState = ClientStateViewProvider.Current.CurrentAvatarStateRaw != null
+                ? WorldBossStates.GetRaiderState(ClientStateViewProvider.Current.CurrentAvatarStateRaw.address)
                 : null;
             var remainingTicket = raiderState != null
                 ? WorldBossFrontHelper.GetRemainTicket(raiderState, currentBlockIndex, interval)

@@ -7,6 +7,7 @@ using Nekoyume.Helper;
 using Nekoyume.L10n;
 using Nekoyume.Model.Mail;
 using Nekoyume.Model.Stat;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.TableData;
 using Nekoyume.TableData.Event;
@@ -196,7 +197,7 @@ namespace Nekoyume.UI.Module
             lockedObject.unlockInfoContainer.SetActive(false);
             _unlockable = false;
             _isWaitingForUnlock = false;
-            var avatarState = States.Instance.CurrentAvatarState;
+            var avatarState = ClientStateViewProvider.Current.CurrentAvatarStateRaw;
             var worldInformation = avatarState.worldInformation;
 
             var unlockStage = equipmentRow.UnlockStage;
@@ -256,7 +257,7 @@ namespace Nekoyume.UI.Module
                     sharedModel.UnlockableRecipes.Value is not null &&
                     sharedModel.UnlockableRecipes.Value.Contains(equipmentRow.Id) &&
                     sharedModel.UnlockableRecipesOpenCost <=
-                    States.Instance.CrystalBalance.MajorUnit;
+                    ClientStateViewProvider.Current.CurrentAgentCrystalBalanceMajorUnit;
                 lockedObject.vfxObject.SetActive(unlockable);
                 equipmentView.Hide();
                 lockedObject.unlockInfoContainer.SetActive(true);
@@ -359,7 +360,7 @@ namespace Nekoyume.UI.Module
                 recipeIds is not null &&
                 recipeIds.Contains(_recipeRow.Key) &&
                 Craft.SharedModel.UnlockableRecipesOpenCost <=
-                States.Instance.CrystalBalance.MajorUnit;
+                ClientStateViewProvider.Current.CurrentAgentCrystalBalanceMajorUnit;
             lockedObject.vfxObject.SetActive(unlockable);
             lockedObject.unlockPriceText.color = unlockable
                 ? Palette.GetColor(ColorType.ButtonEnabled)

@@ -7,8 +7,9 @@ using Nekoyume.Blockchain;
 using Nekoyume.Game.Character;
 using Nekoyume.Game.Factory;
 using Nekoyume.Game.Tween;
-using Nekoyume.Model.EnumType;
 using Nekoyume.Model.Item;
+using Nekoyume.SingleClient.Models.EnumType;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.UI;
 using UnityEngine;
@@ -41,9 +42,9 @@ namespace Nekoyume.Game.Entrance
                     endPos.y = -0.45f;
                 }
 
-                if (States.Instance.AvatarStates.TryGetValue(i, out var avatarState))
+                if (ClientStateViewProvider.Current.AvatarStatesRaw.TryGetValue(i, out var avatarState))
                 {
-                    var itemSlotState = States.Instance.ItemSlotStates[i][BattleType.Adventure];
+                    var itemSlotState = States.Instance.ItemSlotStates[i][BattleType.Adventure.ToLib9c()];
                     var costumeInventory = avatarState.inventory.Costumes;
                     var costumes = itemSlotState.Costumes
                         .Select(guid => costumeInventory.FirstOrDefault(x => x.ItemId == guid))

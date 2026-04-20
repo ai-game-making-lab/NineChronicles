@@ -1,3 +1,4 @@
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using System.Collections.Generic;
 using System.Linq;
@@ -95,7 +96,7 @@ namespace Nekoyume.UI.Model
                 .Where(e => e != null)
                 .ToList();
 
-            var avatarStates = States.Instance.AvatarStates.ToList();
+            var avatarStates = ClientStateViewProvider.Current.AvatarStatesRaw.ToList();
             foreach (var pair in avatarStates)
             {
                 string fetchMyAdventureCpRankingQuery = $@"
@@ -181,7 +182,7 @@ namespace Nekoyume.UI.Model
                 .Where(e => e != null)
                 .ToList();
 
-            var avatarStates = States.Instance.AvatarStates.ToList();
+            var avatarStates = ClientStateViewProvider.Current.AvatarStatesRaw.ToList();
             foreach (var pair in avatarStates)
             {
                 string fetchMyStageRankingQuery = $@"
@@ -259,7 +260,7 @@ namespace Nekoyume.UI.Model
                 .Where(e => e != null)
                 .ToList();
 
-            var avatarStates = States.Instance.AvatarStates.ToList();
+            var avatarStates = ClientStateViewProvider.Current.AvatarStatesRaw.ToList();
             foreach (var pair in avatarStates)
             {
                 var myInfoQuery =
@@ -352,7 +353,7 @@ namespace Nekoyume.UI.Model
                     .Where(e => e != null)
                     .ToList();
 
-                var avatarStates = States.Instance.AvatarStates.ToList();
+                var avatarStates = ClientStateViewProvider.Current.AvatarStatesRaw.ToList();
                 foreach (var pair in avatarStates)
                 {
                     var myInfoQuery =

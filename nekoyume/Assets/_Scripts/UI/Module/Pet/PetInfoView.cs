@@ -1,6 +1,7 @@
 ﻿using Nekoyume.Game;
 using Nekoyume.Helper;
 using Nekoyume.L10n;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using TMPro;
 using UnityEngine;
@@ -64,7 +65,7 @@ namespace Nekoyume.UI.Module.Pet
 
             if (soulStoneGaugeSlider)
             {
-                var isOwn = States.Instance.PetStates.TryGetPetState(id, out var pet);
+                var isOwn = ClientStateViewProvider.Current.PetStatesRaw.TryGetPetState(id, out var pet);
                 var isMaxLevel = !TableSheets.Instance.PetCostSheet[id]
                     .TryGetCost((pet?.Level ?? 0) + 1, out var nextCost);
                 soulStoneGaugeSlider.maxValue = 1;
@@ -78,7 +79,7 @@ namespace Nekoyume.UI.Module.Pet
                 else
                 {
                     var ticker = TableSheets.Instance.PetSheet[id].SoulStoneTicker;
-                    var ownSoulStone = (float)States.Instance.CurrentAvatarBalances[ticker].MajorUnit;
+                    var ownSoulStone = (float)ClientStateViewProvider.Current.CurrentAvatarBalancesRaw[ticker].MajorUnit;
                     var need = nextCost.SoulStoneQuantity;
                     soulStoneText.text = $"{ownSoulStone}/{need}";
                     sliderFillRectImage.color = PetFrontHelper.GetUIColor(isOwn

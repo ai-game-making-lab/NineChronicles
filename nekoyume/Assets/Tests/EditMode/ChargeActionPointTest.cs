@@ -17,8 +17,12 @@ namespace Tests.EditMode
                 avatarAddress = address
             };
             var serialized = (Dictionary) action.PlainValue;
-            Assert.IsTrue(serialized.ContainsKey((IKey)(Text) "avatarAddress"));
-            Assert.AreEqual(address, serialized["avatarAddress"].ToAddress());
+            Assert.IsTrue(serialized.ContainsKey((IKey)(Text) "type_id"));
+            Assert.IsTrue(serialized.ContainsKey((IKey)(Text) "values"));
+
+            var values = (Dictionary)serialized["values"];
+            Assert.IsTrue(values.ContainsKey((IKey)(Text) "avatarAddress"));
+            Assert.AreEqual(address, values["avatarAddress"].ToAddress());
             Assert.DoesNotThrow(() => Nekoyume.ByteSerializer.Serialize(action));
         }
     }

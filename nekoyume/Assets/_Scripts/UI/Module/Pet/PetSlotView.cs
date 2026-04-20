@@ -6,6 +6,7 @@ using Nekoyume.Game;
 using Nekoyume.Helper;
 using Nekoyume.L10n;
 using Nekoyume.Model.State;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.UI.Module.Pet;
 using Nekoyume.UI.Scroller;
@@ -106,7 +107,7 @@ namespace Nekoyume.UI.Module
                 .OrderBy(data => data.Level)
                 .Last()
                 .Level;
-            var isOwn = States.Instance.PetStates.TryGetPetState(model.PetRow.Id, out _petState);
+            var isOwn = ClientStateViewProvider.Current.PetStatesRaw.TryGetPetState(model.PetRow.Id, out _petState);
             var isMaxLevel = _petState?.Level == maxLevel;
             infoView.Set(model.PetRow.Id, model.PetRow.Grade);
             levelText.text = isOwn

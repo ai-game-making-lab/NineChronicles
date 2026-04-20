@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Nekoyume.Helper;
 using Nekoyume.L10n;
 using Nekoyume.Model.Mail;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.UI.Module;
 using Nekoyume.UI.Scroller;
@@ -86,7 +87,7 @@ namespace Nekoyume.UI
 
         private bool CheckCrystal(BigInteger cost)
         {
-            if (States.Instance.CrystalBalance.MajorUnit >= cost)
+            if (ClientStateViewProvider.Current.CrystalBalanceRaw.MajorUnit >= cost)
             {
                 return true;
             }
@@ -100,7 +101,7 @@ namespace Nekoyume.UI
             if (CheckCrystal(_normalCost))
             {
                 var usageMessage = L10nManager.Localize("UI_DRAW_NORMAL_BUFF");
-                var balance = States.Instance.CrystalBalance;
+                var balance = ClientStateViewProvider.Current.CrystalBalanceRaw;
                 var content = balance.GetPaymentFormatText(usageMessage, _normalCost);
 
                 Find<PaymentPopup>().ShowCheckPaymentCrystal(
@@ -116,7 +117,7 @@ namespace Nekoyume.UI
             if (CheckCrystal(_advancedCost))
             {
                 var usageMessage = L10nManager.Localize("UI_DRAW_ADVANCED_BUFF");
-                var balance = States.Instance.CrystalBalance;
+                var balance = ClientStateViewProvider.Current.CrystalBalanceRaw;
                 var content = balance.GetPaymentFormatText(usageMessage, _advancedCost);
 
                 Find<PaymentPopup>().ShowCheckPaymentCrystal(

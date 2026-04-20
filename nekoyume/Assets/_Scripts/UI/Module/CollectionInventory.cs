@@ -3,13 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using Nekoyume.Battle;
 using Nekoyume.Helper;
-using Nekoyume.Model.EnumType;
 using Nekoyume.Model.Item;
+using Nekoyume.SingleClient.Models.EnumType;
+using Nekoyume.SingleClient.Models.Items;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.UI.Model;
 using Nekoyume.UI.Scroller;
 using UnityEngine;
 using Material = Nekoyume.Model.Item.Material;
+using ItemType = Nekoyume.Model.Item.ItemType;
 
 namespace Nekoyume.UI.Module
 {
@@ -85,7 +88,7 @@ namespace Nekoyume.UI.Module
             {
                 case ItemType.Equipment:
                     items = items
-                        .OrderBy(item => CPHelper.GetCP(item.ItemBase as Equipment)).ToList();
+                        .OrderBy(item => item.ItemBase.ToPolySnapshot() is EquipmentSnapshot colEqSnap ? colEqSnap.GetCP() : 0L).ToList();
                     UpdateEquipmentEquipped(items);
                     break;
                 case ItemType.Costume:
@@ -114,7 +117,7 @@ namespace Nekoyume.UI.Module
             var equippedEquipments = new List<Guid>();
             for (var i = 1; i < (int)BattleType.End; i++)
             {
-                equippedEquipments.AddRange(States.Instance.CurrentItemSlotStates[(BattleType)i].Equipments);
+                equippedEquipments.AddRange(ClientStateViewProvider.Current.CurrentItemSlotStatesRaw[((BattleType)i).ToLib9c()].Equipments);
             }
 
             foreach (var equipment in equipments)
@@ -130,7 +133,7 @@ namespace Nekoyume.UI.Module
             var equippedCostumes = new List<Guid>();
             for (var i = 1; i < (int)BattleType.End; i++)
             {
-                equippedCostumes.AddRange(States.Instance.CurrentItemSlotStates[(BattleType)i].Costumes);
+                equippedCostumes.AddRange(ClientStateViewProvider.Current.CurrentItemSlotStatesRaw[((BattleType)i).ToLib9c()].Costumes);
             }
 
             foreach (var costume in costumes)
@@ -252,7 +255,7 @@ namespace Nekoyume.UI.Module
         private bool TryGetMaterial(Material material, out InventoryItem model)
         {
             model = _items.FirstOrDefault(item =>
-                item.ItemBase is Material m && m.ItemId.Equals(material.ItemId));
+                item.ItemBase.ToPolySnapshot() is MaterialSnapshot mSnap && mSnap.MatchesItemId(material));
 
             return model != null;
         }

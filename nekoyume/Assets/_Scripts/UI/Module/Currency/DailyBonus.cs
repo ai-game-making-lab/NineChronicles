@@ -8,6 +8,7 @@ using Nekoyume.Game.Controller;
 using Nekoyume.Game.VFX;
 using Nekoyume.L10n;
 using Nekoyume.Model.Mail;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.State.Subjects;
 using Nekoyume.UI.Module.Common;
@@ -74,7 +75,7 @@ namespace Nekoyume.UI.Module
             base.OnEnable();
 
             sliderAnimator.SetMaxValue(DailyReward.DailyRewardInterval);
-            if (States.Instance.CurrentAvatarState is not null)
+            if (ClientStateViewProvider.Current.CurrentAvatarStateRaw is not null)
             {
                 SetBlockIndex(Game.Game.instance.Agent.BlockIndex, false);
                 SetRewardReceivedBlockIndex(ReactiveAvatarState.DailyRewardReceivedIndex, false);
@@ -204,7 +205,7 @@ namespace Nekoyume.UI.Module
 
             Game.Game.instance.ActionManager.DailyReward().Subscribe();
 
-            var address = States.Instance.CurrentAvatarState.address;
+            var address = ClientStateViewProvider.Current.CurrentAvatarStateRaw.address;
             if (GameConfigStateSubject.ActionPointState.ContainsKey(address))
             {
                 GameConfigStateSubject.ActionPointState.Remove(address);

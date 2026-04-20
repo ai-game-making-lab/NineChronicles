@@ -6,6 +6,7 @@ using Cysharp.Threading.Tasks;
 using Nekoyume.Game;
 using Nekoyume.Game.Controller;
 using Nekoyume.L10n;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.UI.Module;
 using Nekoyume.UI.Module.Arena.Join;
@@ -370,7 +371,7 @@ namespace Nekoyume.UI
 
             var blockIndex = Game.Game.instance.Agent.BlockIndex;
             var lastChampionship = RxProps.ArenaSeasonResponses.Value.LastOrDefault();
-            var avatarState = States.Instance.CurrentAvatarState;
+            var avatarState = ClientStateViewProvider.Current.CurrentAvatarStateRaw;
             var requiredMedal = lastChampionship?.RequiredMedalCount ?? 0;
             var medalTotalCount = _totalMedalCountForThisChampionship;
             return ((int)requiredMedal, medalTotalCount);

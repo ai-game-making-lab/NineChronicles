@@ -7,6 +7,7 @@ using Libplanet.Crypto;
 using Nekoyume.Game.Controller;
 using Nekoyume.Helper;
 using Nekoyume.L10n;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using TMPro;
 using UnityEngine;
@@ -128,12 +129,12 @@ namespace Nekoyume.UI.Module.WorldBoss
 
         public async void ShowAsync(bool isReset = true)
         {
-            if (States.Instance.CurrentAvatarState is null)
+            if (ClientStateViewProvider.Current.CurrentAvatarStateRaw is null)
             {
                 return;
             }
 
-            if (_cachedAvatarAddress != States.Instance.CurrentAvatarState.address)
+            if (_cachedAvatarAddress != ClientStateViewProvider.Current.CurrentAvatarStateRaw.address)
             {
                 foreach (var toggle in categoryToggles)
                 {
@@ -141,7 +142,7 @@ namespace Nekoyume.UI.Module.WorldBoss
                     toggle.Item.Reset();
                 }
 
-                _cachedAvatarAddress = States.Instance.CurrentAvatarState.address;
+                _cachedAvatarAddress = ClientStateViewProvider.Current.CurrentAvatarStateRaw.address;
             }
 
             if (isReset)

@@ -39,15 +39,13 @@ namespace Nekoyume.State.Modifiers
 
         public override AvatarState Modify(AvatarState state)
         {
-            return state;
+            if (state is null)
+            {
+                return null;
+            }
 
-            // if (state is null)
-            // {
-            //     return null;
-            // }
-            //
-            // state.actionPoint += actionPoint;
-            // return state;
+            state.actionPoint += actionPoint;
+            return state;
         }
 
         public override string ToString()

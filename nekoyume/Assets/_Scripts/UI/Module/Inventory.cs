@@ -12,6 +12,9 @@ using Nekoyume.Model.Item;
 using Nekoyume.Model.Mail;
 using Nekoyume.Model.State;
 using Nekoyume.SingleClient.Models.Elemental;
+using Nekoyume.SingleClient.Models.Items;
+using Nekoyume.SingleClient.Models.TableData;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.TableData;
 using Nekoyume.TableData.Rune;
@@ -19,6 +22,8 @@ using Nekoyume.UI.Model;
 using Nekoyume.UI.Scroller;
 using UnityEngine;
 using Material = Nekoyume.Model.Item.Material;
+using ItemType = Nekoyume.Model.Item.ItemType;
+using ItemSubType = Nekoyume.Model.Item.ItemSubType;
 
 namespace Nekoyume.UI.Module
 {
@@ -284,12 +289,12 @@ namespace Nekoyume.UI.Module
                 AddItem(item.item, item.count);
             }
 
-            foreach (var runeState in States.Instance.AllRuneState.Runes.Values)
+            foreach (var runeState in ClientStateViewProvider.Current.AllRuneStateRaw.Runes.Values)
             {
                 _runes.Add(new InventoryItem(runeState));
             }
 
-            foreach (var fav in States.Instance.CurrentAvatarBalances.Values)
+            foreach (var fav in ClientStateViewProvider.Current.CurrentAvatarBalancesRaw.Values)
             {
                 _fungibleAssets.Add(new InventoryItem(fav));
             }
@@ -304,10 +309,10 @@ namespace Nekoyume.UI.Module
             UpdateDimmedInventoryItem();
             onUpdateInventory?.Invoke(this, inventory);
 
-            var itemSlotState = States.Instance.CurrentItemSlotStates[battleType];
+            var itemSlotState = ClientStateViewProvider.Current.CurrentItemSlotStatesRaw[battleType];
             UpdateEquipmentEquipped(itemSlotState.Equipments);
             UpdateCostumes(itemSlotState.Costumes);
-            var equippedRuneState = States.Instance.GetEquippedRuneStates(battleType);
+            var equippedRuneState = ClientStateViewProvider.Current.GetEquippedRuneStates(battleType);
             var runeListSheet = Game.Game.instance.TableSheets.RuneListSheet;
             UpdateRuneEquipped(equippedRuneState, battleType, runeListSheet);
             UpdateRuneNotification(GetBestRunes(battleType));
@@ -385,7 +390,7 @@ namespace Nekoyume.UI.Module
         private bool TryGetMaterial(Material material, bool isTradable, out InventoryItem model)
         {
             model = _materials.FirstOrDefault(item =>
-                item.ItemBase is Material m && m.ItemId.Equals(material.ItemId) &&
+                item.ItemBase.ToPolySnapshot() is MaterialSnapshot mSnap && mSnap.MatchesItemId(material) &&
                 isTradable == item.ItemBase is TradableMaterial);
 
             return model != null;
@@ -535,7 +540,7 @@ namespace Nekoyume.UI.Module
         private List<InventoryItem> GetOrganizedMaterials()
         {
             return _materials
-                .OrderBy(x => (x.ItemBase as Material).GetMaterialPriority())
+                .OrderBy(x => x.ItemBase.ToPolySnapshot() is MaterialSnapshot matSnap ? matSnap.GetMaterialPriority() : int.MaxValue)
                 .ThenBy(x => x.ItemBase is ITradableItem).ToList();
         }
 
@@ -592,8 +597,10 @@ namespace Nekoyume.UI.Module
                 if (equippedItem != null)
                 {
                     var costumeSheet = Game.Game.instance.TableSheets.CostumeStatSheet;
-                    var cp = CPHelper.GetCP(item.ItemBase as Costume, costumeSheet);
-                    var equippedCostumeCp = CPHelper.GetCP(equippedItem.ItemBase as Costume, costumeSheet);
+                    var cp = item.ItemBase.ToPolySnapshot() is CostumeSnapshot itemCostumeSnap
+                        ? itemCostumeSnap.GetCP(costumeSheet) : 0L;
+                    var equippedCostumeCp = equippedItem.ItemBase.ToPolySnapshot() is CostumeSnapshot equippedCostumeSnap
+                        ? equippedCostumeSnap.GetCP(costumeSheet) : 0L;
                     item.HasNotification.Value = cp > equippedCostumeCp;
                 }
                 else
@@ -635,7 +642,7 @@ namespace Nekoyume.UI.Module
 
             var level = currentAvatarState.level;
             var availableSlots =
-                UnlockHelper.GetAvailableEquipmentSlots(level, States.Instance.GameConfigState);
+                UnlockHelper.GetAvailableEquipmentSlots(level, ClientStateViewProvider.Current.CurrentGameConfigStateRaw);
 
             var bestItems = new List<InventoryItem>();
             var selectedEquipments = new Dictionary<ItemSubType, List<InventoryItem>>();
@@ -669,7 +676,7 @@ namespace Nekoyume.UI.Module
             {
                 var (_, slotCount) = availableSlots.FirstOrDefault(x => x.Item1.Equals(pair.Key));
                 var item = pair.Value.Where(x => Util.IsUsableItem(x.ItemBase))
-                    .OrderByDescending(x => CPHelper.GetCP(x.ItemBase as Equipment))
+                    .OrderByDescending(x => x.ItemBase.ToPolySnapshot() is EquipmentSnapshot eqSnap ? eqSnap.GetCP() : 0L)
                     .ThenByDescending(x => x.Equipped.Value ? 1 : 0)
                     .Take(slotCount);
                 bestItems.AddRange(item);
@@ -701,11 +708,11 @@ namespace Nekoyume.UI.Module
             foreach (var pair in sortedCostumes)
             {
                 var highScore = pair.Value.Where(x => Util.IsUsableItem(x.ItemBase))
-                    .Select(inventoryItem => CPHelper.GetCP(inventoryItem.ItemBase as Costume, costumeSheet))
+                    .Select(inventoryItem => inventoryItem.ItemBase.ToPolySnapshot() is CostumeSnapshot csSnap ? csSnap.GetCP(costumeSheet) : 0L)
                     .Prepend(0)
                     .Max();
                 var item = pair.Value.Where(x => Util.IsUsableItem(x.ItemBase))
-                    .Where(x => CPHelper.GetCP(x.ItemBase as Costume, costumeSheet) == highScore);
+                    .Where(x => (x.ItemBase.ToPolySnapshot() is CostumeSnapshot csCmp ? csCmp.GetCP(costumeSheet) : 0L) == highScore);
                 best.AddRange(item);
             }
 
@@ -737,14 +744,14 @@ namespace Nekoyume.UI.Module
 
         public bool HasNotification()
         {
-            var clearedStageId = States.Instance.CurrentAvatarState
+            var clearedStageId = ClientStateViewProvider.Current.CurrentAvatarStateRaw
                 .worldInformation.TryGetLastClearedStageId(out var id)
                 ? id
                 : 1;
             var equipments = GetBestEquipments();
             foreach (var guid in equipments)
             {
-                var slots = States.Instance.CurrentItemSlotStates.Values;
+                var slots = ClientStateViewProvider.Current.CurrentItemSlotStatesRaw.Values;
                 foreach (var slotState in slots.Where(x => !x.Equipments.Exists(x => x == guid)))
                 {
                     if (slotState.BattleType == BattleType.Arena)
@@ -774,7 +781,7 @@ namespace Nekoyume.UI.Module
                 var inventoryItems = GetBestRunes(battleType);
                 foreach (var inventoryItem in inventoryItems)
                 {
-                    var slots = States.Instance.CurrentRuneSlotStates[battleType].GetRuneSlot();
+                    var slots = ClientStateViewProvider.Current.CurrentRuneSlotStatesRaw[battleType].GetRuneSlot();
                     if (!slots.Exists(x => x.RuneId == inventoryItem.RuneState.RuneId))
                     {
                         if (battleType == BattleType.Arena)
@@ -812,8 +819,9 @@ namespace Nekoyume.UI.Module
         public List<Guid> GetBestEquipments()
         {
             return GetUsableBestEquipments()
-                .Select(x => x.ItemBase as Equipment)
-                .Select(x => x.ItemId)
+                .Select(x => x.ItemBase.ToPolySnapshot() as IItemSnapshot)
+                .Where(s => s is EquipmentSnapshot bestEqSnap && bestEqSnap.NonFungibleId.HasValue)
+                .Select(s => ((EquipmentSnapshot)s).NonFungibleId!.Value)
                 .ToList();
         }
 
@@ -927,7 +935,7 @@ namespace Nekoyume.UI.Module
             for (var i = 1; i < (int)BattleType.End; i++)
             {
                 var battleType = (BattleType)i;
-                equipments.AddRange(States.Instance.CurrentItemSlotStates[battleType].Equipments);
+                equipments.AddRange(ClientStateViewProvider.Current.CurrentItemSlotStatesRaw[battleType].Equipments);
             }
 
             foreach (var eps in _equipments.Values)
@@ -958,7 +966,7 @@ namespace Nekoyume.UI.Module
         public void UpdateFungibleAssets()
         {
             _fungibleAssets.Clear();
-            foreach (var fav in States.Instance.CurrentAvatarBalances.Values)
+            foreach (var fav in ClientStateViewProvider.Current.CurrentAvatarBalancesRaw.Values)
             {
                 _fungibleAssets.Add(new InventoryItem(fav));
             }
@@ -1028,14 +1036,11 @@ namespace Nekoyume.UI.Module
                 var equipped = costumes.Exists(x => x == ((Costume)costume.ItemBase).ItemId);
                 costume.Equipped.SetValueAndForceNotify(equipped);
 
-                if (floorData != null && costume.ItemBase is Costume costumeItem)
+                if (floorData != null && costume.ItemBase.ToPolySnapshot() is CostumeSnapshot costumeSnap)
                 {
                     try
                     {
-                        var testList = new List<Costume> { costumeItem };
-                        floorData.ValidateItemTypeRestrictions(testList);
-                        floorData.ValidateItemGradeRestrictions(testList);
-                        floorData.ValidateItemLevelRestrictions(testList);
+                        floorData.ValidateCostumeRestrictions(costumeSnap);
                         // 검증 성공 - 기존 딤 상태는 유지하되, 검증 실패로 인한 딤은 해제
                         // 다른 조건에 의해 딤 처리된 경우를 고려하여 강제로 false로 설정하지 않음
                     }
@@ -1057,14 +1062,11 @@ namespace Nekoyume.UI.Module
                     var equipped = equipments.Exists(x => x == ((Equipment)equipment.ItemBase).ItemId);
                     equipment.Equipped.Value = equipped;
 
-                    if (floorData != null && equipment.ItemBase is Equipment equipmentItem)
+                    if (floorData != null && equipment.ItemBase.ToPolySnapshot() is EquipmentSnapshot equipmentSnap)
                     {
                         try
                         {
-                            var testList = new List<Equipment> { equipmentItem };
-                            floorData.ValidateItemTypeRestrictions(testList);
-                            floorData.ValidateItemGradeRestrictions(testList);
-                            floorData.ValidateItemLevelRestrictions(testList);
+                            floorData.ValidateEquipmentRestrictions(equipmentSnap);
                             // 검증 성공 - 기존 딤 상태는 유지하되, 검증 실패로 인한 딤은 해제
                             // 다른 조건에 의해 딤 처리된 경우를 고려하여 강제로 false로 설정하지 않음
                         }
@@ -1278,7 +1280,7 @@ namespace Nekoyume.UI.Module
                     .OrderByDescending(x => x.ItemBase is ITradableItem)
                     .ThenByDescending(x => x.ItemBase.Grade)
                     .ThenBy(x => x.ItemBase.ItemSubType)
-                    .ThenByDescending(x => CPHelper.GetCP(x.ItemBase as Equipment))
+                    .ThenByDescending(x => x.ItemBase.ToPolySnapshot() is EquipmentSnapshot sortEqSnap ? sortEqSnap.GetCP() : 0L)
                     .ToList();
             }
 
@@ -1305,7 +1307,7 @@ namespace Nekoyume.UI.Module
                     .OrderByDescending(x => x.ItemBase is ITradableItem)
                     .ThenByDescending(x => x.ItemBase.Grade)
                     .ThenBy(x => x.ItemBase.ItemSubType)
-                    .ThenByDescending(x => CPHelper.GetCP(x.ItemBase as Costume, costumeSheet))
+                    .ThenByDescending(x => x.ItemBase.ToPolySnapshot() is CostumeSnapshot sortCsSnap ? sortCsSnap.GetCP(costumeSheet) : 0L)
                     .ToList();
             }
 
@@ -1352,7 +1354,7 @@ namespace Nekoyume.UI.Module
                 data = data
                        .OrderByDescending(x => x.ItemBase is ITradableItem)
                        .ThenByDescending(x => x.ItemBase.Grade)
-                       .ThenByDescending(x => CPHelper.GetCP(x.ItemBase as Equipment))
+                       .ThenByDescending(x => x.ItemBase.ToPolySnapshot() is EquipmentSnapshot sort3EqSnap ? sort3EqSnap.GetCP() : 0L)
                        .ToList();
             }
             scroll.UpdateData(data);

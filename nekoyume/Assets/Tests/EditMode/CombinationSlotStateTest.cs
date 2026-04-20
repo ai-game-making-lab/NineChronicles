@@ -39,11 +39,15 @@ namespace Tests.EditMode
             var serialized = (Dictionary) state.Serialize();
             Assert.IsTrue(serialized.ContainsKey((IKey)(Text) "address"));
             Assert.IsTrue(serialized.ContainsKey((IKey)(Text) "unlockBlockIndex"));
-            Assert.IsTrue(serialized.ContainsKey((IKey)(Text) "unlockStage"));
+            Assert.IsTrue(serialized.ContainsKey((IKey)(Text) "startBlockIndex"));
+            Assert.IsTrue(serialized.ContainsKey((IKey)(Text) "index"));
+            Assert.IsTrue(serialized.ContainsKey((IKey)(Text) "isUnlocked"));
             Assert.IsFalse(serialized.ContainsKey((IKey)(Text) "result"));
             var deserialize = new CombinationSlotState(serialized);
             Assert.AreEqual(state.WorkCompleteBlockIndex, deserialize.WorkCompleteBlockIndex);
             Assert.AreEqual(state.address, deserialize.address);
+            Assert.AreEqual(state.WorkStartBlockIndex, deserialize.WorkStartBlockIndex);
+            Assert.AreEqual(state.Index, deserialize.Index);
         }
 
         [Test]
@@ -76,7 +80,8 @@ namespace Tests.EditMode
             var serialized = (Dictionary) state.Serialize();
             Assert.IsTrue(serialized.ContainsKey((IKey)(Text) "address"));
             Assert.IsTrue(serialized.ContainsKey((IKey)(Text) "unlockBlockIndex"));
-            Assert.IsTrue(serialized.ContainsKey((IKey)(Text) "unlockStage"));
+            Assert.IsTrue(serialized.ContainsKey((IKey)(Text) "index"));
+            Assert.IsTrue(serialized.ContainsKey((IKey)(Text) "isUnlocked"));
             Assert.IsTrue(serialized.ContainsKey((IKey)(Text) "result"));
             Assert.IsTrue(serialized.ContainsKey((IKey)(Text) "startBlockIndex"));
             var deserialize = new CombinationSlotState(serialized);

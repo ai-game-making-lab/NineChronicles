@@ -1,5 +1,5 @@
 using Libplanet.Types.Assets;
-using Nekoyume.Model.Item;
+using Nekoyume.SingleClient.Models.Items;
 using Nekoyume.UI.Tween;
 using UniRx;
 using UnityEngine;
@@ -66,12 +66,17 @@ namespace Nekoyume.UI.Module
             rewardTweener.PlayWithNotation(prevReward, _cachedGrindingReward);
         }
 
-        public void ShowWithItemReward((ItemBase itemBase, int count) reward)
+        /// <summary>
+        /// Snapshot-facing primary overload. Callers that still hold a lib9c <c>ItemBase</c>
+        /// should project via <c>ItemSnapshotMapper.ToPolySnapshot()</c> at the call site; this
+        /// view no longer depends on <c>Nekoyume.Model.Item</c> types.
+        /// </summary>
+        public void ShowWithItemReward((IItemSnapshot snapshot, int count) reward)
         {
             gameObject.SetActive(true);
-            if (reward.itemBase.Id != _cachedRewardType.ItemId)
+            if (reward.snapshot.Id != _cachedRewardType.ItemId)
             {
-                _cachedRewardType.ItemId = reward.itemBase.Id;
+                _cachedRewardType.ItemId = reward.snapshot.Id;
                 _cachedGrindingReward = 0;
                 Observable.NextFrame().Subscribe(_ => animator.SetTrigger(Show));
             }
@@ -80,7 +85,7 @@ namespace Nekoyume.UI.Module
             rewardTweener.gameObject.SetActive(true);
             moreInfoButton.gameObject.SetActive(false);
 
-            iconImage.sprite = reward.itemBase.GetIconSprite();
+            iconImage.sprite = reward.snapshot.GetIconSprite();
             var prevReward = _cachedGrindingReward;
             _cachedGrindingReward = reward.count;
             rewardTweener.PlayWithNotation(prevReward, _cachedGrindingReward);

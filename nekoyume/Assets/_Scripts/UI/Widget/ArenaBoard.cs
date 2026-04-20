@@ -3,8 +3,9 @@ using System.Diagnostics;
 using System.Linq;
 using Cysharp.Threading.Tasks;
 using Nekoyume.Game.Controller;
-using Nekoyume.Model.EnumType;
 using Nekoyume.Model.Mail;
+using Nekoyume.SingleClient.Models.EnumType;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.UI.Module;
 using Nekoyume.UI.Module.Arena.Board;
@@ -305,8 +306,8 @@ namespace Nekoyume.UI
 #if UNITY_EDITOR
             if (_useSo && _so)
             {
-                _characterView.SetByAvatarState(States.Instance.CurrentAvatarState);
-                _myName.text = States.Instance.CurrentAvatarState.NameWithHash;
+                _characterView.SetByAvatarState(ClientStateViewProvider.Current.CurrentAvatarStateRaw);
+                _myName.text = ClientStateViewProvider.Current.CurrentAvatarStateRaw.NameWithHash;
                 _myCp.text = $"CP {TextHelper.FormatNumber(_so.CP)}";
                 _myRating.text = $"{TextHelper.FormatNumber(_so.Rank)} |";
                 _myScore.text = $" {TextHelper.FormatNumber(_so.Rating)}";
@@ -325,8 +326,8 @@ namespace Nekoyume.UI
 
             var currentInfo = RxProps.ArenaInfo.Value;
 
-            _characterView.SetByAvatarState(States.Instance.CurrentAvatarState);
-            _myName.text = States.Instance.CurrentAvatarState.NameWithHash;
+            _characterView.SetByAvatarState(ClientStateViewProvider.Current.CurrentAvatarStateRaw);
+            _myName.text = ClientStateViewProvider.Current.CurrentAvatarStateRaw.NameWithHash;
             _myCp.text = $"CP {TextHelper.FormatNumber(currentInfo.User.Cp)}";
             _myRating.text = $"{TextHelper.FormatNumber(currentInfo.Rank)} |";
             _myScore.text = $" {TextHelper.FormatNumber(currentInfo.Score)}";
@@ -380,7 +381,7 @@ namespace Nekoyume.UI
                     var avatarStates = await Game.Game.instance.Agent.GetAvatarStatesAsync(
                         new[] { new Address(_boundedData[index].AvatarAddress) });
                     var avatarState = avatarStates.Values.First();
-                    Find<FriendInfoPopup>().ShowAsync(avatarState, BattleType.Arena).Forget();
+                    Find<FriendInfoPopup>().ShowAsync(avatarState, BattleType.Arena.ToLib9c()).Forget();
                 })
                 .AddTo(gameObject);
 
@@ -433,7 +434,7 @@ namespace Nekoyume.UI
             }
 #endif
 
-            var currentAvatarAddr = States.Instance.CurrentAvatarState.address;
+            var currentAvatarAddr = ClientStateViewProvider.Current.CurrentAvatarStateRaw.address;
             var scrollData =
                 _boundedData.Select(e => new ArenaBoardPlayerItemData
                 {
@@ -493,13 +494,13 @@ namespace Nekoyume.UI
             if (RxProps.ArenaInfo.Value.RefreshTicketStatus.RemainingTicketsPerRound == 0)
             {
                 var nextCost = RxProps.ArenaInfo.Value.RefreshTicketStatus.NextNCGCosts.FirstOrDefault();
-                var goldCurrency = States.Instance.GoldBalanceState.Gold.Currency;
+                var goldCurrency = ClientStateViewProvider.Current.CurrentGoldBalanceStateRaw.Gold.Currency;
                 var cost = Libplanet.Types.Assets.FungibleAssetValue.Parse(goldCurrency, nextCost.ToString(CultureInfo.InvariantCulture));
 
                 int logId = -1;
                 try
                 {
-                    logId = await ActionManager.Instance.TransferAssetsForArenaBoardRefresh(States.Instance.AgentState.address,
+                    logId = await ActionManager.Instance.TransferAssetsForArenaBoardRefresh(ClientStateViewProvider.Current.CurrentAgentStateRaw.address,
                                            new Address(RxProps.OperationAccountAddress),
                                            cost);
                 }
@@ -705,10 +706,10 @@ namespace Nekoyume.UI
                 else
                 {
                     var nextCost = RxProps.ArenaInfo.Value.RefreshTicketStatus.NextNCGCosts.FirstOrDefault();
-                    var goldCurrency = States.Instance.GoldBalanceState.Gold.Currency;
+                    var goldCurrency = ClientStateViewProvider.Current.CurrentGoldBalanceStateRaw.Gold.Currency;
                     var cost = Libplanet.Types.Assets.FungibleAssetValue.Parse(goldCurrency, nextCost.ToString(CultureInfo.InvariantCulture));
                     Find<PaymentPopup>().ShowCheckPaymentNCG(
-                        States.Instance.GoldBalanceState.Gold,
+                        ClientStateViewProvider.Current.CurrentGoldBalanceStateRaw.Gold,
                         cost,
                         L10nManager.Localize("UI_ARENA_BOARD_REFRESH_NCG_REQUIRE", nextCost.ToString()),
                         () =>

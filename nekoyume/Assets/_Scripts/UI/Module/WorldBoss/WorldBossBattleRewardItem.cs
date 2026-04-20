@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Numerics;
-using Lib9c;
 using Nekoyume.Game;
 using Nekoyume.Helper;
+using Nekoyume.SingleClient;
 using Nekoyume.TableData;
 using TMPro;
 using UnityEngine;
@@ -84,12 +84,12 @@ namespace Nekoyume.UI.Module.WorldBoss
             var materials = new List<(int itemId, int quantity)>();
             foreach (var rewardModel in row.Rewards)
             {
-                if (Currencies.IsRuneTicker(rewardModel.Ticker))
+                if (ClientCurrencies.IsRuneTicker(rewardModel.Ticker))
                 {
                     runeSum += rewardModel.Count;
                 }
 
-                if (Currencies.Crystal.Ticker == rewardModel.Ticker)
+                if (ClientCurrencies.Crystal.Ticker == rewardModel.Ticker)
                 {
                     crystal += rewardModel.Count;
                 }

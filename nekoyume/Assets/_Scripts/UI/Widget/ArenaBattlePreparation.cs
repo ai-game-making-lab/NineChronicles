@@ -7,6 +7,7 @@ using Nekoyume.Blockchain;
 using Nekoyume.Game.Battle;
 using Nekoyume.Game.Controller;
 using Nekoyume.Model.State;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.UI.Module;
 using UnityEngine;
@@ -240,7 +241,7 @@ namespace Nekoyume.UI
         private void SendBattleArenaAction(int ticket = TicketCountToUse)
         {
             startButton.gameObject.SetActive(false);
-            var playerAvatar = States.Instance.CurrentAvatarState;
+            var playerAvatar = ClientStateViewProvider.Current.CurrentAvatarStateRaw;
             Find<ArenaBattleLoadingScreen>().Show(
                 playerAvatar.NameWithHash,
                 playerAvatar.level,
@@ -266,9 +267,9 @@ namespace Nekoyume.UI
                     // 성공시 호출할 콜백
                     try
                     {
-                        var costumes = States.Instance.CurrentItemSlotStates[BattleType.Arena].Costumes;
-                        var equipments = States.Instance.CurrentItemSlotStates[BattleType.Arena].Equipments;
-                        var runeInfos = States.Instance.CurrentRuneSlotStates[BattleType.Arena]
+                        var costumes = ClientStateViewProvider.Current.CurrentItemSlotStatesRaw[BattleType.Arena].Costumes;
+                        var equipments = ClientStateViewProvider.Current.CurrentItemSlotStatesRaw[BattleType.Arena].Equipments;
+                        var runeInfos = ClientStateViewProvider.Current.CurrentRuneSlotStatesRaw[BattleType.Arena]
                             .GetEquippedRuneSlotInfos();
                         ActionRenderHandler.Instance.Pending = true;
                         ActionManager.Instance.BattleArena(
@@ -308,7 +309,7 @@ namespace Nekoyume.UI
         // This method subscribe BlockIndexSubject. Be careful of duplicate subscription.
         private void UpdateStartButton()
         {
-            var (equipments, costumes) = States.Instance.GetEquippedItems(BattleType.Arena);
+            var (equipments, costumes) = ClientStateViewProvider.Current.GetEquippedItems(BattleType.Arena);
             var consumables = information.GetEquippedConsumables().Select(x => x.Id).ToList();
 
             var isEquipmentValid = Util.CanBattle(equipments, costumes, consumables);
@@ -327,7 +328,7 @@ namespace Nekoyume.UI
         private static bool IsIntervalValid(long blockIndex)
         {
             var lastBattleBlockIndex = RxProps.LastArenaBattleBlockIndex.Value;
-            var battleArenaInterval = States.Instance.GameConfigState.BattleArenaInterval;
+            var battleArenaInterval = ClientStateViewProvider.Current.CurrentGameConfigStateRaw.BattleArenaInterval;
 
             return blockIndex - lastBattleBlockIndex >= battleArenaInterval;
         }
@@ -339,7 +340,7 @@ namespace Nekoyume.UI
 
             if (!canBattle)
             {
-                var battleArenaInterval = States.Instance.GameConfigState.BattleArenaInterval;
+                var battleArenaInterval = ClientStateViewProvider.Current.CurrentGameConfigStateRaw.BattleArenaInterval;
                 blockStartingText.text = isEquipValid
                     ? L10nManager.Localize("UI_BATTLE_INTERVAL", battleArenaInterval)
                     : L10nManager.Localize("UI_EQUIP_FAILED");

@@ -4,6 +4,7 @@ using Nekoyume.Blockchain;
 using Nekoyume.Helper;
 using Nekoyume.L10n;
 using Nekoyume.Model.State;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.TableData;
 using TMPro;
@@ -94,7 +95,7 @@ namespace Nekoyume.UI.Module.WorldBoss
             Widget.Find<WorldBossRewardScreen>().CachingInformation(raiderState, row.BossId);
             var highScore = raiderState?.HighScore ?? 0;
             var currentRank = WorldBossHelper.CalculateRank(characterRow, highScore);
-            var avatarAddress = States.Instance.CurrentAvatarState.address;
+            var avatarAddress = ClientStateViewProvider.Current.CurrentAvatarStateRaw.address;
             var latestRewardRank = WorldBossStates.IsReceivingGradeRewards(avatarAddress)
                 ? currentRank
                 : raiderState?.LatestRewardRank ?? 0;
@@ -107,7 +108,7 @@ namespace Nekoyume.UI.Module.WorldBoss
 
         private void ClaimRaidReward()
         {
-            var avatarAddress = States.Instance.CurrentAvatarState.address;
+            var avatarAddress = ClientStateViewProvider.Current.CurrentAvatarStateRaw.address;
             WorldBossStates.SetReceivingGradeRewards(avatarAddress, true);
             WorldBossStates.SetHasGradeRewards(avatarAddress, false);
             ActionManager.Instance.ClaimRaidReward().Subscribe();
@@ -174,7 +175,7 @@ namespace Nekoyume.UI.Module.WorldBoss
 
         private void UpdateClaimButton()
         {
-            var avatarAddress = States.Instance.CurrentAvatarState.address;
+            var avatarAddress = ClientStateViewProvider.Current.CurrentAvatarStateRaw.address;
             claimButton.Interactable = _canReceive;
             claimButton.Text = WorldBossStates.IsReceivingGradeRewards(avatarAddress)
                 ? string.Empty

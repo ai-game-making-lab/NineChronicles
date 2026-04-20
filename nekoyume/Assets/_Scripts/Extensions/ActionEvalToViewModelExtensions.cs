@@ -7,6 +7,7 @@ using Nekoyume.Blockchain;
 using Nekoyume.Game;
 using Nekoyume.Model.Item;
 using Nekoyume.Model.State;
+using Nekoyume.SingleClient;
 using Nekoyume.State;
 using Nekoyume.UI;
 using Nekoyume.UI.Model;
@@ -110,7 +111,7 @@ namespace Nekoyume
                         continue;
                     }
 
-                    var currency = Lib9c.Currencies.GetMinterlessCurrency(ticker);
+                    var currency = ClientCurrencies.GetMinterlessCurrency(ticker);
                     var fungibleAsset = currency * amount;
                     model.AddReward(new CountableItem(fungibleAsset, amount, true));
                 }

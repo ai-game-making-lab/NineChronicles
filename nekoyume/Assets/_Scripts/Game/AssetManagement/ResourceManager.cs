@@ -110,6 +110,12 @@ namespace Nekoyume
             var asyncOperation = Addressables.LoadAssetAsync<T>(key);
             await asyncOperation;
 
+            if (_resources.ContainsKey(key) || _dontDestroyOnLoadResources.ContainsKey(key))
+            {
+                Addressables.Release(asyncOperation);
+                return;
+            }
+
             if (isDonDestroy)
             {
                 _dontDestroyOnLoadResources.Add(key, asyncOperation.Result);
@@ -132,8 +138,14 @@ namespace Nekoyume
 
             NcDebug.Log($"LoadAllAsync : {label}");
 
+            var loadedKeys = new HashSet<string>();
             foreach (var result in opHandle.Result)
             {
+                if (!loadedKeys.Add(result.PrimaryKey))
+                {
+                    continue;
+                }
+
                 await LoadAsync<T>(result.PrimaryKey, isDonDestroy);
                 loadCallback?.Invoke(result.PrimaryKey);
             }

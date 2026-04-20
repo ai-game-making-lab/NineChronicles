@@ -12,6 +12,9 @@ using Nekoyume.Helper;
 using Nekoyume.L10n;
 using Nekoyume.Model.Item;
 using Nekoyume.Model.State;
+using Nekoyume.SingleClient.Models.Items;
+using ItemSubType = Nekoyume.Model.Item.ItemSubType;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.UI.Model;
 using TMPro;
@@ -496,11 +499,11 @@ namespace Nekoyume.UI.Module
             var diff = state.RequiredBlockIndex - currentBlockIndex;
             int cost;
             if (state.PetId.HasValue &&
-                States.Instance.PetStates.TryGetPetState(state.PetId.Value, out var petState))
+                ClientStateViewProvider.Current.PetStatesRaw.TryGetPetState(state.PetId.Value, out var petState))
             {
                 cost = PetHelper.CalculateDiscountedHourglass(
                     diff,
-                    States.Instance.GameConfigState.HourglassPerBlock,
+                    ClientStateViewProvider.Current.CurrentGameConfigStateRaw.HourglassPerBlock,
                     petState,
                     TableSheets.Instance.PetOptionSheet);
             }
@@ -519,7 +522,7 @@ namespace Nekoyume.UI.Module
                 return;
             }
 
-            var isEnough = States.Instance.CurrentAvatarState.inventory
+            var isEnough = ClientStateViewProvider.Current.CurrentAvatarStateRaw.inventory
                 .HasFungibleItem(row.ItemId, currentBlockIndex, cost);
             hasNotificationImage.enabled = isEnough;
         }
@@ -529,20 +532,20 @@ namespace Nekoyume.UI.Module
             var diff = state.WorkCompleteBlockIndex - blockIndex;
             int cost;
             if (state.PetId.HasValue &&
-                States.Instance.PetStates.TryGetPetState(state.PetId.Value, out var petState))
+                ClientStateViewProvider.Current.PetStatesRaw.TryGetPetState(state.PetId.Value, out var petState))
             {
                 cost = PetHelper.CalculateDiscountedHourglass(
                     diff,
-                    States.Instance.GameConfigState.HourglassPerBlock,
+                    ClientStateViewProvider.Current.CurrentGameConfigStateRaw.HourglassPerBlock,
                     petState,
                     TableSheets.Instance.PetOptionSheet);
             }
             else
             {
-                cost = RapidCombination0.CalculateHourglassCount(States.Instance.GameConfigState, diff);
+                cost = RapidCombination0.CalculateHourglassCount(ClientStateViewProvider.Current.CurrentGameConfigStateRaw, diff);
             }
 
-            var inventory = States.Instance.CurrentAvatarState.inventory;
+            var inventory = ClientStateViewProvider.Current.CurrentAvatarStateRaw.inventory;
             var count = inventory.GetUsableItemCount(CostType.Hourglass, blockIndex);
             hourglassCountText.text = cost.ToString();
             hourglassCountText.color = count >= cost
@@ -641,13 +644,13 @@ namespace Nekoyume.UI.Module
         
         private void SetItemUsableImage(ItemUsable? itemUsable, bool clearCustomObjects = false)
         {                    
-            if (itemUsable is Equipment equipment)
+            if (itemUsable.ToPolySnapshot() is EquipmentSnapshot eqSnap)
             {
-                SetBackGroundGroup(equipment.ByCustomCraft ? BackGroundType.CustomCraft : BackGroundType.Default);
+                SetBackGroundGroup(eqSnap.ByCustomCraft ? BackGroundType.CustomCraft : BackGroundType.Default);
                 if (!clearCustomObjects)
                 {
-                    customCraftObject.SetActive(equipment.ByCustomCraft);
-                    randomOnlyIcon.SetActive(equipment.HasRandomOnlyIcon);
+                    customCraftObject.SetActive(eqSnap.ByCustomCraft);
+                    randomOnlyIcon.SetActive(eqSnap.HasRandomOnlyIcon);
                 }
                 else
                 {

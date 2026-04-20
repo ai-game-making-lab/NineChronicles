@@ -1,5 +1,7 @@
 using System;
 using Nekoyume.Game.Controller;
+using Nekoyume.SingleClient.Blockchain;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.UI.Module;
 using TMPro;
@@ -74,7 +76,8 @@ namespace Nekoyume.UI.Scroller
             var rankingInfo = itemData.rankingInfo;
 
             RankingInfo = rankingInfo ?? throw new ArgumentNullException(nameof(rankingInfo));
-            _isCurrentUser = States.Instance.CurrentAvatarState?.address ==
+            _isCurrentUser =
+                (ClientStateViewProvider.Current.CurrentAvatar?.Address.ToLibplanet() ?? default) ==
                 RankingInfo.AvatarAddress;
 
             backgroundImage.enabled = Index % 2 == 1;

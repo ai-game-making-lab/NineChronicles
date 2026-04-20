@@ -1,4 +1,6 @@
 using Nekoyume.Model.Quest;
+using Nekoyume.SingleClient.Blockchain;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.UI.Scroller;
 using System;
@@ -133,7 +135,7 @@ namespace Nekoyume.UI
 
         private void ReceiveAll()
         {
-            var avatarAddress = States.Instance.CurrentAvatarState.address;
+            var avatarAddress = ClientStateViewProvider.Current.CurrentAvatar?.Address.ToLibplanet() ?? default;
             var questList = ReactiveAvatarState.QuestList;
             var mailRewards = questList
                 .Where(q => q.isReceivable && q.Complete)

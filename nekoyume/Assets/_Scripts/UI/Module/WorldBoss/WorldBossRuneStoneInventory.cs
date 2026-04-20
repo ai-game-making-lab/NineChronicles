@@ -2,6 +2,7 @@
 using System.Linq;
 using Libplanet.Types.Assets;
 using Nekoyume.Helper;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.UI.Model;
 using Nekoyume.UI.Scroller;
@@ -29,9 +30,9 @@ namespace Nekoyume.UI.Module.WorldBoss
                 var runeStones = new List<FungibleAssetValue>();
                 foreach (var row in runeRows)
                 {
-                    if (States.Instance.CurrentAvatarBalances.ContainsKey(row.Ticker))
+                    if (ClientStateViewProvider.Current.CurrentAvatarBalancesRaw.ContainsKey(row.Ticker))
                     {
-                        runeStones.Add(States.Instance.CurrentAvatarBalances[row.Ticker]);
+                        runeStones.Add(ClientStateViewProvider.Current.CurrentAvatarBalancesRaw[row.Ticker]);
                     }
                 }
 

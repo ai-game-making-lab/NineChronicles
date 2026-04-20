@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Numerics;
-using Lib9c.Model.Order;
 using Nekoyume.EnumType;
 using Nekoyume.Game.Character;
 using Nekoyume.Game.Controller;
@@ -9,6 +8,8 @@ using Nekoyume.Helper;
 using Nekoyume.L10n;
 using Nekoyume.Model.Item;
 using Nekoyume.Model.Mail;
+using Nekoyume.SingleClient;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.UI.Model;
 using Nekoyume.UI.Module;
@@ -81,7 +82,7 @@ namespace Nekoyume.UI
             enhancementButton.onClick.AddListener(() =>
             {
                 const int requiredStage = Game.LiveAsset.GameConfig.RequiredStage.Enhancement;
-                if (!States.Instance.CurrentAvatarState.worldInformation.IsStageCleared(requiredStage))
+                if (!ClientStateViewProvider.Current.CurrentAvatarStateRaw.worldInformation.IsStageCleared(requiredStage))
                 {
                     OneLineSystem.Push(
                         MailType.System,
@@ -199,7 +200,7 @@ namespace Nekoyume.UI
             if (item.Product.Legacy)
             {
                 sell.Set(
-                    item.Product.RegisteredBlockIndex + Order.ExpirationInterval,
+                    item.Product.RegisteredBlockIndex + ClientOrder.ExpirationInterval,
                     apStoneCount,
                     state =>
                     {
@@ -249,8 +250,8 @@ namespace Nekoyume.UI
             buy.gameObject.SetActive(true);
             if (item.Product.Legacy)
             {
-                buy.Set(item.Product.RegisteredBlockIndex + Order.ExpirationInterval,
-                    (BigInteger)item.Product.Price * States.Instance.GoldBalanceState.Gold.Currency,
+                buy.Set(item.Product.RegisteredBlockIndex + ClientOrder.ExpirationInterval,
+                    (BigInteger)item.Product.Price * ClientStateViewProvider.Current.CurrentAgentGoldBalanceFav.Currency,
                     () =>
                     {
                         onBuy?.Invoke();
@@ -259,7 +260,7 @@ namespace Nekoyume.UI
             }
             else
             {
-                buy.Set((BigInteger)item.Product.Price * States.Instance.GoldBalanceState.Gold.Currency,
+                buy.Set((BigInteger)item.Product.Price * ClientStateViewProvider.Current.CurrentAgentGoldBalanceFav.Currency,
                     () =>
                     {
                         onBuy?.Invoke();

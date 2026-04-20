@@ -6,6 +6,7 @@ using UniRx;
 using Nekoyume.L10n;
 using Cysharp.Threading.Tasks;
 using Nekoyume.Helper;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.ApiClient;
 
@@ -343,7 +344,7 @@ namespace Nekoyume.UI.Module
                 return true;
             }
 
-            if (_data.RequiredLevel.Value < States.Instance.CurrentAvatarState.level)
+            if (_data.RequiredLevel.Value < (ClientStateViewProvider.Current.CurrentAvatar?.Level ?? 0))
             {
                 return true;
             }

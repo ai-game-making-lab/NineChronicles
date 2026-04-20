@@ -13,9 +13,10 @@ using Nekoyume.Game.Battle;
 using Nekoyume.Game.Controller;
 using Nekoyume.L10n;
 using Nekoyume.Model.BattleStatus;
-using Nekoyume.Model.EnumType;
 using Nekoyume.Model.Item;
+using Nekoyume.SingleClient.Models.EnumType;
 using Nekoyume.Model.Mail;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.UI.Model;
 using Nekoyume.UI.Module;
@@ -291,7 +292,7 @@ namespace Nekoyume.UI
             AudioController.PlayClick();
 
             var worldClear = false;
-            if (States.Instance.CurrentAvatarState.worldInformation
+            if (ClientStateViewProvider.Current.CurrentAvatarStateRaw.worldInformation
                 .TryGetLastClearedStageId(out var lastClearedStageId))
             {
                 if (SharedModel.IsClear
@@ -344,7 +345,7 @@ namespace Nekoyume.UI
                     var cost = RxProps.EventScheduleRowForDungeon.Value
                         .GetDungeonTicketCost(
                             RxProps.EventDungeonInfo.Value?.NumberOfTicketPurchases ?? 0,
-                            States.Instance.GoldBalanceState.Gold.Currency);
+                            ClientStateViewProvider.Current.CurrentGoldBalanceStateRaw.Gold.Currency);
                     var purchasedCount =
                         RxProps.EventDungeonInfo.Value?.NumberOfTicketPurchases ?? 0;
 
@@ -387,7 +388,7 @@ namespace Nekoyume.UI
                     var cost = RxProps.EventScheduleRowForDungeon.Value
                         .GetDungeonTicketCost(
                             RxProps.EventDungeonInfo.Value?.NumberOfTicketPurchases ?? 0,
-                            States.Instance.GoldBalanceState.Gold.Currency);
+                            ClientStateViewProvider.Current.CurrentGoldBalanceStateRaw.Gold.Currency);
                     var purchasedCount =
                         RxProps.EventDungeonInfo.Value?.NumberOfTicketPurchases ?? 0;
 
@@ -558,7 +559,7 @@ namespace Nekoyume.UI
                 startRewards.SetActive(true);
                 Game.Game.instance.TableSheets.CrystalStageBuffGachaSheet.TryGetValue(
                     SharedModel.StageID, out var row);
-                var starCount = States.Instance.CrystalRandomSkillState?.StarCount ?? 0;
+                var starCount = ClientStateViewProvider.Current.CrystalRandomSkillStateRaw?.StarCount ?? 0;
                 var maxStarCount = row?.MaxStar ?? 0;
 
                 starForMulti.StarCountText.text = $"{starCount}/{maxStarCount}";
@@ -830,10 +831,10 @@ namespace Nekoyume.UI
 
         private IEnumerator SendBattleActionAsync(int stageIdOffset, bool buyTicketIfNeeded = false)
         {
-            var itemSlotState = States.Instance.CurrentItemSlotStates[BattleType.Adventure];
+            var itemSlotState = ClientStateViewProvider.Current.CurrentItemSlotStatesRaw[BattleType.Adventure.ToLib9c()];
             var costumes = itemSlotState.Costumes;
             var equipments = itemSlotState.Equipments;
-            var runeSlotInfos = States.Instance.CurrentRuneSlotStates[BattleType.Adventure].GetEquippedRuneSlotInfos();
+            var runeSlotInfos = ClientStateViewProvider.Current.CurrentRuneSlotStatesRaw[BattleType.Adventure.ToLib9c()].GetEquippedRuneSlotInfos();
             yield return SharedModel.StageType switch
             {
                 StageType.HackAndSlash => Game.Game.instance.ActionManager
@@ -917,7 +918,7 @@ namespace Nekoyume.UI
                 {
                     Find<HeaderMenuStatic>().Show();
                     Find<LobbyMenu>().Close();
-                    Find<WorldMap>().Show(States.Instance.CurrentAvatarState.worldInformation);
+                    Find<WorldMap>().Show(ClientStateViewProvider.Current.CurrentAvatarStateRaw.worldInformation);
                     worldMapLoading.Close(true);
                 });
             }
@@ -945,7 +946,7 @@ namespace Nekoyume.UI
                     case StageType.Mimisbrunnr:
                         var viewModel = new WorldMap.ViewModel
                         {
-                            WorldInformation = States.Instance.CurrentAvatarState.worldInformation
+                            WorldInformation = ClientStateViewProvider.Current.CurrentAvatarStateRaw.worldInformation
                         };
                         viewModel.SelectedStageId.SetValueAndForceNotify(SharedModel.WorldID);
                         viewModel.SelectedStageId.SetValueAndForceNotify(SharedModel.StageID);
@@ -967,7 +968,7 @@ namespace Nekoyume.UI
                         }
 
                         var worldMap = Find<WorldMap>();
-                        worldMap.Show(States.Instance.CurrentAvatarState.worldInformation, true);
+                        worldMap.Show(ClientStateViewProvider.Current.CurrentAvatarStateRaw.worldInformation, true);
                         worldMap.ShowEventDungeonStage(RxProps.EventDungeonRow, false);
                         stageNumber = SharedModel.StageID.ToEventDungeonStageNumber();
                         break;

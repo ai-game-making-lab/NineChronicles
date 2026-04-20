@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Nekoyume.Helper;
 using Nekoyume.Model.State;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.UI.Module.WorldBoss;
 using TMPro;
@@ -110,7 +111,7 @@ namespace Nekoyume.UI.Module.Lobby
 
         private void CheckSeasonRewards()
         {
-            if (States.Instance.CurrentAvatarState == null)
+            if (ClientStateViewProvider.Current.CurrentAvatarStateRaw == null)
             {
                 return;
             }
@@ -164,7 +165,7 @@ namespace Nekoyume.UI.Module.Lobby
                         return;
                     }
 
-                    if (States.Instance.CurrentAvatarState is null)
+                    if (ClientStateViewProvider.Current.CurrentAvatarStateRaw is null)
                     {
                         return;
                     }
@@ -181,7 +182,7 @@ namespace Nekoyume.UI.Module.Lobby
                     var remainTime = row.EndedBlockIndex - currentBlockIndex;
                     timeBlock.SetTimeBlock($"{remainTime:#,0}", remainTime.BlockRangeToTimeSpanString());
 
-                    var avatarAddress = States.Instance.CurrentAvatarState.address;
+                    var avatarAddress = ClientStateViewProvider.Current.CurrentAvatarStateRaw.address;
                     var raiderState = WorldBossStates.GetRaiderState(avatarAddress);
                     if (raiderState is null)
                     {
@@ -193,7 +194,7 @@ namespace Nekoyume.UI.Module.Lobby
                         var count = WorldBossFrontHelper.GetRemainTicket(
                             raiderState,
                             currentBlockIndex,
-                            States.Instance.GameConfigState.DailyWorldBossInterval);
+                            ClientStateViewProvider.Current.CurrentGameConfigStateRaw.DailyWorldBossInterval);
                         ticketText.text = $"{count}";
                     }
 

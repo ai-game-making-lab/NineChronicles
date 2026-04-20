@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Nekoyume.L10n;
 using Nekoyume.Model.InfiniteTower;
-using Nekoyume.Model.EnumType;
+using Nekoyume.SingleClient.Models.EnumType;
 using Nekoyume.TableData;
 using TMPro;
 using UnityEngine;

@@ -1,6 +1,7 @@
 using System.Linq;
 using Libplanet.Types.Assets;
 using Nekoyume.Helper;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.TableData;
 using Nekoyume.TableData.Rune;
@@ -41,7 +42,7 @@ namespace Nekoyume.UI.Model
             IsMaxLevel = Level == optionRow.LevelOptionMap.Count;
 
             var runeRow = Game.Game.instance.TableSheets.RuneSheet[row.Id];
-            if (!States.Instance.CurrentAvatarBalances.ContainsKey(runeRow.Ticker))
+            if (!ClientStateViewProvider.Current.CurrentAvatarBalancesRaw.ContainsKey(runeRow.Ticker))
             {
                 return;
             }
@@ -51,7 +52,7 @@ namespace Nekoyume.UI.Model
                 SortingOrder = runeData.sortingOrder;
             }
 
-            RuneStone = States.Instance.CurrentAvatarBalances[runeRow.Ticker];
+            RuneStone = ClientStateViewProvider.Current.CurrentAvatarBalancesRaw[runeRow.Ticker];
 
             var costSheet = Game.Game.instance.TableSheets.RuneCostSheet;
             if (!costSheet.TryGetValue(row.Id, out var costRow))
@@ -71,8 +72,8 @@ namespace Nekoyume.UI.Model
             }
 
             EnoughRuneStone = RuneStone.MajorUnit >= cost.RuneStoneQuantity;
-            EnoughCrystal = States.Instance.CrystalBalance.MajorUnit >= cost.CrystalQuantity;
-            EnoughNcg = States.Instance.GoldBalanceState.Gold.MajorUnit >= cost.NcgQuantity;
+            EnoughCrystal = ClientStateViewProvider.Current.CurrentAgentCrystalBalanceMajorUnit >= cost.CrystalQuantity;
+            EnoughNcg = ClientStateViewProvider.Current.CurrentGoldBalanceStateRaw.Gold.MajorUnit >= cost.NcgQuantity;
         }
     }
 }

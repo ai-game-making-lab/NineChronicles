@@ -2,6 +2,7 @@
 using System.Text;
 using Libplanet.Common;
 using Nekoyume.Helper;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using UniRx.Triggers;
 using UnityEngine;
@@ -50,7 +51,7 @@ namespace Nekoyume.UI.Module
                 var url = _url;
                 if (_useAgentAddress)
                 {
-                    var address = States.Instance.AgentState.address;
+                    var address = ClientStateViewProvider.Current.CurrentAgent.Address;
                     url = string.Format(url, address);
                 }
 

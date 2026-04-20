@@ -1,3 +1,4 @@
+using Nekoyume.SingleClient.State;
 using DG.Tweening;
 using Nekoyume.UI.Module;
 using Nekoyume.ValueControlComponents.Shader;
@@ -411,7 +412,7 @@ namespace Nekoyume.UI
 
             _seasonStartBlock = seasonInfo.StartBlockIndex;
             _seasonEndBlock = seasonInfo.EndBlockIndex;
-            var claimInterval = States.Instance.GameConfigState.AdventureBossClaimInterval;
+            var claimInterval = ClientStateViewProvider.Current.CurrentGameConfigStateRaw.AdventureBossClaimInterval;
             rewardRemainTimeText.text = L10n.L10nManager.Localize("UI_ADVENTURE_BOSS_REWARDS_REMAIN_TIME", claimInterval, claimInterval.BlockRangeToTimeSpanString());
             try
             {

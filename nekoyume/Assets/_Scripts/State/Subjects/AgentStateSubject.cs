@@ -1,6 +1,7 @@
+using Nekoyume.SingleClient.State;
 using System;
-using Lib9c;
 using Libplanet.Types.Assets;
+using Nekoyume.SingleClient;
 using UniRx;
 
 namespace Nekoyume.State.Subjects
@@ -30,7 +31,7 @@ namespace Nekoyume.State.Subjects
 
         public static void OnNextGold(FungibleAssetValue gold)
         {
-            if (gold.Currency.Equals(States.Instance.GoldBalanceState.Gold.Currency))
+            if (gold.Currency.Equals(ClientStateViewProvider.Current.CurrentGoldBalanceStateRaw.Gold.Currency))
             {
                 GoldInternal.OnNext(gold);
             }
@@ -38,7 +39,7 @@ namespace Nekoyume.State.Subjects
 
         public static void OnNextCrystal(FungibleAssetValue crystal)
         {
-            if (crystal.Currency.Equals(Currencies.Crystal))
+            if (crystal.Currency.Equals(ClientCurrencies.Crystal))
             {
                 CrystalInternal.OnNext(crystal);
             }
@@ -46,7 +47,7 @@ namespace Nekoyume.State.Subjects
 
         public static void OnNextGarage(FungibleAssetValue garage)
         {
-            if (garage.Currency.Equals(Currencies.Garage))
+            if (garage.Currency.Equals(ClientCurrencies.Garage))
             {
                 GarageInternal.OnNext(garage);
             }

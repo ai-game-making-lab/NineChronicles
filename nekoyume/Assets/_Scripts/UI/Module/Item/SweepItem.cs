@@ -1,4 +1,4 @@
-using Nekoyume.Model.Item;
+using Nekoyume.SingleClient.Models.Items;
 using UnityEngine;
 
 namespace Nekoyume.UI.Module
@@ -8,9 +8,14 @@ namespace Nekoyume.UI.Module
         [SerializeField]
         private SweepItemView view;
 
-        public void Set(ItemBase itemBase, int count)
+        /// <summary>
+        /// Snapshot-facing facade. Callers that still hold a lib9c <c>ItemBase</c> should project
+        /// via <c>ItemSnapshotMapper.ToPolySnapshot()</c> at the call site; this component no
+        /// longer depends on <c>Nekoyume.Model.Item</c> types.
+        /// </summary>
+        public void Set(IItemSnapshot snapshot, int count)
         {
-            view.Set(itemBase, count);
+            view.Set(snapshot, count);
         }
     }
 }

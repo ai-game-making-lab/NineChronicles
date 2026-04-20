@@ -2,8 +2,9 @@ using System.Collections.Generic;
 using System.Linq;
 using Nekoyume.Battle;
 using Nekoyume.Model;
-using Nekoyume.Model.EnumType;
 using Nekoyume.SingleClient.Models.Buffs;
+using Nekoyume.SingleClient.Models.EnumType;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.UI.Module;
 using UnityEngine;
@@ -39,8 +40,8 @@ namespace Nekoyume.UI
                 turnLimit = boss.WaveStats.FirstOrDefault().TurnLimit;
             }
 
-            var (equipments, costumes) = States.Instance.GetEquippedItems(BattleType.Raid);
-            var level = States.Instance.CurrentAvatarState.level;
+            var (equipments, costumes) = ClientStateViewProvider.Current.GetEquippedItems(BattleType.Raid.ToLib9c());
+            var level = ClientStateViewProvider.Current.CurrentAvatar?.Level ?? 0;
             comboText.comboMax = AttackCountHelper.GetCountMax(level);
             comboText.Close();
             playerStatus.SetData(equipments, costumes, turnLimit);

@@ -1,5 +1,6 @@
 using Nekoyume.Helper;
 using Nekoyume.L10n;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.UI.Module;
 using System.Collections.Generic;
@@ -95,7 +96,7 @@ namespace Nekoyume.UI
             }
             else
             {
-                confirmCallback = cost.MajorUnit <= States.Instance.CrystalBalance.MajorUnit
+                confirmCallback = cost.MajorUnit <= ClientStateViewProvider.Current.CrystalBalanceRaw.MajorUnit
                     ? confirmCallback
                     : () => OnInsufficientCost(cost.MajorUnit);
             }

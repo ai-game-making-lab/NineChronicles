@@ -1,5 +1,6 @@
 using Nekoyume.EnumType;
 using Nekoyume.Game.Controller;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using System;
 using System.Collections.Generic;
@@ -49,6 +50,7 @@ namespace Nekoyume.UI.Module
         private List<GameObject> costParents = null;
 
         private readonly Dictionary<CostType, long> _costMap = new();
+        private Func<CostType, long, bool> _costChecker;
         private static CostIconDataScriptableObject _costIconData;
 
         private static CostIconDataScriptableObject CostIconData
@@ -68,6 +70,12 @@ namespace Nekoyume.UI.Module
             _costMap.TryGetValue(type, out var cost)
                 ? cost
                 : 0;
+
+        public void SetCostChecker(Func<CostType, long, bool> costChecker)
+        {
+            _costChecker = costChecker;
+            UpdateObjects();
+        }
 
         public void SetCost(params CostParam[] costs)
         {
@@ -131,7 +139,9 @@ namespace Nekoyume.UI.Module
                 {
                     var cost = _costMap[costObject.type];
                     costText.text.text = cost.ToString();
-                    costText.text.color = CheckCostOfType(costObject.type, cost) ? Palette.GetColor(ColorType.ButtonEnabled) : Palette.GetColor(ColorType.TextDenial);
+                    costText.text.color = CheckCostOfTypeInstance(costObject.type, cost)
+                        ? Palette.GetColor(ColorType.ButtonEnabled)
+                        : Palette.GetColor(ColorType.TextDenial);
                 }
             }
 
@@ -287,7 +297,7 @@ namespace Nekoyume.UI.Module
                         continue;
                 }
 
-                if (!CheckCostOfType(type, cost))
+                if (!CheckCostOfTypeInstance(type, cost))
                 {
                     return type;
                 }
@@ -296,14 +306,19 @@ namespace Nekoyume.UI.Module
             return CostType.None;
         }
 
+        private bool CheckCostOfTypeInstance(CostType type, long cost)
+        {
+            return _costChecker?.Invoke(type, cost) ?? CheckCostOfType(type, cost);
+        }
+
         public static bool CheckCostOfType(CostType type, long cost)
         {
             switch (type)
             {
                 case CostType.NCG:
-                    return States.Instance.GoldBalanceState.Gold.MajorUnit >= cost;
+                    return ClientStateViewProvider.Current.CurrentGoldBalanceStateRaw.Gold.MajorUnit >= cost;
                 case CostType.Crystal:
-                    return States.Instance.CrystalBalance.MajorUnit >= cost;
+                    return ClientStateViewProvider.Current.CurrentAgentCrystalBalanceMajorUnit >= cost;
                 case CostType.ActionPoint:
                     return ReactiveAvatarState.ActionPoint >= cost;
                 case CostType.ArenaTicket:
@@ -317,7 +332,7 @@ namespace Nekoyume.UI.Module
                 case CostType.RubyDust:
                 case CostType.EmeraldDust:
                 case CostType.SapphireDust:
-                    var inventory = States.Instance.CurrentAvatarState?.inventory;
+                    var inventory = ClientStateViewProvider.Current.CurrentAvatarStateRaw?.inventory;
                     if (inventory == null)
                     {
                         return false;
@@ -328,7 +343,7 @@ namespace Nekoyume.UI.Module
                 case CostType.ApPotion:
                 case CostType.CatalystPotion:
                     var blockIndex = Game.Game.instance.Agent.BlockIndex;
-                    inventory = States.Instance.CurrentAvatarState?.inventory;
+                    inventory = ClientStateViewProvider.Current.CurrentAvatarStateRaw?.inventory;
                     if (inventory == null)
                     {
                         return false;

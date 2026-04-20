@@ -1,13 +1,14 @@
+using Nekoyume.SingleClient.State;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Lib9c.Model.Order;
 using MarketService.Response;
 using Nekoyume.ApiClient;
 using Nekoyume.EnumType;
 using Nekoyume.Model.Item;
 using Nekoyume.Model.Skill;
+using Nekoyume.SingleClient;
 using Nekoyume.TableData;
 using UniRx;
 
@@ -126,7 +127,7 @@ namespace Nekoyume.State
 
         public static async Task RequestSellProductsAsync()
         {
-            var avatarAddress = States.Instance.CurrentAvatarState.address;
+            var avatarAddress = ClientStateViewProvider.Current.CurrentAvatarStateRaw.address;
             var (fungibleAssets, items) =
                 await ApiClients.Instance.MarketServiceClient.GetProducts(avatarAddress);
 
@@ -142,7 +143,7 @@ namespace Nekoyume.State
         public static void SetBuyProducts()
         {
             var curBlockIndex = Game.Game.instance.Agent.BlockIndex;
-            var agentAddress = States.Instance.AgentState.address;
+            var agentAddress = ClientStateViewProvider.Current.CurrentAgentStateRaw.address;
 
             var products = new List<ItemProductResponseModel>();
             foreach (var model in CachedBuyItemProducts.Where(model =>
@@ -151,7 +152,7 @@ namespace Nekoyume.State
             {
                 if (model.Legacy)
                 {
-                    if (model.RegisteredBlockIndex + Order.ExpirationInterval - curBlockIndex > 0)
+                    if (model.RegisteredBlockIndex + ClientOrder.ExpirationInterval - curBlockIndex > 0)
                     {
                         products.Add(model);
                     }
@@ -168,7 +169,7 @@ namespace Nekoyume.State
 
         public static void SetBuyFungibleAssets()
         {
-            var agentAddress = States.Instance.AgentState.address;
+            var agentAddress = ClientStateViewProvider.Current.CurrentAgentStateRaw.address;
 
             var favProducts = CachedBuyFungibleAssetProducts.Where(x =>
                 !x.SellerAgentAddress.Equals(agentAddress) &&
@@ -207,7 +208,7 @@ namespace Nekoyume.State
         {
             var itemRow = Game.Game.instance.TableSheets.ItemSheet[product.ItemId];
             var id = product.TradableId;
-            var requiredBlockIndex = product.RegisteredBlockIndex + Order.ExpirationInterval;
+            var requiredBlockIndex = product.RegisteredBlockIndex + ClientOrder.ExpirationInterval;
             var madeWithMimisbrunnrRecipe = false;
             ITradableItem tradableItem = null;
             switch (itemRow.ItemSubType)
@@ -331,7 +332,7 @@ namespace Nekoyume.State
                     var curBlockIndex = Game.Game.instance.Agent.BlockIndex;
                     var legacyItemCount = CachedBuyItemProducts
                         .Where(x => x.Legacy)
-                        .Count(x => x.RegisteredBlockIndex + Order.ExpirationInterval - curBlockIndex > 0);
+                        .Count(x => x.RegisteredBlockIndex + ClientOrder.ExpirationInterval - curBlockIndex > 0);
                     var newItemCount = CachedBuyItemProducts.Count(x => !x.Legacy);
                     var sum = legacyItemCount + newItemCount;
                     return sum;

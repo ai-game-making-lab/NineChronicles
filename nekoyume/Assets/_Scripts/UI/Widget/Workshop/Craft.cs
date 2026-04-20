@@ -8,6 +8,7 @@ using Nekoyume.UI.Model;
 using Nekoyume.UI.Module;
 using System.Text.Json;
 using Nekoyume.Helper;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.TableData;
 using System;
@@ -474,7 +475,7 @@ namespace Nekoyume.UI
             if (quest is null ||
                 !TableSheets.Instance.EquipmentItemRecipeSheet
                     .TryGetValue(quest.RecipeId, out var row) ||
-                !States.Instance.CurrentAvatarState.worldInformation
+                !ClientStateViewProvider.Current.CurrentAvatarStateRaw.worldInformation
                     .TryGetLastClearedStageId(out var clearedStage))
             {
                 SharedModel.NotifiedRow.Value = null;
@@ -599,7 +600,7 @@ namespace Nekoyume.UI
             var insufficientMaterials = recipeInfo.ReplacedMaterials;
             if (insufficientMaterials.Any())
             {
-                var petState = States.Instance.PetStates
+                var petState = ClientStateViewProvider.Current.PetStatesRaw
                     .GetPetState(petId.HasValue ? petId.Value : default);
 
                 Find<ReplaceMaterialPopup>().Show(insufficientMaterials,
@@ -617,8 +618,8 @@ namespace Nekoyume.UI
                             {
                                 ["MaterialCount"] = materialCount,
                                 ["BurntCrystal"] = (long)recipeInfo.CostCrystal.MajorUnit,
-                                ["AvatarAddress"] = States.Instance.CurrentAvatarState.address.ToString(),
-                                ["AgentAddress"] = States.Instance.AgentState.address.ToString()
+                                ["AvatarAddress"] = ClientStateViewProvider.Current.CurrentAvatarStateRaw.address.ToString(),
+                                ["AgentAddress"] = ClientStateViewProvider.Current.CurrentAgentStateRaw.address.ToString()
                             });
 
                         ActionManager.Instance.CombinationEquipment(
@@ -629,7 +630,7 @@ namespace Nekoyume.UI
                                 petId)
                             .Subscribe();
                         StartCoroutine(CoCombineNPCAnimation(equipment, requiredBlockIndex));
-                        States.Instance.PetStates.LockPetTemporarily(petId);
+                        ClientStateViewProvider.Current.PetStatesRaw.LockPetTemporarily(petId);
                     },
                     petState);
             }
@@ -646,7 +647,7 @@ namespace Nekoyume.UI
                         petId)
                     .Subscribe();
                 StartCoroutine(CoCombineNPCAnimation(equipment, requiredBlockIndex));
-                States.Instance.PetStates.LockPetTemporarily(petId);
+                ClientStateViewProvider.Current.PetStatesRaw.LockPetTemporarily(petId);
             }
         }
 

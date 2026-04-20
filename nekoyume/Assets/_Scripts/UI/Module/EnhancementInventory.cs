@@ -8,6 +8,8 @@ using Nekoyume.Helper;
 using Nekoyume.L10n;
 using Nekoyume.Model.EnumType;
 using Nekoyume.Model.Item;
+using Nekoyume.SingleClient.Models.Items;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.TableData;
 using Nekoyume.UI.Model;
@@ -15,6 +17,8 @@ using Nekoyume.UI.Scroller;
 using TMPro;
 using UnityEngine;
 using Material = Nekoyume.Model.Item.Material;
+using ItemSubType = Nekoyume.Model.Item.ItemSubType;
+using ItemType = Nekoyume.Model.Item.ItemType;
 
 namespace Nekoyume.UI.Module
 {
@@ -239,7 +243,8 @@ namespace Nekoyume.UI.Module
 
             var items = _equipments[itemSubType];
             var item = items.First(item =>
-                item.ItemBase is Equipment equipment && equipment.ItemId == itemId);
+                item.ItemBase.ToPolySnapshot() is EquipmentSnapshot eqSnap &&
+                eqSnap.NonFungibleId is Guid eqId && eqId == itemId);
 
             if (_baseModel is null)
             {
@@ -313,7 +318,7 @@ namespace Nekoyume.UI.Module
             }
 
             Widget.Find<AddHammerPopup>().Show(
-                _baseModel.ItemBase as Equipment,
+                _baseModel.ItemBase,
                 _materialModels,
                 item,
                 count => SetMaterialItemCount(item, count));
@@ -388,7 +393,7 @@ namespace Nekoyume.UI.Module
             {
                 usableItems = usableItems
                     .OrderByDescending(x => x.ItemBase.Grade)
-                    .ThenByDescending(x => CPHelper.GetCP(x.ItemBase as Equipment)).ToList();
+                    .ThenByDescending(x => x.ItemBase.ToPolySnapshot() is EquipmentSnapshot enhEqSnap ? enhEqSnap.GetCP() : 0L).ToList();
             }
 
             var result = new List<EnhancementInventoryItem>();
@@ -512,7 +517,7 @@ namespace Nekoyume.UI.Module
             var equippedEquipments = new List<Guid>();
             for (var i = 1; i < (int)BattleType.End; i++)
             {
-                equippedEquipments.AddRange(States.Instance.CurrentItemSlotStates[(BattleType)i].Equipments);
+                equippedEquipments.AddRange(ClientStateViewProvider.Current.CurrentItemSlotStatesRaw[(BattleType)i].Equipments);
             }
 
             foreach (var equipments in _equipments

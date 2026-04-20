@@ -6,6 +6,7 @@ using Nekoyume.Blockchain;
 using Nekoyume.Extensions;
 using Nekoyume.Game.Controller;
 using Nekoyume.Model.State;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.UI.Module;
 using UnityEngine;
@@ -130,7 +131,7 @@ namespace Nekoyume.UI
 
             _bossId = bossId;
             _headerMenu = Find<HeaderMenuStatic>();
-            var avatarState = States.Instance.CurrentAvatarState;
+            var avatarState = ClientStateViewProvider.Current.CurrentAvatarStateRaw;
             var currentBlockIndex = Game.Game.instance.Agent.BlockIndex;
             var raiderState = WorldBossStates.GetRaiderState(avatarState.address);
             startButton.gameObject.SetActive(true);
@@ -177,7 +178,7 @@ namespace Nekoyume.UI
         {
             var crystalCost = GetEntranceFee(Game.Game.instance.States.CurrentAvatarState);
             crystalText.text = crystalCost.ToCurrencyNotation();
-            crystalText.color = States.Instance.CrystalBalance.MajorUnit >= crystalCost ? Palette.GetColor(ColorType.ButtonEnabled) : Palette.GetColor(ColorType.TextDenial);
+            crystalText.color = ClientStateViewProvider.Current.CurrentAgentCrystalBalanceMajorUnit >= crystalCost ? Palette.GetColor(ColorType.ButtonEnabled) : Palette.GetColor(ColorType.TextDenial);
         }
 
         private static int GetEntranceFee(AvatarState currentAvatarState)
@@ -201,7 +202,7 @@ namespace Nekoyume.UI
 
         private void OnClickStartButton()
         {
-            var avatarState = States.Instance.CurrentAvatarState;
+            var avatarState = ClientStateViewProvider.Current.CurrentAvatarStateRaw;
             AudioController.PlayClick();
             var currentBlockIndex = Game.Game.instance.Agent.BlockIndex;
             var curStatus = WorldBossFrontHelper.GetStatus(currentBlockIndex);
@@ -216,7 +217,7 @@ namespace Nekoyume.UI
                     if (raiderState is null)
                     {
                         var cost = GetEntranceFee(avatarState);
-                        var balance = States.Instance.CrystalBalance.MajorUnit;
+                        var balance = ClientStateViewProvider.Current.CurrentAgentCrystalBalanceMajorUnit;
                         Find<PaymentPopup>().ShowCheckPaymentCrystal(
                             balance,
                             cost,
@@ -244,14 +245,14 @@ namespace Nekoyume.UI
 
         private void PracticeRaid()
         {
-            var itemSlotState = States.Instance.CurrentItemSlotStates[BattleType.Raid];
+            var itemSlotState = ClientStateViewProvider.Current.CurrentItemSlotStatesRaw[BattleType.Raid];
             var equipments = itemSlotState.Equipments;
             var costumes = itemSlotState.Costumes;
-            var allRuneState = States.Instance.AllRuneState;
-            var runeSlotState = States.Instance.CurrentRuneSlotStates[BattleType.Raid];
+            var allRuneState = ClientStateViewProvider.Current.AllRuneStateRaw;
+            var runeSlotState = ClientStateViewProvider.Current.CurrentRuneSlotStatesRaw[BattleType.Raid];
             var consumables = information.GetEquippedConsumables().Select(x => x.ItemId).ToList();
             var tableSheets = Game.Game.instance.TableSheets;
-            var avatarState = States.Instance.CurrentAvatarState;
+            var avatarState = ClientStateViewProvider.Current.CurrentAvatarStateRaw;
             var collectionState = Game.Game.instance.States.CollectionState;
             var items = new List<Guid>();
             items.AddRange(equipments);
@@ -301,7 +302,7 @@ namespace Nekoyume.UI
             coverToBlockClick.SetActive(true);
 
             var ticketAnimation = ShowMoveTicketAnimation();
-            var avatarState = States.Instance.CurrentAvatarState;
+            var avatarState = ClientStateViewProvider.Current.CurrentAvatarStateRaw;
             var raiderState = WorldBossStates.GetRaiderState(avatarState.address);
             if (raiderState is null)
             {
@@ -346,11 +347,11 @@ namespace Nekoyume.UI
 
         private void Raid(bool payNcg)
         {
-            var itemSlotState = States.Instance.CurrentItemSlotStates[BattleType.Raid];
+            var itemSlotState = ClientStateViewProvider.Current.CurrentItemSlotStatesRaw[BattleType.Raid];
             var costumes = itemSlotState.Costumes;
             var equipments = itemSlotState.Equipments;
             var consumables = information.GetEquippedConsumables().Select(x => x.ItemId).ToList();
-            var runeInfos = States.Instance.CurrentRuneSlotStates[BattleType.Raid]
+            var runeInfos = ClientStateViewProvider.Current.CurrentRuneSlotStatesRaw[BattleType.Raid]
                 .GetEquippedRuneSlotInfos();
 
             ActionManager.Instance.Raid(costumes, equipments, consumables, runeInfos, payNcg).Subscribe();
@@ -366,9 +367,9 @@ namespace Nekoyume.UI
                 return;
             }
 
-            var avatarState = States.Instance.CurrentAvatarState;
+            var avatarState = ClientStateViewProvider.Current.CurrentAvatarStateRaw;
             var raiderState = WorldBossStates.GetRaiderState(avatarState.address);
-            var cur = States.Instance.GoldBalanceState.Gold.Currency;
+            var cur = ClientStateViewProvider.Current.CurrentGoldBalanceStateRaw.Gold.Currency;
             var cost = WorldBossHelper.CalculateTicketPrice(row, raiderState, cur);
             Find<TicketPurchasePopup>().Show(
                 CostType.WorldBossTicket,
@@ -390,7 +391,7 @@ namespace Nekoyume.UI
         /// <returns>마지막으로 Raid전투를 수행했떤 BlockIndex, raidState가 없는경우 0리턴</returns>
         private long GetUpdatedRaidBlockIndex()
         {
-            var avatarState = States.Instance.CurrentAvatarState;
+            var avatarState = ClientStateViewProvider.Current.CurrentAvatarStateRaw;
             var raiderState = WorldBossStates.GetRaiderState(avatarState.address);
             var raidBlockIndex = Math.Max(raiderState?.UpdatedBlockIndex ?? 0, _txStageBlockIndex);
             return raidBlockIndex;
@@ -398,10 +399,10 @@ namespace Nekoyume.UI
 
         private void UpdateStartButton(long blockIndex)
         {
-            var worldBossRequiredInterval = States.Instance.GameConfigState.WorldBossRequiredInterval;
+            var worldBossRequiredInterval = ClientStateViewProvider.Current.CurrentGameConfigStateRaw.WorldBossRequiredInterval;
             var isIntervalValid = blockIndex - GetUpdatedRaidBlockIndex() >= worldBossRequiredInterval;
 
-            var (equipments, costumes) = States.Instance.GetEquippedItems(BattleType.Raid);
+            var (equipments, costumes) = ClientStateViewProvider.Current.GetEquippedItems(BattleType.Raid);
             var consumables = information.GetEquippedConsumables().Select(x => x.Id).ToList();
 
             var isEquipValid = Util.CanBattle(equipments, costumes, consumables);

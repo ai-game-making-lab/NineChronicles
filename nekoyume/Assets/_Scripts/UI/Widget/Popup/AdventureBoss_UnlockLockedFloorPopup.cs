@@ -52,7 +52,7 @@ namespace Nekoyume.UI
                 _loadingStart?.Invoke();
                 if (Game.Game.instance.AdventureBossData.SeasonInfo?.Value is null)
                 {
-                    NcDebug.LogError("[UnlockFloor] : Game.Game.instance.AdventureBossData.SeasonInfo is null or States.Instance.CurrentAvatarState is null");
+                    NcDebug.LogError("[UnlockFloor] : Game.Game.instance.AdventureBossData.SeasonInfo is null or ClientStateViewProvider.Current.CurrentAvatarStateRaw is null");
                 }
                 else
                 {
@@ -80,7 +80,7 @@ namespace Nekoyume.UI
                 _loadingStart?.Invoke();
                 if (Game.Game.instance.AdventureBossData.SeasonInfo?.Value is null)
                 {
-                    NcDebug.LogError("[UnlockFloor] : Game.Game.instance.AdventureBossData.SeasonInfo is null or States.Instance.CurrentAvatarState is null");
+                    NcDebug.LogError("[UnlockFloor] : Game.Game.instance.AdventureBossData.SeasonInfo is null or ClientStateViewProvider.Current.CurrentAvatarStateRaw is null");
                 }
                 else
                 {

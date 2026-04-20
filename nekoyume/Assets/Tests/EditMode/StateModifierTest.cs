@@ -74,13 +74,14 @@ namespace Tests.EditMode
             if (_tableSheets.MaterialItemSheet.First is null)
                 return;
 
+            const long blockIndex = 0L;
             var material = GetFirstMaterial();
             _avatarState.inventory.AddItem(material);
-            Assert.True(_avatarState.inventory.HasFungibleItem(material.ItemId, Game.instance.Agent.BlockIndex));
+            Assert.True(_avatarState.inventory.HasFungibleItem(material.ItemId, blockIndex));
             var modifier =
                 JsonTest(new AvatarInventoryFungibleItemRemover(material.ItemId, 1));
             _avatarState = modifier.Modify(_avatarState);
-            Assert.False(_avatarState.inventory.HasFungibleItem(material.ItemId, Game.instance.Agent.BlockIndex));
+            Assert.False(_avatarState.inventory.HasFungibleItem(material.ItemId, blockIndex));
         }
 
         [Test]
@@ -126,7 +127,7 @@ namespace Tests.EditMode
         private Equipment GetFirstEquipment()
         {
             var equipmentRowFirst = _tableSheets.EquipmentItemSheet.First;
-            return new Equipment(equipmentRowFirst, new Guid(), 0);
+            return (Equipment)ItemFactory.CreateItemUsable(equipmentRowFirst, new Guid(), 0);
         }
 
         private Material GetFirstMaterial()

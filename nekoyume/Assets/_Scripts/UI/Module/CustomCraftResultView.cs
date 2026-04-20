@@ -7,6 +7,7 @@ using Nekoyume.Game.Controller;
 using Nekoyume.Helper;
 using Nekoyume.L10n;
 using Nekoyume.Model.Item;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using TMPro;
 using UnityEngine;
@@ -54,7 +55,7 @@ namespace Nekoyume.UI.Module
                 var stat = additionalStats[i];
                 var view = optionViews[i];
                 var cp = (long)CPHelper.GetStatCP(stat.StatType, stat.AdditionalValue,
-                    States.Instance.CurrentAvatarState.level);
+                    ClientStateViewProvider.Current.CurrentAvatar?.Level ?? 1);
                 cpSum += cp;
                 if(view is CustomCraftCpOptionView cpView)
                 {

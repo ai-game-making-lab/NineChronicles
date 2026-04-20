@@ -11,6 +11,9 @@ using Nekoyume.Helper;
 using Nekoyume.L10n;
 using Nekoyume.Model.Item;
 using Nekoyume.Model.Mail;
+using Nekoyume.SingleClient.Models.Items;
+using ItemType = Nekoyume.Model.Item.ItemType;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.State.Subjects;
 using Nekoyume.UI.Model;
@@ -151,7 +154,7 @@ namespace Nekoyume.UI.Module
                 DimConditionPredicateList,
                 reverseInventoryOrder);
             UpdateScroll();
-            UpdateStakingBonusObject(States.Instance.StakingLevel);
+            UpdateStakingBonusObject(ClientStateViewProvider.Current.StakingLevel);
         }
 
         private void Subscribe()
@@ -270,7 +273,7 @@ namespace Nekoyume.UI.Module
                 false,
                 TableSheets.Instance.CrystalEquipmentGrindingSheet,
                 TableSheets.Instance.CrystalMonsterCollectionMultiplierSheet,
-                States.Instance.StakingLevel);
+                ClientStateViewProvider.Current.StakingLevel);
             _cachedGrindingRewardCrystal = crystalReward;
             var favRewards = new[] { crystalReward };
             var itemRewards = Grinding.CalculateMaterialReward(
@@ -295,7 +298,11 @@ namespace Nekoyume.UI.Module
 
             for (var i = 0; i < itemRewards.Length && index < rewardViewCount; i++)
             {
-                grindRewards[index].ShowWithItemReward(itemRewards[i]);
+                // GrindReward now consumes IItemSnapshot; project the lib9c reward tuple at the
+                // call site via ItemSnapshotMapper.ToPolySnapshot() so the view itself stays
+                // free of Nekoyume.Model.Item types.
+                var (lib9cItem, count) = itemRewards[i];
+                grindRewards[index].ShowWithItemReward((lib9cItem.ToPolySnapshot(), count));
                 index++;
             }
 
@@ -496,7 +503,7 @@ namespace Nekoyume.UI.Module
             const int selectCount = 20;
 
             var isFirst = _selectedItemsForGrind.Count == 0;
-            var inventoryData = States.Instance.CurrentAvatarState.inventory;
+            var inventoryData = ClientStateViewProvider.Current.CurrentAvatarStateRaw.inventory;
 
             var equipmentWithCpList = new List<(Equipment Equip, long CP)>();
             foreach (var eq in inventoryData.Equipments) {

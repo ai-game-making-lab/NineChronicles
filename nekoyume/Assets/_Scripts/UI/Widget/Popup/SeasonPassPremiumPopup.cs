@@ -7,6 +7,7 @@ using TMPro;
 using System.Linq;
 using Nekoyume.ApiClient;
 using Nekoyume.Helper;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.Model.Mail;
 using Nekoyume.L10n;
@@ -325,7 +326,7 @@ namespace Nekoyume.UI
         private void OnPurchase(string productKey)
         {
 #if UNITY_ANDROID || UNITY_IOS
-            ApiClients.Instance.IAPServiceManager.CheckProductAvailable(productKey, States.Instance.AgentState.address, Game.Game.instance.CurrentPlanetId.ToString(),
+            ApiClients.Instance.IAPServiceManager.CheckProductAvailable(productKey, ClientStateViewProvider.Current.CurrentAgentStateRaw.address, Game.Game.instance.CurrentPlanetId.ToString(),
                 //success
                 () => { Game.Game.instance.IAPStoreManager.OnPurchaseClicked(productKey); },
                 //failed

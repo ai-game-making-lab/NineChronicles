@@ -1,7 +1,7 @@
 using Nekoyume.Game;
 using Nekoyume.Helper;
-using Nekoyume.Model.EnumType;
 using Nekoyume.Model.State;
+using Nekoyume.SingleClient.Models.EnumType;
 using Nekoyume.TestScene;
 using UnityEngine;
 using UnityEngine.UI;
@@ -32,7 +32,7 @@ namespace Nekoyume.UI.Module
 
         public virtual void SetByPlayer(Player player)
         {
-            var id = Util.GetPortraitId(BattleType.Adventure);
+            var id = Util.GetPortraitId(BattleType.Adventure.ToLib9c());
             SetByFullCostumeOrArmorId(id);
         }
 

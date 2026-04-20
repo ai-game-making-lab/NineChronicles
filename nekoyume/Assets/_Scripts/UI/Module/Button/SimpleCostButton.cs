@@ -1,6 +1,7 @@
 using Nekoyume.EnumType;
 using Nekoyume.Game.Controller;
 using Nekoyume.Helper;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using System;
 using System.Collections.Generic;
@@ -89,9 +90,9 @@ namespace Nekoyume.UI.Module
             switch (type)
             {
                 case CostType.NCG:
-                    return States.Instance.GoldBalanceState.Gold.MajorUnit >= cost;
+                    return ClientStateViewProvider.Current.CurrentGoldBalanceStateRaw.Gold.MajorUnit >= cost;
                 case CostType.Crystal:
-                    return States.Instance.CrystalBalance.MajorUnit >= cost;
+                    return ClientStateViewProvider.Current.CurrentAgentCrystalBalanceMajorUnit >= cost;
                 case CostType.ActionPoint:
                     return ReactiveAvatarState.ActionPoint >= cost;
                 case CostType.ArenaTicket:
@@ -104,13 +105,13 @@ namespace Nekoyume.UI.Module
                 case CostType.RubyDust:
                 case CostType.EmeraldDust:
                 case CostType.SapphireDust:
-                    var inventory = States.Instance.CurrentAvatarState.inventory;
+                    var inventory = ClientStateViewProvider.Current.CurrentAvatarStateRaw.inventory;
                     var count = inventory.GetMaterialCount((int)type);
                     return count >= cost;
                 case CostType.Hourglass:
                 case CostType.ApPotion:
                     var blockIndex = Game.Game.instance.Agent.BlockIndex;
-                    inventory = States.Instance.CurrentAvatarState.inventory;
+                    inventory = ClientStateViewProvider.Current.CurrentAvatarStateRaw.inventory;
                     count = inventory.GetUsableItemCount(type, blockIndex);
                     return count >= cost;
                 default:

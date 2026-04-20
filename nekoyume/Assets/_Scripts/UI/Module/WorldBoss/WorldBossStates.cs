@@ -10,6 +10,7 @@ using Libplanet.Crypto;
 using Nekoyume.Extensions;
 using Nekoyume.Helper;
 using Nekoyume.Model.State;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 
 namespace Nekoyume.UI.Module.WorldBoss
@@ -128,11 +129,11 @@ namespace Nekoyume.UI.Module.WorldBoss
             var (worldBoss, raider, raidId, isOnSeason) = await GetDataAsync();
             if (isOnSeason)
             {
-                UpdateState(States.Instance.CurrentAvatarState.address, raider, null, true);
+                UpdateState(ClientStateViewProvider.Current.CurrentAvatarStateRaw.address, raider, null, true);
             }
             else
             {
-                UpdatePreRaiderState(States.Instance.CurrentAvatarState.address, raider);
+                UpdatePreRaiderState(ClientStateViewProvider.Current.CurrentAvatarStateRaw.address, raider);
                 ClearRaiderState();
             }
             _isOnSeason = isOnSeason;
@@ -150,7 +151,7 @@ namespace Nekoyume.UI.Module.WorldBoss
         {
             _hasGradeRewards.ObserveAdd().Subscribe(x =>
             {
-                var address = States.Instance.CurrentAvatarState.address;
+                var address = ClientStateViewProvider.Current.CurrentAvatarStateRaw.address;
                 callback?.Invoke(address == x.Key && x.Value);
             }).AddTo(_disposables);
         }
@@ -159,7 +160,7 @@ namespace Nekoyume.UI.Module.WorldBoss
         {
             _receivingGradeRewards.ObserveAdd().Subscribe(x =>
             {
-                var address = States.Instance.CurrentAvatarState.address;
+                var address = ClientStateViewProvider.Current.CurrentAvatarStateRaw.address;
                 callback?.Invoke(address == x.Key && x.Value);
             }).AddTo(_disposables);
         }
@@ -278,7 +279,7 @@ namespace Nekoyume.UI.Module.WorldBoss
 
         private static async UniTask<(WorldBossState worldBoss, RaiderState raiderState, int raidId, bool isOnSeason)> GetDataAsync()
         {
-            var avatarAddress = States.Instance.CurrentAvatarState.address;
+            var avatarAddress = ClientStateViewProvider.Current.CurrentAvatarStateRaw.address;
             var bossSheet = Game.Game.instance.TableSheets.WorldBossListSheet;
             var blockIndex = Game.Game.instance.Agent.BlockIndex;
 

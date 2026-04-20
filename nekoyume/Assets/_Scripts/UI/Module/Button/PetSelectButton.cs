@@ -1,4 +1,5 @@
 using Nekoyume.Game;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using System.Collections.Generic;
 using TMPro;
@@ -39,7 +40,7 @@ namespace Nekoyume.UI.Module
             notificationObject.SetActive(false);
 
             if (!petId.HasValue ||
-                !States.Instance.PetStates.TryGetPetState(petId.Value, out var petState))
+                !ClientStateViewProvider.Current.PetStatesRaw.TryGetPetState(petId.Value, out var petState))
             {
                 emptyObject.SetActive(true);
                 equippedObject.SetActive(false);

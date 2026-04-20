@@ -7,9 +7,12 @@ using Nekoyume.Action;
 using Nekoyume.Battle;
 using Nekoyume.Game;
 using Nekoyume.Helper;
-using Nekoyume.Model.EnumType;
 using Nekoyume.Model.Item;
+using Nekoyume.SingleClient.Models.EnumType;
+using Nekoyume.SingleClient.Models.Items;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
+using ItemType = Nekoyume.Model.Item.ItemType;
 using Nekoyume.UI.Model;
 using Nekoyume.UI.Scroller;
 using UnityEngine;
@@ -199,7 +202,7 @@ namespace Nekoyume.UI.Module
         {
             // get from _items by required item's condition
             var items = _items.Where(item =>
-                (Grade)item.ItemBase.Grade == requiredItem.Grade &&
+                ((Grade)item.ItemBase.Grade).ToLib9c() == requiredItem.Grade &&
                 item.ItemBase.ItemSubType == requiredItem.ItemSubType &&
                 !Synthesize.InvalidMaterialItemId.Contains(item.ItemBase.Id) &&
                 item.ItemBase is INonFungibleItem).ToList();
@@ -213,14 +216,14 @@ namespace Nekoyume.UI.Module
             {
                 case ItemType.Equipment:
                     items = items
-                        .OrderBy(item => CPHelper.GetCP(item.ItemBase as Equipment))
+                        .OrderBy(item => item.ItemBase.ToPolySnapshot() is EquipmentSnapshot synEqSnap ? synEqSnap.GetCP() : 0L)
                         .ToList();
                     UpdateEquipmentEquipped(items);
                     break;
                 case ItemType.Costume:
                     var costumeSheet = TableSheets.Instance.CostumeStatSheet;
                     items = items
-                        .OrderBy(item => CPHelper.GetCP(item.ItemBase as Costume, costumeSheet))
+                        .OrderBy(item => item.ItemBase.ToPolySnapshot() is CostumeSnapshot synCsSnap ? synCsSnap.GetCP(costumeSheet) : 0L)
                         .ToList();
                     UpdateCostumeEquipped(items);
                     break;
@@ -263,7 +266,7 @@ namespace Nekoyume.UI.Module
             var equippedEquipments = new List<Guid>();
             for (var i = 1; i < (int)BattleType.End; i++)
             {
-                equippedEquipments.AddRange(States.Instance.CurrentItemSlotStates[(BattleType)i].Equipments);
+                equippedEquipments.AddRange(ClientStateViewProvider.Current.CurrentItemSlotStatesRaw[((BattleType)i).ToLib9c()].Equipments);
             }
 
             foreach (var equipment in equipments)
@@ -279,7 +282,7 @@ namespace Nekoyume.UI.Module
             var equippedCostumes = new List<Guid>();
             for (var i = 1; i < (int)BattleType.End; i++)
             {
-                equippedCostumes.AddRange(States.Instance.CurrentItemSlotStates[(BattleType)i].Costumes);
+                equippedCostumes.AddRange(ClientStateViewProvider.Current.CurrentItemSlotStatesRaw[((BattleType)i).ToLib9c()].Costumes);
             }
 
             foreach (var costume in costumes)
@@ -334,7 +337,7 @@ namespace Nekoyume.UI.Module
                 return;
             }
 
-            if (_selectedModel.Grade != (Grade)itemBase.Grade)
+            if (_selectedModel.Grade != ((Grade)itemBase.Grade).ToLib9c())
             {
                 return;
             }

@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using Nekoyume.Helper;
 using Nekoyume.Model.Item;
+using Nekoyume.SingleClient.Models.Items;
 using Nekoyume.UI.Model;
 using Nekoyume.UI.Scroller;
 using UnityEngine;
+using ItemType = Nekoyume.Model.Item.ItemType;
 
 namespace Nekoyume.UI.Module
 {
@@ -61,11 +63,11 @@ namespace Nekoyume.UI.Module
             baseItemView.GradeHsv.saturation = data.GradeHsvSaturation;
             baseItemView.GradeHsv.value = data.GradeHsvValue;
 
-            if (model.ItemBase is Equipment equipment && equipment.level > 0)
+            if (model.ItemBase.ToPolySnapshot() is EquipmentSnapshot eqSnap && eqSnap.Level > 0)
             {
                 baseItemView.EnhancementText.gameObject.SetActive(true);
-                baseItemView.EnhancementText.text = $"+{equipment.level}";
-                if (equipment.level >= Util.VisibleEnhancementEffectLevel)
+                baseItemView.EnhancementText.text = $"+{eqSnap.Level}";
+                if (eqSnap.Level >= Util.VisibleEnhancementEffectLevel)
                 {
                     baseItemView.EnhancementImage.material = data.EnhancementMaterial;
                     baseItemView.EnhancementImage.gameObject.SetActive(true);
@@ -125,9 +127,9 @@ namespace Nekoyume.UI.Module
                 .Subscribe(b => baseItemView.MinusObject.SetActive(b))
                 .AddTo(Disposables);
 
-            if (model.ItemBase is Equipment equipmentItem)
+            if (model.ItemBase.ToPolySnapshot() is EquipmentSnapshot eqCraftSnap)
             {
-                baseItemView.CustomCraftArea.SetActive(equipmentItem.ByCustomCraft);
+                baseItemView.CustomCraftArea.SetActive(eqCraftSnap.ByCustomCraft);
             }
         }
 

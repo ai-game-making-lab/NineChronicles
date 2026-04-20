@@ -1,4 +1,6 @@
 using Nekoyume.Model.State;
+using Nekoyume.SingleClient.Blockchain;
+using Nekoyume.SingleClient.State;
 using Nekoyume.UI.Module;
 using System.Collections.Generic;
 using System.Linq;
@@ -66,7 +68,7 @@ namespace Nekoyume.UI
                             selectedBuffIcon.sprite = view.CurrentIcon;
                             selectedBuffBg.sprite = view.CurrentGradeData.BgSprite;
 
-                            var avatarAddress = States.Instance.CurrentAvatarState.address;
+                            var avatarAddress = ClientStateViewProvider.Current.CurrentAvatar?.Address.ToLibplanet() ?? default;
                             var key = string.Format("HackAndSlash.SelectedBonusSkillId.{0}", avatarAddress);
                             PlayerPrefs.SetInt(key, row.Id);
                         }
@@ -106,7 +108,7 @@ namespace Nekoyume.UI
                 viewParent.SetActive(true);
             }
 
-            var avatarAddress = States.Instance.CurrentAvatarState.address;
+            var avatarAddress = ClientStateViewProvider.Current.CurrentAvatar?.Address.ToLibplanet() ?? default;
             var key = string.Format("HackAndSlash.SelectedBonusSkillId.{0}", avatarAddress);
             var selectedId = PlayerPrefs.GetInt(key, 0);
             var contains = buffs.Any(x => x.Id == selectedId);
@@ -124,12 +126,12 @@ namespace Nekoyume.UI
         {
             Close();
 
-            var avatarAddress = States.Instance.CurrentAvatarState.address;
+            var avatarAddress = ClientStateViewProvider.Current.CurrentAvatar?.Address.ToLibplanet() ?? default;
             var key = string.Format("HackAndSlash.SelectedBonusSkillId.{0}", avatarAddress);
             PlayerPrefs.SetInt(key, 0);
             var hasEnoughStar =
                 Game.Game.instance.TableSheets.CrystalStageBuffGachaSheet.TryGetValue(_stageId, out var row)
-                && States.Instance.CrystalRandomSkillState.StarCount >= row.MaxStar;
+                && ClientStateViewProvider.Current.CrystalRandomSkillStateRaw.StarCount >= row.MaxStar;
             Find<BuffBonusPopup>().Show(_stageId, hasEnoughStar);
         }
     }

@@ -1,4 +1,5 @@
-﻿using Lib9c.DevExtensions.Model;
+﻿#if LIB9C_TOOLS || LIB9C_DEV_EXTENSIONS
+using Lib9c.DevExtensions.Model;
 
 namespace Nekoyume.Game.ScriptableObject
 {
@@ -7,3 +8,4 @@ namespace Nekoyume.Game.ScriptableObject
         public T Data;
     }
 }
+#endif

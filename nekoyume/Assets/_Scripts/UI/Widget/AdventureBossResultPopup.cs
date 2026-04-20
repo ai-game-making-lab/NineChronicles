@@ -3,6 +3,7 @@ using Nekoyume.Game;
 using Nekoyume.Game.Controller;
 using Nekoyume.L10n;
 using Nekoyume.Model.Item;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.TableData;
 using Nekoyume.UI.Model;
@@ -204,7 +205,7 @@ namespace Nekoyume.UI
                 CloseWithOtherWidgets();
                 Find<HeaderMenuStatic>().UpdateAssets(HeaderMenuStatic.AssetVisibleState.Battle);
                 var worldMap = Find<WorldMap>();
-                worldMap.Show(States.Instance.CurrentAvatarState.worldInformation, true);
+                worldMap.Show(ClientStateViewProvider.Current.CurrentAvatarStateRaw.worldInformation, true);
                 Game.Game.instance.AdventureBossData.RefreshAllByCurrentState().ContinueWith(() =>
                 {
                     Find<AdventureBoss>().Show();
@@ -231,7 +232,7 @@ namespace Nekoyume.UI
                 CloseWithOtherWidgets();
                 Find<HeaderMenuStatic>().UpdateAssets(HeaderMenuStatic.AssetVisibleState.Battle);
                 var worldMap = Find<WorldMap>();
-                worldMap.Show(States.Instance.CurrentAvatarState.worldInformation, true);
+                worldMap.Show(ClientStateViewProvider.Current.CurrentAvatarStateRaw.worldInformation, true);
                 Game.Game.instance.AdventureBossData.RefreshAllByCurrentState().ContinueWith(() =>
                 {
                     Find<AdventureBoss>().Show();

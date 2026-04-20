@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Nekoyume.Model.Stat;
+using Nekoyume.SingleClient.Models.TableData;
 using Nekoyume.TableData;
 using Nekoyume.TableData.Summon;
 using Nekoyume.UI.Scroller;
@@ -82,8 +83,11 @@ namespace Nekoyume.UI
                         RuneOptionInfo = runeOptionInfo,
                         Ratio = ratio
                     },
-                    SkillRow = skillRow,
-                    EquipmentOptionRow = equipmentOptionRow,
+                    // Project at the sheet-access boundary — SummonSkillsCell.Model now
+                    // stores client-owned row views; skillRow is never null at this point
+                    // because both branches assign it (equipment option or rune option).
+                    SkillRow = skillRow.ToView(),
+                    EquipmentOptionRow = equipmentOptionRow?.ToView(),
                 };
             }).Where(model => model != null).OrderBy(model => model.SummonDetailCellModel.Ratio);
             scroll.UpdateData(models, true);

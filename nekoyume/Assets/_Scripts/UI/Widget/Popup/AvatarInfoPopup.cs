@@ -5,6 +5,7 @@ using Nekoyume.Helper;
 using Nekoyume.L10n;
 using Nekoyume.Model.EnumType;
 using Nekoyume.Model.Mail;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.UI.Module;
 using Nekoyume.UI.Scroller;
@@ -187,7 +188,7 @@ namespace Nekoyume.UI
         {
             base.Show(ignoreShowAnimation);
 
-            var clearedStageId = States.Instance.CurrentAvatarState
+            var clearedStageId = ClientStateViewProvider.Current.CurrentAvatarStateRaw
                 .worldInformation.TryGetLastClearedStageId(out var stageId)
                 ? stageId
                 : 1;
@@ -267,13 +268,13 @@ namespace Nekoyume.UI
             arenaButton.HasNotification.Value = false;
             raidButton.HasNotification.Value = false;
 
-            var clearedStageId = States.Instance.CurrentAvatarState
+            var clearedStageId = ClientStateViewProvider.Current.CurrentAvatarStateRaw
                 .worldInformation.TryGetLastClearedStageId(out var id)
                 ? id
                 : 1;
-            var adventure = States.Instance.CurrentItemSlotStates[BattleType.Adventure];
-            var arena = States.Instance.CurrentItemSlotStates[BattleType.Arena];
-            var raid = States.Instance.CurrentItemSlotStates[BattleType.Raid];
+            var adventure = ClientStateViewProvider.Current.CurrentItemSlotStatesRaw[BattleType.Adventure];
+            var arena = ClientStateViewProvider.Current.CurrentItemSlotStatesRaw[BattleType.Arena];
+            var raid = ClientStateViewProvider.Current.CurrentItemSlotStatesRaw[BattleType.Raid];
             var bestEquipments = information.GetBestEquipments();
             foreach (var guid in bestEquipments)
             {
@@ -301,7 +302,7 @@ namespace Nekoyume.UI
                 var inventoryItems = information.GetBestRunes(battleType);
                 foreach (var inventoryItem in inventoryItems)
                 {
-                    var slots = States.Instance.CurrentRuneSlotStates[battleType].GetRuneSlot();
+                    var slots = ClientStateViewProvider.Current.CurrentRuneSlotStatesRaw[battleType].GetRuneSlot();
                     if (!slots.Exists(x => x.RuneId == inventoryItem.RuneState.RuneId))
                     {
                         switch (battleType)

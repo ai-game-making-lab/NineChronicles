@@ -1,4 +1,5 @@
 using Nekoyume.Model.State;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using System.Collections.Generic;
 using System.Linq;
@@ -61,7 +62,7 @@ namespace Nekoyume.UI.Module
             _stageId = currentStageId;
 
             var tableSheets = Game.Game.instance.TableSheets;
-            if (States.Instance.CurrentAvatarState.worldInformation.IsStageCleared(currentStageId) ||
+            if (ClientStateViewProvider.Current.CurrentAvatarStateRaw.worldInformation.IsStageCleared(currentStageId) ||
                 !tableSheets.CrystalStageBuffGachaSheet.TryGetValue(currentStageId, out var row))
             {
                 gameObject.SetActive(false);
@@ -88,10 +89,10 @@ namespace Nekoyume.UI.Module
 
         private void SetIcon()
         {
-            var skillState = States.Instance.CrystalRandomSkillState;
+            var skillState = ClientStateViewProvider.Current.CrystalRandomSkillStateRaw;
             var isBuffAvailable = skillState != null && _hasEnoughStars;
 
-            var avatarAddress = States.Instance.CurrentAvatarState.address;
+            var avatarAddress = ClientStateViewProvider.Current.CurrentAvatarStateRaw.address;
             var key = $"HackAndSlash.SelectedBonusSkillId.{avatarAddress}";
             var selectedId = PlayerPrefs.GetInt(key, 0);
 
@@ -139,7 +140,7 @@ namespace Nekoyume.UI.Module
 
         private void OnClickButton()
         {
-            var skillState = States.Instance.CrystalRandomSkillState;
+            var skillState = ClientStateViewProvider.Current.CrystalRandomSkillStateRaw;
 
             if (skillState is null ||
                 !skillState.SkillIds.Any())

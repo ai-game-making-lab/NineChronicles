@@ -9,13 +9,17 @@ using Nekoyume.L10n;
 using Nekoyume.Model.Item;
 using Nekoyume.Model.Stat;
 using Nekoyume.SingleClient.Models.Elemental;
+using Nekoyume.SingleClient.Models.Items;
 using Nekoyume.SingleClient.Models.Skills;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.UI.Module.Common;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using Material = Nekoyume.Model.Item.Material;
+using ItemType = Nekoyume.Model.Item.ItemType;
+using ItemSubType = Nekoyume.Model.Item.ItemSubType;
 
 namespace Nekoyume.UI.Module
 {
@@ -193,7 +197,7 @@ namespace Nekoyume.UI.Module
                         false,
                         TableSheets.Instance.CrystalEquipmentGrindingSheet,
                         TableSheets.Instance.CrystalMonsterCollectionMultiplierSheet,
-                        States.Instance.StakingLevel).MajorUnit;
+                        ClientStateViewProvider.Current.StakingLevel).MajorUnit;
                     descriptionArea.crystalText.text = L10nManager.Localize("UI_CRYSTAL_VALUE", crystal.ToCurrencyNotation());
 
                     break;
@@ -408,9 +412,9 @@ namespace Nekoyume.UI.Module
         private void UpdateExpText(ItemBase itemBase)
         {
             var exp = 0L;
-            if (itemBase is Equipment equipment)
+            if (itemBase.ToPolySnapshot() is EquipmentSnapshot eqSnap)
             {
-                exp = equipment.Exp;
+                exp = eqSnap.Exp;
             }
 
             expText.gameObject.SetActive(exp > 0);

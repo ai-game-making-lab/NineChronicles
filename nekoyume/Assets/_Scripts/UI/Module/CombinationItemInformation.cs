@@ -3,10 +3,14 @@ using System.Collections.Generic;
 using Nekoyume.Model.Item;
 using Nekoyume.Model.Stat;
 using Nekoyume.SingleClient.Models.Elemental;
+using Nekoyume.SingleClient.Models.Items;
+using Nekoyume.SingleClient.Models.Stats;
 using Nekoyume.UI.Model;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using ClientStatView = Nekoyume.SingleClient.Models.Stats.StatView;
+using Lib9cStatTypeMapper = Nekoyume.SingleClient.Models.Buffs.BuffViewMapper;
 
 namespace Nekoyume.UI.Module
 {
@@ -120,28 +124,28 @@ namespace Nekoyume.UI.Module
             }
 
             var statCount = 0;
-            if (Model.item.Value.ItemBase.Value is Equipment equipment)
+            if (Model.item.Value.ItemBase.Value.ToPolySnapshot() is EquipmentSnapshot eqSnap)
             {
-                var uniqueStatType = equipment.UniqueStatType;
-                foreach (var stat in equipment.StatsMap.GetDecimalStats(true))
+                var uniqueStatType = eqSnap.UniqueStatType;
+                foreach (var sv in eqSnap.StatsMap)
                 {
-                    if (!stat.StatType.Equals(uniqueStatType))
+                    if (!sv.StatType.Equals(uniqueStatType))
                     {
                         continue;
                     }
 
-                    AddStat(stat, true);
+                    AddStat(sv, true);
                     statCount++;
                 }
 
-                foreach (var stat in equipment.StatsMap.GetDecimalStats(true))
+                foreach (var sv in eqSnap.StatsMap)
                 {
-                    if (stat.StatType.Equals(uniqueStatType))
+                    if (sv.StatType.Equals(uniqueStatType))
                     {
                         continue;
                     }
 
-                    AddStat(stat);
+                    AddStat(sv);
                     statCount++;
                 }
             }
@@ -173,6 +177,31 @@ namespace Nekoyume.UI.Module
             }
 
             statView.Show(model, isMainStat);
+        }
+
+        // Client-DTO overload: projects a StatView snapshot onto the same BulletedStatView surface
+        // as the DecimalStat overload above. Kept side-by-side so Equipment-vs-ItemUsable branches
+        // can migrate independently off the Equipment downcast.
+        private void AddStat(ClientStatView model, bool isMainStat = false)
+        {
+            var statView = GetDisabledStatView();
+            if (statView is null)
+            {
+                throw new NotFoundComponentException<BulletedStatView>();
+            }
+
+            statView.bulletMainImage.enabled = isMainStat;
+            statView.bulletSubImage.enabled = !isMainStat;
+
+            var lib9cStatType = Lib9cStatTypeMapper.MapStatType(model.StatType);
+            if (isMainStat)
+            {
+                statView.Show(lib9cStatType, (long)model.BaseValue, (long)model.AdditionalValue);
+            }
+            else
+            {
+                statView.Show(lib9cStatType, (long)model.TotalValue, 0L);
+            }
         }
 
         private BulletedStatView GetDisabledStatView()

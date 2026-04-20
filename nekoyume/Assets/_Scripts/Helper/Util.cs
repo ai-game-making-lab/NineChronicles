@@ -19,6 +19,8 @@ using Nekoyume.Model;
 using Nekoyume.Model.EnumType;
 using Nekoyume.Model.Item;
 using Nekoyume.Model.State;
+using Nekoyume.SingleClient;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.TableData;
 using Org.BouncyCastle.Crypto.Digests;
@@ -50,7 +52,26 @@ namespace Nekoyume.Helper
 
         public static double BlockInterval => Blockchain.Policy.BlockPolicySource.BlockInterval.TotalSeconds;
 
-        public static async Task<Order> GetOrder(Guid orderId)
+        public static async Task<ClientOrder> GetClientOrder(Guid orderId)
+        {
+            var order = await GetOrder(orderId);
+            if (order is null)
+            {
+                return null;
+            }
+
+            return new ClientOrder(
+                order.OrderId,
+                order.TradableId,
+                order.ExpiredBlockIndex,
+                order.SellerAgentAddress,
+                order.SellerAvatarAddress,
+                order.ItemSubType,
+                order.Price,
+                order is FungibleOrder fungibleOrder ? fungibleOrder.ItemCount : 1);
+        }
+
+        private static async Task<Order> GetOrder(Guid orderId)
         {
             var address = Order.DeriveAddress(orderId);
             return await UniTask.RunOnThreadPool(async () =>
@@ -69,7 +90,7 @@ namespace Nekoyume.Helper
 
         public static async Task<string> GetItemNameByOrderId(Guid orderId, bool isNonColored = false)
         {
-            var order = await GetOrder(orderId);
+            var order = await GetClientOrder(orderId);
             if (order == null)
             {
                 return string.Empty;
@@ -198,14 +219,14 @@ namespace Nekoyume.Helper
             try
             {
                 var costumeIds = costumes.Select(costume => costume.Id);
-                States.Instance.CurrentAvatarState.ValidateItemRequirement(
+                ClientStateViewProvider.Current.CurrentAvatarStateRaw.ValidateItemRequirement(
                     costumeIds.Concat(foodIds).ToList(),
                     equipments,
                     tableSheets.ItemRequirementSheet,
                     tableSheets.EquipmentItemRecipeSheet,
                     tableSheets.EquipmentItemSubRecipeSheetV2,
                     tableSheets.EquipmentItemOptionSheet,
-                    States.Instance.CurrentAvatarState.address.ToHex());
+                    ClientStateViewProvider.Current.CurrentAvatarStateRaw.address.ToHex());
                 isValidated = true;
             }
             catch (Exception e)
@@ -247,13 +268,13 @@ namespace Nekoyume.Helper
 
             var costumeSheet = Game.Game.instance.TableSheets.CostumeStatSheet;
             var runeOptionSheet = Game.Game.instance.TableSheets.RuneOptionSheet;
-            var (equipments, costumes) = States.Instance.GetEquippedItems(battleType);
+            var (equipments, costumes) = ClientStateViewProvider.Current.GetEquippedItems(battleType);
             // 무한의 탑에서는 룬을 InfiniteTower 타입에서 가져옴 (EquipRune/UnequipRune과 동일한 로직)
             var runeBattleType = battleType;
-            var runeStates = States.Instance.GetEquippedRuneStates(runeBattleType);
+            var runeStates = ClientStateViewProvider.Current.GetEquippedRuneStates(runeBattleType);
             var runeOptionInfos = GetRuneOptions(runeStates, runeOptionSheet);
 
-            var allRuneState = States.Instance.AllRuneState;
+            var allRuneState = ClientStateViewProvider.Current.AllRuneStateRaw;
             var runeListSheet = Game.Game.instance.TableSheets.RuneListSheet;
             var runeLevelBonusSheet = Game.Game.instance.TableSheets.RuneLevelBonusSheet;
             var runeLevelBonus = RuneHelper.CalculateRuneLevelBonus(allRuneState,
@@ -285,11 +306,11 @@ namespace Nekoyume.Helper
 
             var costumeSheet = Game.Game.instance.TableSheets.CostumeStatSheet;
             var runeOptionSheet = Game.Game.instance.TableSheets.RuneOptionSheet;
-            var (equipments, costumes) = States.Instance.GetEquippedItems(BattleType.Adventure);
-            var runeStates = States.Instance.GetEquippedRuneStates(BattleType.Adventure);
+            var (equipments, costumes) = ClientStateViewProvider.Current.GetEquippedItems(BattleType.Adventure);
+            var runeStates = ClientStateViewProvider.Current.GetEquippedRuneStates(BattleType.Adventure);
             var runeOptionInfos = GetRuneOptions(runeStates, runeOptionSheet);
 
-            var allRuneState = States.Instance.AllRuneState;
+            var allRuneState = ClientStateViewProvider.Current.AllRuneStateRaw;
             var runeListSheet = Game.Game.instance.TableSheets.RuneListSheet;
             var runeLevelBonusSheet = Game.Game.instance.TableSheets.RuneLevelBonusSheet;
             var runeLevelBonus = RuneHelper.CalculateRuneLevelBonus(allRuneState,
@@ -313,13 +334,13 @@ namespace Nekoyume.Helper
 
             var costumeSheet = Game.Game.instance.TableSheets.CostumeStatSheet;
             var runeOptionSheet = Game.Game.instance.TableSheets.RuneOptionSheet;
-            var (equipments, costumes) = States.Instance.GetEquippedItems(BattleType.Adventure);
+            var (equipments, costumes) = ClientStateViewProvider.Current.GetEquippedItems(BattleType.Adventure);
 
             var previousRuneStates =
-                States.Instance.GetEquippedRuneStates(previousState, BattleType.Adventure);
+                ClientStateViewProvider.Current.GetEquippedRuneStates(previousState, BattleType.Adventure);
             var previousRuneOptionInfos = GetRuneOptions(previousRuneStates, runeOptionSheet);
             var currentRuneStates =
-                States.Instance.GetEquippedRuneStates(currentState, BattleType.Adventure);
+                ClientStateViewProvider.Current.GetEquippedRuneStates(currentState, BattleType.Adventure);
             var currentRuneOptionInfos = GetRuneOptions(currentRuneStates, runeOptionSheet);
 
             var runeListSheet = Game.Game.instance.TableSheets.RuneListSheet;
@@ -400,13 +421,13 @@ namespace Nekoyume.Helper
 
         public static int GetPortraitId(BattleType battleType)
         {
-            var (equipments, costumes) = States.Instance.GetEquippedItems(battleType);
+            var (equipments, costumes) = ClientStateViewProvider.Current.GetEquippedItems(battleType);
             return GetPortraitId(equipments, costumes);
         }
 
         public static int GetArmorId()
         {
-            var (equipments, costumes) = States.Instance.GetEquippedItems(BattleType.Adventure);
+            var (equipments, costumes) = ClientStateViewProvider.Current.GetEquippedItems(BattleType.Adventure);
             var id = GameConfig.DefaultAvatarArmorId;
             var armor = equipments.FirstOrDefault(x => x.ItemSubType == ItemSubType.Armor);
             if (armor != null)

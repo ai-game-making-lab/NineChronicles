@@ -7,6 +7,7 @@ using Nekoyume.Game;
 using Nekoyume.Game.Controller;
 using Nekoyume.L10n;
 using Nekoyume.Model.Item;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.UI.Model;
 using Nekoyume.UI.Module;
@@ -275,7 +276,7 @@ namespace Nekoyume.UI
                     CloseWithOtherWidgets();
 
                     // 로비 진입이 완료된 후 월드맵 표시
-                    Find<WorldMap>().Show(States.Instance.CurrentAvatarState.worldInformation, true);
+                    Find<WorldMap>().Show(ClientStateViewProvider.Current.CurrentAvatarStateRaw.worldInformation, true);
 
                     // 콜백 실행
                     onLobbyEnterEnd(infiniteTower, loading);

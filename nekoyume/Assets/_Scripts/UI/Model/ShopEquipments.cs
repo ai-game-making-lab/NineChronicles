@@ -1,9 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Numerics;
-using Lib9c.Model.Order;
-using Libplanet.Crypto;
-using Libplanet.Types.Assets;
 
 namespace Nekoyume.UI.Model
 {
@@ -29,12 +25,6 @@ namespace Nekoyume.UI.Model
         public int itemCount;
         public string itemSubType;
 
-        public OrderDigest ToOrderDigest(Currency currency)
-        {
-            return new OrderDigest(new Address(sellerAgentAddress), sellStartedBlockIndex,
-                sellExpiredBlockIndex, Guid.Parse(orderId), Guid.Parse(tradableId),
-                (BigInteger)price * currency, combatPoint, level, id, itemCount);
-        }
     }
 
     [Serializable]

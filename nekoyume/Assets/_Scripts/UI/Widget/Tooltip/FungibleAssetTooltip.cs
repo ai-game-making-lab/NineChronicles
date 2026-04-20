@@ -2,13 +2,14 @@ using System;
 using System.Linq;
 using System.Numerics;
 using Coffee.UIEffects;
-using Lib9c;
 using Libplanet.Types.Assets;
 using Nekoyume.Action;
 using Nekoyume.EnumType;
 using Nekoyume.Game.Character;
 using Nekoyume.Helper;
 using Nekoyume.L10n;
+using Nekoyume.SingleClient;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.UI.Model;
 using Nekoyume.UI.Module;
@@ -143,7 +144,7 @@ namespace Nekoyume.UI
         {
             buy.gameObject.SetActive(true);
             sell.gameObject.SetActive(false);
-            buy.Set((BigInteger)item.FungibleAssetProduct.Price * States.Instance.GoldBalanceState.Gold.Currency,
+            buy.Set((BigInteger)item.FungibleAssetProduct.Price * ClientStateViewProvider.Current.CurrentAgentGoldBalanceFav.Currency,
                 () =>
                 {
                     onBuy?.Invoke();
@@ -247,7 +248,7 @@ namespace Nekoyume.UI
                     id = runeData.id;
                 }
 
-                var rune = Currencies.GetRune(ticker);
+                var rune = ClientCurrencies.GetRune(ticker);
                 tradable = !RegisterProduct.NonTradableTickerCurrencies.Contains(rune);
             }
 

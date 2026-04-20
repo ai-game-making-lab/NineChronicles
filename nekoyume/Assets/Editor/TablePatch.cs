@@ -1,3 +1,4 @@
+#if LIB9C_TOOLS
 using System;
 using System.IO;
 using System.Linq;
@@ -94,3 +95,4 @@ namespace NekoyumeEditor
         }
     }
 }
+#endif

@@ -12,6 +12,7 @@ using Nekoyume.Model.EnumType;
 using Nekoyume.Model.Item;
 using Nekoyume.Model.Mail;
 using Nekoyume.Model.State;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.TableData;
 using Nekoyume.TableData.Event;
@@ -189,7 +190,7 @@ namespace Nekoyume.UI
                     else
                     {
                         var (count1, count2) = GetPlayCount(_stageRow, _apStoneCount.Value, _ap.Value,
-                            States.Instance.StakingLevel);
+                            ClientStateViewProvider.Current.StakingLevel);
                         _repeatBattleAction(
                             StageType.HackAndSlash,
                             count1 + count2,
@@ -239,7 +240,7 @@ namespace Nekoyume.UI
             _eventDungeonId = 0;
             _eventDungeonStageId = 0;
             _repeatBattleAction = repeatBattleAction;
-            var disableRepeat = States.Instance.CurrentAvatarState.worldInformation.IsStageCleared(stageId);
+            var disableRepeat = ClientStateViewProvider.Current.CurrentAvatarStateRaw.worldInformation.IsStageCleared(stageId);
             canvasGroupForRepeat.alpha = disableRepeat ? 0 : 1;
             canvasGroupForRepeat.interactable = !disableRepeat;
             pageToggle.isOn = disableRepeat;
@@ -332,7 +333,7 @@ namespace Nekoyume.UI
 
                 var materialSheet = TableSheets.Instance.MaterialItemSheet;
                 var haveApStoneCount =
-                    States.Instance.CurrentAvatarState.inventory.GetUsableItemCount(
+                    ClientStateViewProvider.Current.CurrentAvatarStateRaw.inventory.GetUsableItemCount(
                         materialSheet.Values.First(r => r.ItemSubType == ItemSubType.ApStone).Id,
                         Game.Game.instance.Agent?.BlockIndex ?? -1);
                 apStoneSlider.Set(0,
@@ -346,14 +347,14 @@ namespace Nekoyume.UI
                 haveApText.text = haveApCount.ToString();
                 haveApStoneText.text = haveApStoneCount.ToString();
 
-                _costAp = States.Instance.StakingLevel > 0
+                _costAp = ClientStateViewProvider.Current.StakingLevel > 0
                     ? TableSheets.Instance.StakeActionPointCoefficientSheet.GetActionPointByStaking(
-                        _stageRow.CostAP, 1, States.Instance.StakingLevel)
+                        _stageRow.CostAP, 1, ClientStateViewProvider.Current.StakingLevel)
                     : _stageRow.CostAP;
                 apSlider.Set(0,
                     (int)(haveApCount / _costAp),
                     (int)haveApCount / _costAp,
-                    States.Instance.GameConfigState.ActionPointMax,
+                    ClientStateViewProvider.Current.CurrentGameConfigStateRaw.ActionPointMax,
                     _costAp,
                     x => _ap.Value = x * _costAp);
                 descriptionText.text = L10nManager.Localize("UI_BOOSTER_POPUP_DESCRIPTION");
@@ -386,14 +387,14 @@ namespace Nekoyume.UI
                     haveApText.text = haveApCount.ToString();
                     haveApStoneText.text = haveApStoneCount.ToString();
 
-                    _costAp = States.Instance.StakingLevel > 0
+                    _costAp = ClientStateViewProvider.Current.StakingLevel > 0
                         ? TableSheets.Instance.StakeActionPointCoefficientSheet.GetActionPointByStaking(
-                            _stageRow.CostAP, 1, States.Instance.StakingLevel)
+                            _stageRow.CostAP, 1, ClientStateViewProvider.Current.StakingLevel)
                         : _stageRow.CostAP;
                     apSlider.Set(0,
                         (int)(haveApCount / _costAp),
                         (int)haveApCount / _costAp,
-                        States.Instance.GameConfigState.ActionPointMax,
+                        ClientStateViewProvider.Current.CurrentGameConfigStateRaw.ActionPointMax,
                         _costAp,
                         x => _ap.Value = x * _costAp);
 
@@ -466,7 +467,7 @@ namespace Nekoyume.UI
 
             var available = GetEntryCostAvailable();
 
-            var (apPlayCount, apStonePlayCount) = GetPlayCount(_stageRow, _apStoneCount.Value, _ap.Value, States.Instance.StakingLevel);
+            var (apPlayCount, apStonePlayCount) = GetPlayCount(_stageRow, _apStoneCount.Value, _ap.Value, ClientStateViewProvider.Current.StakingLevel);
             var totalPlayCount = apPlayCount + apStonePlayCount;
             var needed = totalPlayCount * _entryCostItemCount;
             var countColor = available >= needed
@@ -479,7 +480,7 @@ namespace Nekoyume.UI
 
         private int GetEntryCostAvailable()
         {
-            var inventory = States.Instance.CurrentAvatarState?.inventory;
+            var inventory = ClientStateViewProvider.Current.CurrentAvatarStateRaw?.inventory;
             var blockIndex = Game.Game.instance.Agent?.BlockIndex ?? -1;
             var costType = (CostType)_entryCostItemId;
             return costType switch
@@ -521,7 +522,7 @@ namespace Nekoyume.UI
 
         private void UpdateView()
         {
-            var avatarState = States.Instance.CurrentAvatarState;
+            var avatarState = ClientStateViewProvider.Current.CurrentAvatarStateRaw;
             if (avatarState is null)
             {
                 return;
@@ -543,7 +544,7 @@ namespace Nekoyume.UI
                 }
 
                 var (apPlayCount, apStonePlayCount) =
-                    GetPlayCount(_stageRow, _apStoneCount.Value, _ap.Value, States.Instance.StakingLevel);
+                    GetPlayCount(_stageRow, _apStoneCount.Value, _ap.Value, ClientStateViewProvider.Current.StakingLevel);
                 UpdateRewardView(avatarState, _stageRow, apPlayCount, apStonePlayCount);
 
                 var totalPlayCount = apPlayCount + apStonePlayCount;
@@ -640,7 +641,7 @@ namespace Nekoyume.UI
                 return (0, 0);
             }
 
-            var actionMaxPoint = States.Instance.GameConfigState.ActionPointMax;
+            var actionMaxPoint = ClientStateViewProvider.Current.CurrentGameConfigStateRaw.ActionPointMax;
             var costAp = row.CostAP;
             if (stakingLevel > 0)
             {
@@ -715,7 +716,7 @@ namespace Nekoyume.UI
 
                 if (_entryCostItemId > 0 && _entryCostItemCount > 0)
                 {
-                    var (apPlayCount, apStonePlayCount) = GetPlayCount(_stageRow, _apStoneCount.Value, _ap.Value, States.Instance.StakingLevel);
+                    var (apPlayCount, apStonePlayCount) = GetPlayCount(_stageRow, _apStoneCount.Value, _ap.Value, ClientStateViewProvider.Current.StakingLevel);
                     var totalPlayCount = apPlayCount + apStonePlayCount;
                     if (totalPlayCount * _entryCostItemCount > GetEntryCostAvailable())
                     {
@@ -730,9 +731,9 @@ namespace Nekoyume.UI
 
         private void Sweep(int apStoneCount, int ap, int worldId, StageSheet.Row stageRow)
         {
-            var avatarState = States.Instance.CurrentAvatarState;
+            var avatarState = ClientStateViewProvider.Current.CurrentAvatarStateRaw;
             var (apPlayCount, apStonePlayCount)
-                = GetPlayCount(stageRow, apStoneCount, ap, States.Instance.StakingLevel);
+                = GetPlayCount(stageRow, apStoneCount, ap, ClientStateViewProvider.Current.StakingLevel);
             var totalPlayCount = apPlayCount + apStonePlayCount;
             var actionPoint = apPlayCount * _costAp;
             if (totalPlayCount <= 0)
@@ -757,9 +758,9 @@ namespace Nekoyume.UI
                 return;
             }
 
-            var costumes = States.Instance.CurrentItemSlotStates[BattleType.Adventure].Costumes;
-            var equipments = States.Instance.CurrentItemSlotStates[BattleType.Adventure].Equipments;
-            var runeInfos = States.Instance.CurrentRuneSlotStates[BattleType.Adventure]
+            var costumes = ClientStateViewProvider.Current.CurrentItemSlotStatesRaw[BattleType.Adventure].Costumes;
+            var equipments = ClientStateViewProvider.Current.CurrentItemSlotStatesRaw[BattleType.Adventure].Equipments;
+            var runeInfos = ClientStateViewProvider.Current.CurrentRuneSlotStatesRaw[BattleType.Adventure]
                 .GetEquippedRuneSlotInfos();
             Game.Game.instance.ActionManager.HackAndSlashSweep(
                 costumes,
@@ -780,7 +781,7 @@ namespace Nekoyume.UI
 
         private void EventDungeonSweep(int ticketCount)
         {
-            var avatarState = States.Instance.CurrentAvatarState;
+            var avatarState = ClientStateViewProvider.Current.CurrentAvatarStateRaw;
             var playCount = ticketCount;
 
             if (playCount <= 0)
@@ -799,9 +800,9 @@ namespace Nekoyume.UI
                 return;
             }
 
-            var costumes = States.Instance.CurrentItemSlotStates[BattleType.Adventure].Costumes;
-            var equipments = States.Instance.CurrentItemSlotStates[BattleType.Adventure].Equipments;
-            var runeInfos = States.Instance.CurrentRuneSlotStates[BattleType.Adventure]
+            var costumes = ClientStateViewProvider.Current.CurrentItemSlotStatesRaw[BattleType.Adventure].Costumes;
+            var equipments = ClientStateViewProvider.Current.CurrentItemSlotStatesRaw[BattleType.Adventure].Equipments;
+            var runeInfos = ClientStateViewProvider.Current.CurrentRuneSlotStatesRaw[BattleType.Adventure]
                 .GetEquippedRuneSlotInfos();
 
             // Event dungeon sweep uses only tickets, no AP stones

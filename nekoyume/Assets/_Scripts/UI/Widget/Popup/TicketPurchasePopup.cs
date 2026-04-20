@@ -1,6 +1,7 @@
 ﻿using Nekoyume.L10n;
 using Libplanet.Types.Assets;
 using Nekoyume.Game.Controller;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.UI.Module;
 using TMPro;
@@ -81,7 +82,7 @@ namespace Nekoyume.UI
             ticketIcon.overrideSprite = costIconData.GetIcon(ticketType);
             costIcon.overrideSprite = costIconData.GetIcon(costType);
 
-            var balance = States.Instance.GoldBalanceState.Gold;
+            var balance = ClientStateViewProvider.Current.CurrentAgentGoldBalanceFav;
             var enoughBalance = balance >= cost;
 
             costContainer.SetActive(true);

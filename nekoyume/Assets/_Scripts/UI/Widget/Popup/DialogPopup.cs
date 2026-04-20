@@ -6,7 +6,10 @@ using Libplanet.Crypto;
 using Nekoyume.Game.Controller;
 using Nekoyume.Helper;
 using Nekoyume.L10n;
+using Nekoyume.SingleClient.Blockchain;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
+using Address = Libplanet.Crypto.Address;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -47,13 +50,14 @@ namespace Nekoyume.UI
 
         public static bool TryGetPlayerPrefsKeyOfCurrentAvatarState(int dialogId, out string key)
         {
-            if (States.Instance.CurrentAvatarState is null)
+            var currentAvatar = ClientStateViewProvider.Current.CurrentAvatar;
+            if (currentAvatar is null)
             {
                 key = default;
                 return false;
             }
 
-            key = GetPlayerPrefsKey(States.Instance.CurrentAvatarState.address, dialogId);
+            key = GetPlayerPrefsKey(currentAvatar.Value.Address.ToLibplanet(), dialogId);
             return true;
         }
 
@@ -65,12 +69,13 @@ namespace Nekoyume.UI
 
         public static void DeleteDialogPlayerPrefsOfCurrentAvatarState()
         {
-            if (States.Instance.CurrentAvatarState is null)
+            var currentAvatar = ClientStateViewProvider.Current.CurrentAvatar;
+            if (currentAvatar is null)
             {
                 return;
             }
 
-            DeleteDialogPlayerPrefs(States.Instance.CurrentAvatarState.address);
+            DeleteDialogPlayerPrefs(currentAvatar.Value.Address.ToLibplanet());
         }
 
         public static void DeleteDialogPlayerPrefs(Address address)

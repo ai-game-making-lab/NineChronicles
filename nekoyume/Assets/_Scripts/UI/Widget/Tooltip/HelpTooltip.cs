@@ -5,6 +5,7 @@ using System.Text;
 using DG.Tweening;
 using Nekoyume.Game.Controller;
 using Nekoyume.Pool;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.UI.Tween;
 using TMPro;
@@ -141,13 +142,13 @@ namespace Nekoyume.UI
             if (showOnceForEachAgentAddress)
             {
                 if (PlayerPrefs.HasKey(
-                    $"{nameof(HelpTooltip)}_{id}_{States.Instance.AgentState.address}"))
+                    $"{nameof(HelpTooltip)}_{id}_{ClientStateViewProvider.Current.CurrentAgent.Address}"))
                 {
                     return;
                 }
 
                 PlayerPrefs.SetInt(
-                    $"{nameof(HelpTooltip)}_{id}_{States.Instance.AgentState.address}",
+                    $"{nameof(HelpTooltip)}_{id}_{ClientStateViewProvider.Current.CurrentAgent.Address}",
                     1);
             }
 

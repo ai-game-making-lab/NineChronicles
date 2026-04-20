@@ -1,11 +1,10 @@
 using System;
 using System.Collections.Generic;
-using Nekoyume.Model.Item;
+using Nekoyume.SingleClient.Models.Items;
 using UnityEngine;
 
 namespace Nekoyume.UI.Module
 {
-    using Helper;
     using UniRx;
 
     [RequireComponent(typeof(BaseItemView))]
@@ -16,9 +15,15 @@ namespace Nekoyume.UI.Module
 
         private readonly List<IDisposable> _disposables = new();
 
-        public void Set(ItemBase itemBase, int count)
+        /// <summary>
+        /// Snapshot-facing primary overload. Renders icon, grade panel, and the custom-craft
+        /// decoration using <see cref="IItemSnapshot"/> + <see cref="EquipmentSnapshot"/> fields
+        /// only — callers that still hold a lib9c <c>ItemBase</c> should project via
+        /// <c>ItemSnapshotMapper.ToPolySnapshot()</c> before calling.
+        /// </summary>
+        public void Set(IItemSnapshot snapshot, int count)
         {
-            if (itemBase == null)
+            if (snapshot is null)
             {
                 return;
             }
@@ -29,14 +34,14 @@ namespace Nekoyume.UI.Module
             baseItemView.TouchHandler.gameObject.SetActive(false);
             baseItemView.MinusObject.gameObject.SetActive(false);
 
-            var data = baseItemView.GetItemViewData(itemBase);
+            var data = baseItemView.GetItemViewData(snapshot);
             baseItemView.GradeImage.overrideSprite = data.GradeBackground;
             baseItemView.GradeHsv.range = data.GradeHsvRange;
             baseItemView.GradeHsv.hue = data.GradeHsvHue;
             baseItemView.GradeHsv.saturation = data.GradeHsvSaturation;
             baseItemView.GradeHsv.value = data.GradeHsvValue;
 
-            baseItemView.ItemImage.overrideSprite = BaseItemView.GetItemIcon(itemBase);
+            baseItemView.ItemImage.overrideSprite = BaseItemView.GetItemIcon(snapshot);
             baseItemView.SpineItemImage.gameObject.SetActive(false);
             baseItemView.EnhancementImage.gameObject.SetActive(false);
             baseItemView.EnhancementText.gameObject.SetActive(false);
@@ -47,9 +52,9 @@ namespace Nekoyume.UI.Module
             baseItemView.SelectCollectionObject.SetActive(false);
             baseItemView.SelectArrowObject.SetActive(false);
 
-            if (itemBase is Equipment equipmentItem)
+            if (snapshot is EquipmentSnapshot equipmentSnapshot)
             {
-                baseItemView.CustomCraftArea.SetActive(equipmentItem.ByCustomCraft);
+                baseItemView.CustomCraftArea.SetActive(equipmentSnapshot.ByCustomCraft);
             }
         }
     }

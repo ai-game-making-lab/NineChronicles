@@ -3,6 +3,7 @@ using Libplanet.Types.Assets;
 using Nekoyume.Game;
 using Nekoyume.Helper;
 using Nekoyume.Model.AdventureBoss;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.UI;
 using Nekoyume.UI.Model;
@@ -94,7 +95,7 @@ namespace Nekoyume
 
                 if(!Game.Game.instance.AdventureBossData.EndedExploreInfos.TryGetValue(seasonIndex, out var prevExploreInfo))
                 {
-                    prevExploreInfo = await Game.Game.instance.Agent.GetExploreInfoAsync(States.Instance.CurrentAvatarState.address, seasonIndex);
+                    prevExploreInfo = await Game.Game.instance.Agent.GetExploreInfoAsync(ClientStateViewProvider.Current.CurrentAvatarStateRaw.address, seasonIndex);
                 }
 
                 var myBountyRewardsData = new ClaimableReward
@@ -121,7 +122,7 @@ namespace Nekoyume
                                 prevBountyBoard,
                                 Game.Game.instance.States.CurrentAvatarState.address,
                                 TableSheets.Instance.AdventureBossNcgRewardRatioSheet,
-                                States.Instance.GameConfigState.AdventureBossNcgRuneRatio,
+                                ClientStateViewProvider.Current.CurrentGameConfigStateRaw.AdventureBossNcgRuneRatio,
                                 out var wantedReward);
                         }
                     }
@@ -130,7 +131,7 @@ namespace Nekoyume
                         NcDebug.LogError(e);
                     }
                     totalBounty.text = prevBountyBoard.totalBounty().MajorUnit.ToString("#,0");
-                    var investor = prevBountyBoard.Investors.FirstOrDefault(inv => inv.AvatarAddress == States.Instance.CurrentAvatarState.address);
+                    var investor = prevBountyBoard.Investors.FirstOrDefault(inv => inv.AvatarAddress == ClientStateViewProvider.Current.CurrentAvatarStateRaw.address);
                     if (investor != null)
                     {
                         myBounty.text = investor.Price.MajorUnit.ToString("#,0");
@@ -154,8 +155,8 @@ namespace Nekoyume
                         prevExploreInfo,
                         prevExploreInfo.AvatarAddress,
                         TableSheets.Instance.AdventureBossNcgRewardRatioSheet,
-                        States.Instance.GameConfigState.AdventureBossNcgApRatio,
-                        States.Instance.GameConfigState.AdventureBossNcgRuneRatio,
+                        ClientStateViewProvider.Current.CurrentGameConfigStateRaw.AdventureBossNcgApRatio,
+                        ClientStateViewProvider.Current.CurrentGameConfigStateRaw.AdventureBossNcgRuneRatio,
                         false,
                         out var ncgReward);
                     }

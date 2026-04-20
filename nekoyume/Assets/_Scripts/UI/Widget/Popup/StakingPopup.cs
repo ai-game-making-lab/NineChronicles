@@ -2,7 +2,6 @@ using System;
 using System.Linq;
 using System.Numerics;
 using Cysharp.Threading.Tasks;
-using Lib9c;
 using Libplanet.Types.Assets;
 using Nekoyume.Blockchain;
 using Nekoyume.EnumType;
@@ -15,6 +14,9 @@ using Nekoyume.Model.Item;
 using Nekoyume.Model.Mail;
 using Nekoyume.Model.State;
 using Nekoyume.Module.Guild;
+using Nekoyume.SingleClient;
+using Nekoyume.SingleClient.Models.Items;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.TableData;
 using Nekoyume.UI.Module;
@@ -110,7 +112,7 @@ namespace Nekoyume.UI
             _toggleGroup.RegisterToggleable(levelBenefitsTabButton);
             currentBenefitsTabButton.OnClick.Subscribe(_ =>
             {
-                if (States.Instance.StakeStateV2.HasValue)
+                if (ClientStateViewProvider.Current.StakeStateV2Raw.HasValue)
                 {
                     currentBenefitsTab.SetActive(true);
                     levelBenefitsTab.SetActive(false);
@@ -141,7 +143,7 @@ namespace Nekoyume.UI
             {
                 AudioController.PlayClick();
                 ActionManager.Instance
-                    .ClaimStakeReward(States.Instance.CurrentAvatarState.address)
+                    .ClaimStakeReward(ClientStateViewProvider.Current.CurrentAvatarStateRaw.address)
                     .Subscribe();
                 LoadingHelper.ClaimStakeReward.Value = true;
                 archiveButton.UpdateObjects();
@@ -162,8 +164,8 @@ namespace Nekoyume.UI
             informationBg.OnClick = () => { stakingInformationObject.SetActive(false); };
             stakingNcgInputField.onEndEdit.AddListener(value =>
             {
-                var totalDeposit = (States.Instance.GoldBalanceState.Gold +
-                        States.Instance.StakedBalance)
+                var totalDeposit = (ClientStateViewProvider.Current.CurrentGoldBalanceStateRaw.Gold +
+                        ClientStateViewProvider.Current.StakedBalanceRaw)
                     .MajorUnit;
                 stakingNcgInputField.textComponent.color =
                     BigInteger.TryParse(value, out var inputBigInt) && totalDeposit < inputBigInt
@@ -198,7 +200,7 @@ namespace Nekoyume.UI
             OnChangeEditingState(false);
             SetView();
 
-            if (!States.Instance.StakeStateV2.HasValue)
+            if (!ClientStateViewProvider.Current.StakeStateV2Raw.HasValue)
             {
                 stakingInformationObject.SetActive(true);
             }
@@ -217,7 +219,7 @@ namespace Nekoyume.UI
             unbondButton.UpdateObjects();
             unbondButton.gameObject.SetActive(false);
             unbondBlockText.gameObject.SetActive(false);
-            var agentAddress = States.Instance.AgentState.address;
+            var agentAddress = ClientStateViewProvider.Current.CurrentAgentStateRaw.address;
             var blockTipStateRootHash = Game.Game.instance.Agent.BlockTipStateRootHash;
             var value = await agent.GetUnbondClaimableHeightByStateRootHashAsync(blockTipStateRootHash, agentAddress);
             editSaveButton.SetCondition(() => true);
@@ -244,7 +246,7 @@ namespace Nekoyume.UI
         {
             sharePowerText.gameObject.SetActive(false);
             var agent = Game.Game.instance.Agent;
-            var agentAddress = States.Instance.AgentState.address;
+            var agentAddress = ClientStateViewProvider.Current.CurrentAgentStateRaw.address;
             var blockTipStateRootHash = Game.Game.instance.Agent.BlockTipStateRootHash;
             var rawValue = await agent.GetDelegationInfoByStateRootHashAsync(blockTipStateRootHash, agentAddress);
             // rawValue: [userShared, allShared, delegateGuildGold]
@@ -259,7 +261,7 @@ namespace Nekoyume.UI
             var allShared = rawValue[1].ToBigInteger();
             var delegateGuildGold = rawValue[2].ToFungibleAssetValue();
             var delegatedNcg = GuildModule.ConvertCurrency(delegateGuildGold,
-                States.Instance.GoldBalanceState.Gold.Currency).TargetFAV;
+                ClientStateViewProvider.Current.CurrentGoldBalanceStateRaw.Gold.Currency).TargetFAV;
             NcDebug.Log($"[{nameof(StakingPopup)}] DelegationInfoByBlockHash: {userShared}, {allShared}, {delegatedNcg}");
             allShared /= 1000000000000000000;
             userShared /= 10000000000000000; // 백분율 표기를 위해 allShared보다 100배 작게 나눔
@@ -293,7 +295,7 @@ namespace Nekoyume.UI
             ncgArchiveButton.Interactable = false;
             ncgArchiveButton.UpdateObjects();
 
-            var agentAddress = States.Instance.AgentState.address;
+            var agentAddress = ClientStateViewProvider.Current.CurrentAgentStateRaw.address;
             var blockTipStateRootHash = Game.Game.instance.Agent.BlockTipStateRootHash;
             var claimableRewards = await agent.GetClaimableRewardsByStateRootHashAsync(blockTipStateRootHash, agentAddress);
             if (claimableRewards.Count < 0)
@@ -336,18 +338,18 @@ namespace Nekoyume.UI
 
         public void SetView()
         {
-            var deposit = States.Instance.StakedBalance.MajorUnit;
+            var deposit = ClientStateViewProvider.Current.StakedBalanceRaw.MajorUnit;
             var blockIndex = Game.Game.instance.Agent.BlockIndex;
 
             OnDepositSet(deposit);
             OnBlockUpdated(blockIndex);
 
             // can not category UI toggle when user has not StakeState.
-            var hasStakeState = States.Instance.StakeStateV2.HasValue;
+            var hasStakeState = ClientStateViewProvider.Current.StakeStateV2Raw.HasValue;
 
             // if StakePolicySheet has diff with my StakeStateV2.Contract, require migration
             var requiredMigrate = hasStakeState &&
-                States.Instance.StakeStateV2.Value.Contract
+                ClientStateViewProvider.Current.StakeStateV2Raw.Value.Contract
                     .StakeRegularRewardSheetTableName !=
                 TableSheets.Instance.StakePolicySheet
                     .StakeRegularRewardSheetValue;
@@ -396,8 +398,8 @@ namespace Nekoyume.UI
 
         private void OnClickEditButton()
         {
-            var deposit = States.Instance.StakedBalance.MajorUnit;
-            if (deposit == 0 && States.Instance.GoldBalanceState.Gold.MajorUnit < 50)
+            var deposit = ClientStateViewProvider.Current.StakedBalanceRaw.MajorUnit;
+            if (deposit == 0 && ClientStateViewProvider.Current.CurrentGoldBalanceStateRaw.Gold.MajorUnit < 50)
             {
                 OneLineSystem.Push(MailType.System,
                     L10nManager.Localize("UI_REQUIRE_STAKE_MINIMUM_NCG_FORMAT", 50),
@@ -413,13 +415,13 @@ namespace Nekoyume.UI
 
         private void OnClickMigrateButton()
         {
-            if (!States.Instance.StakeStateV2.HasValue)
+            if (!ClientStateViewProvider.Current.StakeStateV2Raw.HasValue)
             {
                 NcDebug.LogWarning("[StakingPopup] invoked OnClickMigrateButton(), but not has StakeState.");
                 return;
             }
 
-            var stakeState = States.Instance.StakeStateV2.Value;
+            var stakeState = ClientStateViewProvider.Current.StakeStateV2Raw.Value;
             var currentBlockIndex = Game.Game.instance.Agent.BlockIndex;
             if (stakeState.ClaimableBlockIndex <= currentBlockIndex)
             {
@@ -445,8 +447,8 @@ namespace Nekoyume.UI
             var disposable = confirmUI.ContentText.SubscribeForClickLink(linkInfo => { Util.OpenURL(linkInfo.GetLinkID()); });
             confirmUI.ConfirmCallback = () =>
             {
-                var majorUnit = States.Instance.StakedBalance.MajorUnit;
-                var avatarAddress = States.Instance.CurrentAvatarState.address;
+                var majorUnit = ClientStateViewProvider.Current.StakedBalanceRaw.MajorUnit;
+                var avatarAddress = ClientStateViewProvider.Current.CurrentAvatarStateRaw.address;
                 ActionManager.Instance.Stake(majorUnit, avatarAddress).Subscribe();
                 disposable.Dispose();
                 OnChangeEditingState(false);
@@ -465,7 +467,7 @@ namespace Nekoyume.UI
                 return;
             }
 
-            if (inputBigInt == States.Instance.StakedBalance.MajorUnit)
+            if (inputBigInt == ClientStateViewProvider.Current.StakedBalanceRaw.MajorUnit)
             {
                 OneLineSystem.Push(MailType.System,
                     L10nManager.Localize("UI_REQUIRE_DIFF_VALUE_WITH_EXIST"),
@@ -481,8 +483,8 @@ namespace Nekoyume.UI
                 return;
             }
 
-            var totalDepositNcg = States.Instance.GoldBalanceState.Gold +
-                States.Instance.StakedBalance;
+            var totalDepositNcg = ClientStateViewProvider.Current.CurrentGoldBalanceStateRaw.Gold +
+                ClientStateViewProvider.Current.StakedBalanceRaw;
             if (inputBigInt > totalDepositNcg.MajorUnit)
             {
                 Find<PaymentPopup>().ShowLackPaymentNCG(inputBigInt.ToString(), true);
@@ -494,8 +496,8 @@ namespace Nekoyume.UI
             var confirmTitle = "UI_ITEM_INFORMATION";
             var confirmContent = "UI_INTRODUCE_STAKING";
             var confirmIcon = IconAndButtonSystem.SystemType.Information;
-            var nullableStakeState = States.Instance.StakeStateV2;
-            if (nullableStakeState.HasValue && inputBigInt < States.Instance.StakedBalance.MajorUnit)
+            var nullableStakeState = ClientStateViewProvider.Current.StakeStateV2Raw;
+            if (nullableStakeState.HasValue && inputBigInt < ClientStateViewProvider.Current.StakedBalanceRaw.MajorUnit)
             {
                 var blockIndex = Game.Game.instance.Agent.BlockIndex;
                 if (_getUnbondClaimableHeight != -1 && blockIndex < _getUnbondClaimableHeight)
@@ -516,7 +518,7 @@ namespace Nekoyume.UI
             confirmUI.ConfirmCallback = () =>
             {
                 var majorUnit = BigInteger.Parse(stakingNcgInputField.text);
-                var avatarAddress = States.Instance.CurrentAvatarState.address;
+                var avatarAddress = ClientStateViewProvider.Current.CurrentAvatarStateRaw.address;
                 ActionManager.Instance.Stake(majorUnit, avatarAddress).Subscribe();
                 OnChangeEditingState(false);
             };
@@ -600,9 +602,12 @@ namespace Nekoyume.UI
                     switch (regular.Rewards[i].Type)
                     {
                         case StakeRegularRewardSheet.StakeRewardType.Item:
+                            // StakingInterestBenefitsView now consumes IItemSnapshot; the lib9c
+                            // material is projected at the call site via ToPolySnapshot() so the
+                            // view itself no longer pulls in Nekoyume.Model.Item.
                             view.Set(
                                 ItemFactory.CreateMaterial(materialSheet,
-                                    regular.Rewards[i].ItemId),
+                                    regular.Rewards[i].ItemId).ToPolySnapshot(),
                                 (int)result);
                             break;
                         case StakeRegularRewardSheet.StakeRewardType.Rune:
@@ -615,7 +620,7 @@ namespace Nekoyume.UI
                             view.Set(
                                 ticker,
                                 (int)result,
-                                ticker.Equals(Currencies.Crystal.Ticker));
+                                ticker.Equals(ClientCurrencies.Crystal.Ticker));
                             break;
                     }
                     displayIndex++;
@@ -645,7 +650,7 @@ namespace Nekoyume.UI
 
                     var view = interestBenefitsViews[displayIndex];
                     view.gameObject.SetActive(true);
-                    view.Set(ItemFactory.CreateMaterial(materialSheet, fixedReward.ItemId), count);
+                    view.Set(ItemFactory.CreateMaterial(materialSheet, fixedReward.ItemId).ToPolySnapshot(), count);
                     displayIndex++;
                 }
             }
@@ -672,7 +677,7 @@ namespace Nekoyume.UI
             int rewardBlockInterval,
             out long waitedBlockRange)
         {
-            var stakeState = States.Instance.StakeStateV2;
+            var stakeState = ClientStateViewProvider.Current.StakeStateV2Raw;
             if (!stakeState.HasValue)
             {
                 waitedBlockRange = 0;

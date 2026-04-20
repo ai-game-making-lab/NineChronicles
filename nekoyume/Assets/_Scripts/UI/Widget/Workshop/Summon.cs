@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using DG.Tweening;
-using Lib9c;
 using Lib9c.Renderers;
 using Libplanet.Action;
 using Libplanet.Crypto;
@@ -14,6 +13,8 @@ using Nekoyume.Helper;
 using Nekoyume.L10n;
 using Nekoyume.Model.Item;
 using Nekoyume.Model.State;
+using Nekoyume.SingleClient;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.TableData.Summon;
 using Nekoyume.UI.Model;
@@ -285,7 +286,7 @@ namespace Nekoyume.UI
             long blockIndex)
         {
             var tableSheets = Game.Game.instance.TableSheets;
-            var addressHex = $"[{States.Instance.CurrentAvatarState.address.ToHex()}]";
+            var addressHex = $"[{ClientStateViewProvider.Current.CurrentAvatar?.Address.ToHex() ?? string.Empty}]";
             return AuraSummon.SimulateSummon(
                     addressHex,
                     tableSheets.EquipmentItemRecipeSheet,
@@ -305,7 +306,7 @@ namespace Nekoyume.UI
             IRandom random)
         {
             var tableSheets = Game.Game.instance.TableSheets;
-            var addressHex = $"[{States.Instance.CurrentAvatarState.address.ToHex()}]";
+            var addressHex = $"[{ClientStateViewProvider.Current.CurrentAvatar?.Address.ToHex() ?? string.Empty}]";
             return CostumeSummon.SimulateSummon(
                     addressHex,
                     tableSheets.CostumeItemSheet,
@@ -404,7 +405,7 @@ namespace Nekoyume.UI
                         }
 
                         var fav = new FungibleAssetValue(
-                            Currencies.GetRune(rune.Ticker), 1, 0);
+                            ClientCurrencies.GetRune(rune.Ticker), 1, 0);
                         loadingScreen.SpeechBubbleWithItem.SetItemMaterial(new Item(fav));
                         yield return new WaitForSeconds(.1f);
                     }
@@ -480,7 +481,7 @@ namespace Nekoyume.UI
         {
             var summonRow = Game.Game.instance.TableSheets.EquipmentSummonSheet.First;
             var resultEquipment =
-                States.Instance.CurrentAvatarState.inventory.Equipments.FirstOrDefault(e =>
+                ClientStateViewProvider.Current.CurrentAvatarStateRaw.inventory.Equipments.FirstOrDefault(e =>
                     e is Aura);
             var button = costButtons.FirstOrDefault();
             if (resultEquipment is null)

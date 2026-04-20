@@ -1,13 +1,16 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Nekoyume.Game.Character;
 using Nekoyume.Game.Controller;
 using Nekoyume.Game.Util;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using UnityEngine;
 using mixpanel;
 using Nekoyume.L10n;
 using Nekoyume.Model.Mail;
+using Nekoyume.SingleClient;
 using Nekoyume.UI.Module;
 using Nekoyume.UI.Scroller;
 
@@ -46,7 +49,7 @@ namespace Nekoyume.UI
                 return;
             }
 
-            if (States.Instance.AvatarStates.TryGetValue(index, out var avatarState) &&
+            if (ClientStateViewProvider.Current.AvatarStatesRaw.TryGetValue(index, out var avatarState) &&
                 (avatarState.inventory == null ||
                     avatarState.questList == null ||
                     avatarState.worldInformation == null))
@@ -68,26 +71,60 @@ namespace Nekoyume.UI
             base.Show(ignoreShowAnimation);
             Analyzer.Instance.Track("Unity/LoginImpression");
 
-            for (var i = 0; i < slots.Length; i++)
+            if (!TryShowSingleClientSlots())
             {
-                var slot = slots[i];
-                var playerSlot = slot.GetComponent<LoginPlayerSlot>();
+                for (var i = 0; i < slots.Length; i++)
+                {
+                    var slot = slots[i];
+                    var playerSlot = slot.GetComponent<LoginPlayerSlot>();
 
-                if (States.Instance.AvatarStates.TryGetValue(i, out var avatarState))
-                {
-                    playerSlot.LabelLevel.text = $"LV.{avatarState.level}";
-                    playerSlot.LabelName.text = avatarState.NameWithHash;
-                    playerSlot.CreateView.SetActive(false);
-                    playerSlot.NameView.SetActive(true);
-                }
-                else
-                {
-                    playerSlot.CreateView.SetActive(true);
-                    playerSlot.NameView.SetActive(false);
+                    if (ClientStateViewProvider.Current.AvatarStatesRaw.TryGetValue(i, out var avatarState))
+                    {
+                        playerSlot.LabelLevel.text = $"LV.{avatarState.level}";
+                        playerSlot.LabelName.text = avatarState.NameWithHash;
+                        playerSlot.CreateView.SetActive(false);
+                        playerSlot.NameView.SetActive(true);
+                    }
+                    else
+                    {
+                        playerSlot.CreateView.SetActive(true);
+                        playerSlot.NameView.SetActive(false);
+                    }
                 }
             }
 
             AudioController.instance.PlayMusic(AudioController.MusicCode.SelectCharacter);
+        }
+
+        private bool TryShowSingleClientSlots()
+        {
+            var game = Game.Game.instance;
+            if (game is null ||
+                !SingleClientMode.IsEnabled(game.CommandLineOptions) ||
+                game.ClientRuntime?.State is not { } state)
+            {
+                return false;
+            }
+
+            for (var i = 0; i < slots.Length; i++)
+            {
+                var slot = slots[i];
+                var playerSlot = slot.GetComponent<LoginPlayerSlot>();
+                var avatar = state.Avatars.FirstOrDefault(candidate => candidate.SlotIndex == i);
+                if (avatar is null)
+                {
+                    playerSlot.CreateView.SetActive(true);
+                    playerSlot.NameView.SetActive(false);
+                    continue;
+                }
+
+                playerSlot.LabelLevel.text = $"LV.{avatar.Level}";
+                playerSlot.LabelName.text = avatar.AvatarName;
+                playerSlot.CreateView.SetActive(false);
+                playerSlot.NameView.SetActive(true);
+            }
+
+            return true;
         }
 
         private void ClearPlayers()

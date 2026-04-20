@@ -3,7 +3,8 @@ using System.Globalization;
 using System.Linq;
 using Nekoyume.Game.LiveAsset;
 using Nekoyume.Helper;
-using Nekoyume.Model.EnumType;
+using Nekoyume.SingleClient.Models.EnumType;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.UI.Model;
 using Nekoyume.UI.Module.WorldBoss;
@@ -141,7 +142,7 @@ namespace Nekoyume.UI.Module
             void TryOpenBanner()
             {
                 const int requiredStage = Game.LiveAsset.GameConfig.RequiredStage.ShowPopupLobbyEntering;
-                if (!States.Instance.CurrentAvatarState.worldInformation.IsStageCleared(requiredStage))
+                if (!ClientStateViewProvider.Current.CurrentAvatarStateRaw.worldInformation.IsStageCleared(requiredStage))
                 {
                     return;
                 }

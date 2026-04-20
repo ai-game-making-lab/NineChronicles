@@ -1,3 +1,4 @@
+using Nekoyume.SingleClient.State;
 using Nekoyume.UI.Module;
 using System.Collections.Generic;
 using TMPro;
@@ -104,7 +105,7 @@ namespace Nekoyume.UI
         protected override void Awake()
         {
             stakingWarningButton.onClick.AddListener(LackStakingLevelPopup);
-            bountyInputPlaceholder.text = L10nManager.Localize("ADVENTURE_BOSS_BOUNTY_INPUT_PLACEHOLDER", States.Instance.GameConfigState.AdventureBossMinBounty);
+            bountyInputPlaceholder.text = L10nManager.Localize("ADVENTURE_BOSS_BOUNTY_INPUT_PLACEHOLDER", ClientStateViewProvider.Current.CurrentGameConfigStateRaw.AdventureBossMinBounty);
             bountyInputArea.onSelect.AddListener(OnBountyInputAreaFocus);
             bountyInputArea.onValueChanged.AddListener(OnBountyInputAreaValueChanged);
             bountyInputArea.onEndEdit.AddListener(OnBountyInputAreaValueChanged);
@@ -119,7 +120,7 @@ namespace Nekoyume.UI
         private void LackStakingLevelPopup()
         {
             var paymentPopup = Find<PaymentPopup>();
-            paymentPopup.ShowLackMonsterCollection(States.Instance.GameConfigState.AdventureBossWantedRequiredStakingLevel);
+            paymentPopup.ShowLackMonsterCollection(ClientStateViewProvider.Current.CurrentGameConfigStateRaw.AdventureBossWantedRequiredStakingLevel);
             Close(true);
         }
 
@@ -150,11 +151,11 @@ namespace Nekoyume.UI
 
             if (long.TryParse(input, out var bounty))
             {
-                if (bounty < States.Instance.GameConfigState.AdventureBossMinBounty)
+                if (bounty < ClientStateViewProvider.Current.CurrentGameConfigStateRaw.AdventureBossMinBounty)
                 {
                     bountyInputArea.textComponent.color = bountyRedColor;
                     inputWarning.SetActive(true);
-                    inputWarningText.text = L10nManager.Localize("ADVENTURE_BOSS_BOUNTY_INPUT_WARNING", States.Instance.GameConfigState.AdventureBossMinBounty);
+                    inputWarningText.text = L10nManager.Localize("ADVENTURE_BOSS_BOUNTY_INPUT_WARNING", ClientStateViewProvider.Current.CurrentGameConfigStateRaw.AdventureBossMinBounty);
                     confirmButton.Interactable = false;
                 }
                 else
@@ -211,11 +212,11 @@ namespace Nekoyume.UI
                 return;
             }
 
-            if (States.Instance.StakingLevel < States.Instance.GameConfigState.AdventureBossWantedRequiredStakingLevel)
+            if (ClientStateViewProvider.Current.StakingLevel < ClientStateViewProvider.Current.CurrentGameConfigStateRaw.AdventureBossWantedRequiredStakingLevel)
             {
                 stakingWarningMassage.SetActive(true);
                 bountyInputArea.gameObject.SetActive(false);
-                stakingWarningMassageText.text = L10nManager.Localize("ADVENTURE_BOSS_BOUNTY_INPUT_STAKING_LEVEL_WARNING", States.Instance.GameConfigState.AdventureBossWantedRequiredStakingLevel);
+                stakingWarningMassageText.text = L10nManager.Localize("ADVENTURE_BOSS_BOUNTY_INPUT_STAKING_LEVEL_WARNING", ClientStateViewProvider.Current.CurrentGameConfigStateRaw.AdventureBossWantedRequiredStakingLevel);
             }
             else
             {
@@ -373,7 +374,7 @@ namespace Nekoyume.UI
                 return;
             }
 
-            if (States.Instance.StakingLevel < States.Instance.GameConfigState.AdventureBossWantedRequiredStakingLevel)
+            if (ClientStateViewProvider.Current.StakingLevel < ClientStateViewProvider.Current.CurrentGameConfigStateRaw.AdventureBossWantedRequiredStakingLevel)
             {
                 NcDebug.LogError("[AdventureBossEnterBountyPopup] OnClickConfirm: Staking level is not enough");
                 return;

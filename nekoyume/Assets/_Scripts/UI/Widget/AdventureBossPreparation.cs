@@ -8,6 +8,8 @@ using Nekoyume.Game.Controller;
 using Nekoyume.Helper;
 using Nekoyume.Model.BattleStatus;
 using Nekoyume.Model.EnumType;
+using Nekoyume.SingleClient.Blockchain;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using TMPro;
 using UnityEngine.UI;
@@ -122,8 +124,8 @@ namespace Nekoyume.UI
             _requiredCost = requiredCost;
             Analyzer.Instance.Track("Unity/Click AdventureBoss Prepareation", new Dictionary<string, Value>()
             {
-                ["AvatarAddress"] = States.Instance.CurrentAvatarState.address.ToString(),
-                ["AgentAddress"] = States.Instance.AgentState.address.ToString()
+                ["AvatarAddress"] = (ClientStateViewProvider.Current.CurrentAvatar?.Address.ToString() ?? string.Empty),
+                ["AgentAddress"] = ClientStateViewProvider.Current.CurrentAgent.Address.ToString()
             });
 
             UpdateStartButton();
@@ -228,10 +230,10 @@ namespace Nekoyume.UI
             Find<AdventureBoss>().Close(true);
             Find<LoadingScreen>().Show(LoadingScreen.LoadingType.AdventureBoss);
             startButton.gameObject.SetActive(false);
-            var itemSlotState = States.Instance.CurrentItemSlotStates[BattleType.Adventure];
+            var itemSlotState = ClientStateViewProvider.Current.CurrentItemSlotStatesRaw[BattleType.Adventure];
             var costumes = itemSlotState.Costumes;
             var equipments = itemSlotState.Equipments;
-            var runeInfos = States.Instance.CurrentRuneSlotStates[BattleType.Adventure]
+            var runeInfos = ClientStateViewProvider.Current.CurrentRuneSlotStatesRaw[BattleType.Adventure]
                 .GetEquippedRuneSlotInfos();
             var consumables = information.GetEquippedConsumables().Select(x => x.ItemId).ToList();
 
@@ -240,8 +242,8 @@ namespace Nekoyume.UI
             stage.foodCount = consumables.Count;
             ActionRenderHandler.Instance.Pending = true;
 
-            var skillState = States.Instance.CrystalRandomSkillState;
-            var avatarAddress = States.Instance.CurrentAvatarState.address;
+            var skillState = ClientStateViewProvider.Current.CrystalRandomSkillStateRaw;
+            var avatarAddress = ClientStateViewProvider.Current.CurrentAvatar?.Address.ToLibplanet() ?? default;
             try
             {
                 switch (_type)
@@ -249,7 +251,7 @@ namespace Nekoyume.UI
                     case AdventureBossPreparationType.Challenge:
                         if (Game.Game.instance.AdventureBossData.SeasonInfo?.Value is null)
                         {
-                            NcDebug.LogError("[ExploreAdventureBoss] : Game.Game.instance.AdventureBossData.SeasonInfo is null or States.Instance.CurrentAvatarState is null");
+                            NcDebug.LogError("[ExploreAdventureBoss] : Game.Game.instance.AdventureBossData.SeasonInfo is null or ClientStateViewProvider.Current.CurrentAvatarStateRaw is null");
                         }
                         else
                         {
@@ -260,7 +262,7 @@ namespace Nekoyume.UI
                     case AdventureBossPreparationType.BreakThrough:
                         if (Game.Game.instance.AdventureBossData.SeasonInfo?.Value is null)
                         {
-                            NcDebug.LogError("[SweepAdventureBoss] : Game.Game.instance.AdventureBossData.SeasonInfo is null or States.Instance.CurrentAvatarState is null");
+                            NcDebug.LogError("[SweepAdventureBoss] : Game.Game.instance.AdventureBossData.SeasonInfo is null or ClientStateViewProvider.Current.CurrentAvatarStateRaw is null");
                         }
                         else
                         {
@@ -331,7 +333,7 @@ namespace Nekoyume.UI
                 }
             }
 
-            var (equipments, costumes) = States.Instance.GetEquippedItems(BattleType.Adventure);
+            var (equipments, costumes) = ClientStateViewProvider.Current.GetEquippedItems(BattleType.Adventure);
             var consumables = information.GetEquippedConsumables().Select(x => x.Id).ToList();
             var canBattle = Util.CanBattle(equipments, costumes, consumables);
 

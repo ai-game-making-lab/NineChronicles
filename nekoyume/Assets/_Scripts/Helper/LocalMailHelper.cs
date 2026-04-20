@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Libplanet.Crypto;
 using Nekoyume.Game;
 using Nekoyume.Model.Mail;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 
 namespace Nekoyume.Helper
@@ -15,11 +16,11 @@ namespace Nekoyume.Helper
         {
             _localMailDictionary = new Dictionary<Address, List<Mail>>();
             _disposables = new List<IDisposable>();
-            _localMailBox = new ReactiveProperty<MailBox>(States.Instance.CurrentAvatarState?.mailBox);
+            _localMailBox = new ReactiveProperty<MailBox>(ClientStateViewProvider.Current.CurrentAvatarStateRaw?.mailBox);
             Event.OnUpdateAddresses.AsObservable()
                 .Subscribe(_ =>
                 {
-                    if (States.Instance.CurrentAvatarState?.address is { } addr)
+                    if (ClientStateViewProvider.Current.CurrentAvatarStateRaw?.address is { } addr)
                     {
                         Initialize(addr);
                     }
@@ -78,7 +79,7 @@ namespace Nekoyume.Helper
                 }
             }
 
-            if (_localMailDictionary.TryGetValue(States.Instance.CurrentAvatarState?.address ?? new Address(),
+            if (_localMailDictionary.TryGetValue(ClientStateViewProvider.Current.CurrentAvatarStateRaw?.address ?? new Address(),
                 out var localMailList))
             {
                 foreach (var mail in localMailList)

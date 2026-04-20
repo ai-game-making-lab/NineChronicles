@@ -1,8 +1,8 @@
 using Libplanet.Crypto;
 using Nekoyume.Game;
 using Nekoyume.Helper;
-using Nekoyume.Model.EnumType;
 using Nekoyume.Model.State;
+using Nekoyume.SingleClient.Models.EnumType;
 using Nekoyume.State;
 using Nekoyume.UI.Model;
 using Nekoyume.UI.Module;
@@ -72,7 +72,7 @@ namespace Nekoyume.UI.Scroller
                                 new[] { address }))[address];
                     }
 
-                    Widget.Find<FriendInfoPopup>().ShowAsync(avatarState, BattleType.Adventure).Forget();
+                    Widget.Find<FriendInfoPopup>().ShowAsync(avatarState, BattleType.Adventure.ToLib9c()).Forget();
                     loadingScreen.Close();
                 })
                 .AddTo(gameObject);

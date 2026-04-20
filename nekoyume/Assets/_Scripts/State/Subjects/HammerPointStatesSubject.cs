@@ -1,3 +1,4 @@
+using Nekoyume.SingleClient.State;
 ﻿using System;
 using Nekoyume.Model.State;
 using UniRx;
@@ -19,7 +20,7 @@ namespace Nekoyume.State.Subjects
         public static void OnReplaceHammerPointState(int recipeId, HammerPointState state)
         {
             if (Addresses.GetHammerPointStateAddress(
-                    States.Instance.CurrentAvatarState.address,
+                    ClientStateViewProvider.Current.CurrentAvatarStateRaw.address,
                     recipeId) == state.Address)
             {
                 HammerPointSubjectInternal.OnNext((recipeId, state));

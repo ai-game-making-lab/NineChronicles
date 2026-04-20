@@ -16,6 +16,8 @@ using Nekoyume.L10n;
 using Nekoyume.Model.Item;
 using Nekoyume.Model.Mail;
 using Nekoyume.Model.Quest;
+using Nekoyume.SingleClient.Blockchain;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.TableData;
 using TMPro;
@@ -158,7 +160,7 @@ namespace Nekoyume.UI
                 return;
             }
 
-            var quest = States.Instance.CurrentAvatarState?.questList
+            var quest = ClientStateViewProvider.Current.CurrentAvatarStateRaw?.questList
                 .OfType<CombinationEquipmentQuest>()
                 .FirstOrDefault(item =>
                     item.Id == row.Id);
@@ -218,7 +220,7 @@ namespace Nekoyume.UI
             UpdateLocalState(quest.Id, quest.Reward?.ItemMap);
             // 퀘스트 받음 처리와 함께 퀘스트 리스트의 상태를 갱신해서 레드닷 제거
             quest.isReceivable = false;
-            ReactiveAvatarState.UpdateQuestList(States.Instance.CurrentAvatarState.questList);
+            ReactiveAvatarState.UpdateQuestList(ClientStateViewProvider.Current.CurrentAvatarStateRaw.questList);
         }
 
 #endregion
@@ -335,7 +337,7 @@ namespace Nekoyume.UI
                 return;
             }
 
-            var avatarAddress = States.Instance.CurrentAvatarState.address;
+            var avatarAddress = ClientStateViewProvider.Current.CurrentAvatar?.Address.ToLibplanet() ?? default;
 
             LocalLayerModifier.RemoveReceivableQuest(avatarAddress, questId, false);
         }

@@ -4,10 +4,10 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using DG.Tweening;
-using Lib9c;
 using Libplanet.Types.Assets;
 using Nekoyume.Game;
 using Nekoyume.Game.Controller;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.Model.BattleStatus;
 using UnityEngine;
@@ -20,10 +20,11 @@ using Nekoyume.Game.Battle;
 using Nekoyume.Game.LiveAsset;
 using Nekoyume.Helper;
 using Nekoyume.L10n;
-using Nekoyume.Model.EnumType;
 using Nekoyume.Model.Item;
+using Nekoyume.SingleClient.Models.EnumType;
 using Nekoyume.Model.Mail;
 using Nekoyume.Model.State;
+using Nekoyume.SingleClient;
 using Nekoyume.State.Subjects;
 using Nekoyume.UI.Module;
 using Nekoyume.UI.Module.Lobby;
@@ -361,8 +362,8 @@ namespace Nekoyume.UI
             Analyzer.Instance.Track("Unity/Click Guided Quest Combination Equipment",
                 new Dictionary<string, Value>()
                 {
-                    ["AvatarAddress"] = States.Instance.CurrentAvatarState.address.ToString(),
-                    ["AgentAddress"] = States.Instance.AgentState.address.ToString()
+                    ["AvatarAddress"] = ClientStateViewProvider.Current.CurrentAvatarStateRaw.address.ToString(),
+                    ["AgentAddress"] = ClientStateViewProvider.Current.CurrentAgentStateRaw.address.ToString()
                 });
 
             CombinationClickInternal(() =>
@@ -398,7 +399,7 @@ namespace Nekoyume.UI
             btnDcc.Update();
             btnNcu.Update();
 
-            var addressHex = States.Instance.CurrentAvatarState.address.ToHex();
+            var addressHex = ClientStateViewProvider.Current.CurrentAvatarStateRaw.address.ToHex();
             var firstOpenCombinationKey
                 = string.Format(FirstOpenCombinationKeyFormat, addressHex);
             var firstOpenQuestKey
@@ -459,13 +460,13 @@ namespace Nekoyume.UI
 
             if (questExclamationMark.gameObject.activeSelf)
             {
-                var addressHex = States.Instance.CurrentAvatarState.address.ToHex();
+                var addressHex = ClientStateViewProvider.Current.CurrentAvatarStateRaw.address.ToHex();
                 var key = string.Format(FirstOpenQuestKeyFormat, addressHex);
                 PlayerPrefs.SetInt(key, 1);
             }
 
             Close();
-            var avatarState = States.Instance.CurrentAvatarState;
+            var avatarState = ClientStateViewProvider.Current.CurrentAvatarStateRaw;
             Find<WorldMap>().Show(avatarState.worldInformation);
             AudioController.PlayClick();
         }
@@ -481,7 +482,7 @@ namespace Nekoyume.UI
 
             if (shopExclamationMark.gameObject.activeSelf)
             {
-                var addressHex = States.Instance.CurrentAvatarState.address.ToHex();
+                var addressHex = ClientStateViewProvider.Current.CurrentAvatarStateRaw.address.ToHex();
                 var key = string.Format(FirstOpenShopKeyFormat, addressHex);
                 PlayerPrefs.SetInt(key, 1);
             }
@@ -515,7 +516,7 @@ namespace Nekoyume.UI
 
             if (combinationExclamationMark.gameObject.activeSelf)
             {
-                var addressHex = States.Instance.CurrentAvatarState.address.ToHex();
+                var addressHex = ClientStateViewProvider.Current.CurrentAvatarStateRaw.address.ToHex();
                 var key = string.Format(FirstOpenCombinationKeyFormat, addressHex);
                 PlayerPrefs.SetInt(key, 1);
             }
@@ -538,8 +539,8 @@ namespace Nekoyume.UI
 
             Analyzer.Instance.Track("Unity/Enter arena page", new Dictionary<string, Value>()
             {
-                ["AvatarAddress"] = States.Instance.CurrentAvatarState.address.ToString(),
-                ["AgentAddress"] = States.Instance.AgentState.address.ToString()
+                ["AvatarAddress"] = ClientStateViewProvider.Current.CurrentAvatarStateRaw.address.ToString(),
+                ["AgentAddress"] = ClientStateViewProvider.Current.CurrentAgentStateRaw.address.ToString()
             });
 
             AudioController.PlayClick();
@@ -565,11 +566,11 @@ namespace Nekoyume.UI
         //        return;
         //    }
 
-        //    var wi = States.Instance.CurrentAvatarState.worldInformation;
+        //    var wi = ClientStateViewProvider.Current.CurrentAvatarStateRaw.worldInformation;
         //    if (!wi.TryGetWorld(worldId, out var world))
         //    {
         //        LocalLayerModifier.AddWorld(
-        //            States.Instance.CurrentAvatarState.address,
+        //            ClientStateViewProvider.Current.CurrentAvatarStateRaw.address,
         //            worldId);
 
         //        if (!wi.TryGetWorld(worldId, out world))
@@ -592,7 +593,7 @@ namespace Nekoyume.UI
 
         //    if (mimisbrunnrExclamationMark.gameObject.activeSelf)
         //    {
-        //        var addressHex = States.Instance.CurrentAvatarState.address.ToHex();
+        //        var addressHex = ClientStateViewProvider.Current.CurrentAvatarStateRaw.address.ToHex();
         //        var key = string.Format(FirstOpenMimisbrunnrKeyFormat, addressHex);
         //        PlayerPrefs.SetInt(key, 1);
         //    }
@@ -750,7 +751,7 @@ namespace Nekoyume.UI
             StartCoroutine(CoStartSpeeches());
             UpdateButtons();
             stakingLevelIcon.sprite =
-                stakeIconData.GetIcon(States.Instance.StakingLevel, IconType.Bubble);
+                stakeIconData.GetIcon(ClientStateViewProvider.Current.StakingLevel, IconType.Bubble);
 
             var thorSchedule = LiveAssetManager.instance.ThorSchedule;
             thorSeasonButton.gameObject.SetActive(thorSchedule?.IsOpened == true);
@@ -829,7 +830,7 @@ namespace Nekoyume.UI
                 yield return null;
             }
 
-            guidedQuest.Show(States.Instance.CurrentAvatarState);
+            guidedQuest.Show(ClientStateViewProvider.Current.CurrentAvatarStateRaw);
         }
 
         public override void Close(bool ignoreCloseAnimation = false)
@@ -895,7 +896,7 @@ namespace Nekoyume.UI
 
             if (combinationExclamationMark.gameObject.activeSelf)
             {
-                var addressHex = States.Instance.CurrentAvatarState.address.ToHex();
+                var addressHex = ClientStateViewProvider.Current.CurrentAvatarStateRaw.address.ToHex();
                 var key = string.Format(FirstOpenCombinationKeyFormat, addressHex);
                 PlayerPrefs.SetInt(key, 1);
             }
@@ -911,7 +912,7 @@ namespace Nekoyume.UI
             var player = Game.Game.instance.Stage.GetPlayer();
             player.DisableHudContainer();
             HackAndSlash(
-                States.Instance.CurrentAvatarState.worldInformation.TryGetLastClearedStageId(
+                ClientStateViewProvider.Current.CurrentAvatarStateRaw.worldInformation.TryGetLastClearedStageId(
                     out var targetStage)
                     ? targetStage + 1
                     : 1);
@@ -983,7 +984,7 @@ namespace Nekoyume.UI
                                     9,
                                     99)
                             ),
-                            (states.CurrentAvatarState.address, 99 * Currencies.Crystal)
+                            (states.CurrentAvatarState.address, 99 * ClientCurrencies.Crystal)
                         },
                         sheet.OrderedList!.Take(3)
                             .Select((row, index) => (

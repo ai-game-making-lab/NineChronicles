@@ -3,6 +3,7 @@ using System.Linq;
 using Coffee.UIEffects;
 using Nekoyume.Helper;
 using Nekoyume.Model.Item;
+using Nekoyume.SingleClient.Models.Items;
 using Nekoyume.TableData;
 using UnityEngine;
 using UnityEngine.UI;
@@ -24,12 +25,13 @@ namespace Nekoyume.UI.Module
         {
             background.gameObject.SetActive(false);
 
-            if (!(itemBase is Equipment equipment))
+            if (itemBase.ToPolySnapshot() is not EquipmentSnapshot eqSnap)
             {
                 return;
             }
 
-            if (equipment.GetOptionCountFromCombination() <= 0)
+            var optionInfo = eqSnap.ToItemOptionInfoSnapshot();
+            if (optionInfo.OptionCountFromCombination <= 0)
             {
                 return;
             }
@@ -44,11 +46,9 @@ namespace Nekoyume.UI.Module
             background.hue = data.GradeHsvHue;
             background.saturation = data.GradeHsvSaturation;
             background.value = data.GradeHsvValue;
-            var optionInfo = new ItemOptionInfo(equipment);
 
-            var optionCount = optionInfo.StatOptions.Sum(x => x.count);
             var index = 0;
-            for (var i = 0; i < optionCount; ++i)
+            for (var i = 0; i < optionInfo.StatOptionTotalCount; ++i)
             {
                 var image = optionTagImages[index];
                 image.gameObject.SetActive(true);
@@ -56,7 +56,7 @@ namespace Nekoyume.UI.Module
                 ++index;
             }
 
-            for (var i = 0; i < optionInfo.SkillOptions.Count; ++i)
+            for (var i = 0; i < optionInfo.SkillOptionCount; ++i)
             {
                 var image = optionTagImages[index];
                 image.gameObject.SetActive(true);

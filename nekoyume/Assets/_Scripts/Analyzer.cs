@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using mixpanel;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 
 #if ENABLE_FIREBASE
@@ -298,7 +299,7 @@ namespace Nekoyume
 
         private static void UpdateAvatarAddress()
         {
-            var avatarState = States.Instance.CurrentAvatarState;
+            var avatarState = ClientStateViewProvider.Current.CurrentAvatarStateRaw;
             if (avatarState is null)
             {
                 Mixpanel.Register("AvatarAddress", string.Empty);

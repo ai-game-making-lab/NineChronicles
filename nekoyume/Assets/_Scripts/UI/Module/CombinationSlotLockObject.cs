@@ -5,6 +5,7 @@ using System.Numerics;
 using Nekoyume.Blockchain;
 using Nekoyume.Game.Controller;
 using Nekoyume.L10n;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.TableData;
 using TMPro;
@@ -103,11 +104,11 @@ namespace Nekoyume.UI.Model
 #region GetBalance
         private BigInteger GetBalance()
         {
-            var inventory = States.Instance.CurrentAvatarState.inventory;
+            var inventory = ClientStateViewProvider.Current.CurrentAvatarStateRaw.inventory;
             return _costType switch
             {
-                CostType.Crystal => States.Instance.CrystalBalance.MajorUnit,
-                CostType.NCG => States.Instance.GoldBalanceState.Gold.MajorUnit,
+                CostType.Crystal => ClientStateViewProvider.Current.CurrentAgentCrystalBalanceMajorUnit,
+                CostType.NCG => ClientStateViewProvider.Current.CurrentAgentGoldBalanceMajorUnit,
                 CostType.GoldDust => inventory.GetMaterialCount((int)_costType),
                 CostType.RubyDust => inventory.GetMaterialCount((int)_costType),
                 _ => throw new ArgumentOutOfRangeException()

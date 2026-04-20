@@ -1,5 +1,6 @@
 using System;
 using Libplanet.Types.Assets;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using UniRx;
 
@@ -14,7 +15,7 @@ namespace Nekoyume.UI.Model
 
         public ItemCountAndPricePopup()
         {
-            var currency = States.Instance.GoldBalanceState.Gold.Currency;
+            var currency = ClientStateViewProvider.Current.CurrentAgentGoldBalanceFav.Currency;
             Price = new ReactiveProperty<FungibleAssetValue>(new FungibleAssetValue(currency, 10, 0));
         }
 

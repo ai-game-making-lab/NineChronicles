@@ -1,5 +1,6 @@
 using System;
 using Libplanet.Types.Assets;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.UI.Module.Common;
 using TMPro;
@@ -73,7 +74,7 @@ namespace Nekoyume.UI.Module
 
         private void UpdateCrystal()
         {
-            SetCrystal(States.Instance.CrystalBalance);
+            SetCrystal(ClientStateViewProvider.Current.CrystalBalanceRaw);
         }
 
         private void SetCrystal(FungibleAssetValue crystal)

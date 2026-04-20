@@ -8,6 +8,7 @@ using Nekoyume.Helper;
 using Nekoyume.L10n;
 using Nekoyume.Model.Mail;
 using Nekoyume.Model.State;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.UI.Module;
 using Nekoyume.UI.Module.Pet;
@@ -126,7 +127,7 @@ namespace Nekoyume.UI
             submitButton.Text = L10nManager.Localize("UI_LEVEL_UP");
             var option = TableSheets.Instance.PetOptionSheet[petState.PetId].LevelOptionMap[petState.Level];
             contentText.text =
-                PetFrontHelper.GetDefaultDescriptionText(option, States.Instance.GameConfigState);
+                PetFrontHelper.GetDefaultDescriptionText(option, ClientStateViewProvider.Current.CurrentGameConfigStateRaw);
             petInfoView.Set(_petRow.Id,
                 _petRow.Grade
             );
@@ -195,7 +196,7 @@ namespace Nekoyume.UI
             if (targetLevel == 1)
             {
                 contentText.text = PetFrontHelper.GetDefaultDescriptionText(
-                    targetOption, States.Instance.GameConfigState);
+                    targetOption, ClientStateViewProvider.Current.CurrentGameConfigStateRaw);
             }
             else
             {
@@ -205,14 +206,14 @@ namespace Nekoyume.UI
                     currentOption, targetOption);
             }
 
-            var goldBalanceState = States.Instance.GoldBalanceState;
+            var goldBalanceState = ClientStateViewProvider.Current.CurrentGoldBalanceStateRaw;
             soulStoneCostText.text = soulStone.ToString();
             _ncgCost = goldBalanceState.Gold.Currency * ncg;
             var soulStoneCost =
                 PetHelper.GetSoulstoneCurrency(_petRow.SoulStoneTicker) *
                 soulStone;
             var enoughNcg = goldBalanceState.Gold >= _ncgCost;
-            var enoughSoulStone = States.Instance.CurrentAvatarBalances[soulStoneCost.Currency.Ticker] >= soulStoneCost;
+            var enoughSoulStone = ClientStateViewProvider.Current.CurrentAvatarBalancesRaw[soulStoneCost.Currency.Ticker] >= soulStoneCost;
             var enough = enoughNcg && enoughSoulStone;
             _enoughBalance = enough;
             soulStoneNotEnoughObject.SetActive(!enoughSoulStone);
@@ -231,7 +232,7 @@ namespace Nekoyume.UI
         {
             var popup = Find<MaterialNavigationPopup>();
             var soulStoneName = PetFrontHelper.GetPetSoulStoneName(row.Id);
-            var count = States.Instance.CurrentAvatarBalances[row.SoulStoneTicker].GetQuantityString();
+            var count = ClientStateViewProvider.Current.CurrentAvatarBalancesRaw[row.SoulStoneTicker].GetQuantityString();
             var content = PetFrontHelper.GetPetSoulStoneDescription(row.Id);
             var buttonText = L10nManager.Localize("UI_SHOP");
 

@@ -12,6 +12,7 @@ using Nekoyume.Game;
 using Nekoyume.Game.Controller;
 using Nekoyume.L10n;
 using Nekoyume.Model.Quest;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.TableData;
 using Nekoyume.TableData.Event;
@@ -167,7 +168,7 @@ namespace Nekoyume.UI
             {
                 UpdateStageInformationForWorld(
                     selectedStageId,
-                    States.Instance.CurrentAvatarState?.level ?? 1);
+                    ClientStateViewProvider.Current.CurrentAvatar?.Level ?? 1);
             }).AddTo(_disposablesOnShow);
 
             closeButtonText.text = worldRow.GetLocalizedName();
@@ -358,7 +359,7 @@ namespace Nekoyume.UI
             var amount = "0";
             try
             {
-                var bal = States.Instance.CurrentAvatarBalances.Values
+                var bal = ClientStateViewProvider.Current.CurrentAvatarBalancesRaw.Values
                     .FirstOrDefault(v => v.Currency.Ticker.Equals(ticker, StringComparison.OrdinalIgnoreCase));
                 amount = string.IsNullOrEmpty(bal.Currency.Ticker) ? "0" : bal.ToCurrencyNotation();
             }

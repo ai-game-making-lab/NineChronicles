@@ -1,5 +1,5 @@
-using Lib9c;
 using Nekoyume.Model.AdventureBoss;
+using Nekoyume.SingleClient;
 using System.Text.RegularExpressions;
 
 namespace Nekoyume.ActionExtensions
@@ -33,7 +33,7 @@ namespace Nekoyume.ActionExtensions
                     baseItemView.ItemViewSetCurrencyData(reward.ItemId, reward.Amount);
                     return true;
                 case "Crystal":
-                    baseItemView.ItemViewSetCurrencyData(Currencies.Crystal.Ticker, reward.Amount);
+                    baseItemView.ItemViewSetCurrencyData(ClientCurrencies.Crystal.Ticker, reward.Amount);
                     return true;
                 default:
                     NcDebug.LogError($"Invalid ItemType: {reward.ItemType} ItemId: {reward.ItemId}");
@@ -54,7 +54,7 @@ namespace Nekoyume.ActionExtensions
                     baseItemView.ItemViewSetCurrencyData(reward.ItemId, 0);
                     return true;
                 case "Crystal":
-                    baseItemView.ItemViewSetCurrencyData(Currencies.Crystal.Ticker, 0);
+                    baseItemView.ItemViewSetCurrencyData(ClientCurrencies.Crystal.Ticker, 0);
                     return true;
                 default:
                     NcDebug.LogError($"Invalid ItemType: {reward.ItemType} ItemId: {reward.ItemId}");

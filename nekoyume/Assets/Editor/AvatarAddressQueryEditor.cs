@@ -1,4 +1,5 @@
-﻿using Libplanet.Action.State;
+﻿#if LIB9C_TOOLS
+using Libplanet.Action.State;
 using Libplanet.Crypto;
 using Nekoyume;
 using Nekoyume.Model.EnumType;
@@ -62,3 +63,4 @@ namespace Editor
         }
     }
 }
+#endif

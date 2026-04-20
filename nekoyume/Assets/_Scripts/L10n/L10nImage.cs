@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
 using Nekoyume.Helper;
-using Nekoyume.Model.EnumType;
+using Nekoyume.SingleClient.Models.EnumType;
 using Nekoyume.UI.Module.WorldBoss;
 using UnityEngine;
 using UnityEngine.UI;

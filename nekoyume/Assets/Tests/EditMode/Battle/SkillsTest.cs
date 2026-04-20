@@ -75,7 +75,7 @@ namespace Tests.EditMode.Battle
 
         private Skill GetFirstSkill()
         {
-            var skillRow = _skillSheet.First().Value;
+            var skillRow = _skillSheet[Nekoyume.GameConfig.DefaultAttackId];
             Assert.IsNotNull(skillRow);
 
             var firstSkill = SkillFactory.GetV1(skillRow, 100, 100);

@@ -5,6 +5,7 @@ using Nekoyume.Game;
 using Nekoyume.Helper;
 using Nekoyume.L10n;
 using Nekoyume.Model.Mail;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.UI.Module;
 using Nekoyume.UI.Module.Pet;
@@ -84,7 +85,7 @@ namespace Nekoyume.UI
             levelUpButton.OnSubmitSubject.Subscribe(_ =>
             {
                 var row = _selectedViewModel.PetRow;
-                if (States.Instance.PetStates.TryGetPetState(row.Id, out var petState))
+                if (ClientStateViewProvider.Current.PetStatesRaw.TryGetPetState(row.Id, out var petState))
                 {
                     Find<PetEnhancementPopup>().ShowForLevelUp(petState);
                 }
@@ -159,7 +160,7 @@ namespace Nekoyume.UI
                 infoView.Set(petId, row.Grade);
 
                 var petOptionMap = TableSheets.Instance.PetOptionSheet[petId].LevelOptionMap;
-                if (States.Instance.PetStates.TryGetPetState(petId, out var petState))
+                if (ClientStateViewProvider.Current.PetStatesRaw.TryGetPetState(petId, out var petState))
                 {
                     var currentLevel = petState.Level;
                     var targetLevel = currentLevel + 1;
@@ -184,7 +185,7 @@ namespace Nekoyume.UI
 
                         var currentOption = petOptionMap[currentLevel];
                         descriptionText.text = PetFrontHelper.GetDefaultDescriptionText(
-                            currentOption, States.Instance.GameConfigState);
+                            currentOption, ClientStateViewProvider.Current.CurrentGameConfigStateRaw);
                     }
                 }
                 else
@@ -196,7 +197,7 @@ namespace Nekoyume.UI
 
                     var targetOption = petOptionMap[1];
                     descriptionText.text = PetFrontHelper.GetDefaultDescriptionText(
-                        targetOption, States.Instance.GameConfigState);
+                        targetOption, ClientStateViewProvider.Current.CurrentGameConfigStateRaw);
                 }
             }
         }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Libplanet.Types.Assets;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.State.Subjects;
 using TMPro;
@@ -42,8 +43,8 @@ namespace Nekoyume.UI.Module.Lobby
                 .AddTo(_disposables);
             Game.Game.instance.Agent.BlockIndexSubject.Subscribe(OnEveryUpdateBlockIndex)
                 .AddTo(_disposables);
-            OnUpdateStakingLevel(States.Instance.StakingLevel);
-            OnUpdateStakedBalance(States.Instance.StakedBalance);
+            OnUpdateStakingLevel(ClientStateViewProvider.Current.StakingLevel);
+            OnUpdateStakedBalance(ClientStateViewProvider.Current.StakedBalanceRaw);
             OnEveryUpdateBlockIndex(Game.Game.instance.Agent.BlockIndex);
         }
 
@@ -54,7 +55,7 @@ namespace Nekoyume.UI.Module.Lobby
 
         private void OnEveryUpdateBlockIndex(long tip)
         {
-            var nullableStakeState = States.Instance.StakeStateV2;
+            var nullableStakeState = ClientStateViewProvider.Current.StakeStateV2Raw;
             var hasStakeState = nullableStakeState.HasValue;
             bool enableNotification;
             var enableNotStaking = false;
@@ -67,11 +68,11 @@ namespace Nekoyume.UI.Module.Lobby
             }
             else
             {
-                var minimumNcg = States.Instance.StakeRegularRewardSheet
+                var minimumNcg = ClientStateViewProvider.Current.StakeRegularRewardSheetRaw
                     .First(pair => pair.Value.Level == 1)
                     .Value.RequiredGold;
                 enableNotification = enableNotStaking =
-                    States.Instance.GoldBalanceState.Gold.MajorUnit >= minimumNcg;
+                    ClientStateViewProvider.Current.CurrentGoldBalanceStateRaw.Gold.MajorUnit >= minimumNcg;
                 claimableTimeBlock.gameObject.SetActive(false);
             }
 

@@ -11,6 +11,7 @@ using Nekoyume.Helper;
 using Nekoyume.L10n;
 using Nekoyume.Model.Item;
 using Nekoyume.Model.Stat;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.TableData;
 using Nekoyume.TableData.Event;
@@ -195,10 +196,10 @@ namespace Nekoyume.UI.Scroller
 
         private void OpenEveryAvailableRecipes()
         {
-            if (States.Instance.CrystalBalance.MajorUnit >= _openCost)
+            if (ClientStateViewProvider.Current.CurrentAgentCrystalBalanceMajorUnit >= _openCost)
             {
                 var usageMessage = L10nManager.Localize("UI_UNLOCK_RECIPES_FORMAT", _unlockableRecipeIds.Count);
-                var balance = States.Instance.CrystalBalance;
+                var balance = ClientStateViewProvider.Current.CrystalBalanceRaw;
 
                 Widget.Find<PaymentPopup>().ShowCheckPaymentCrystal(
                     balance.MajorUnit,
@@ -277,7 +278,7 @@ namespace Nekoyume.UI.Scroller
 
         private static bool IsEquipmentLocked(EquipmentItemRecipeSheet.Row equipmentRow)
         {
-            var worldInformation = States.Instance.CurrentAvatarState.worldInformation;
+            var worldInformation = ClientStateViewProvider.Current.CurrentAvatarStateRaw.worldInformation;
             var clearedStage = worldInformation.TryGetLastClearedStageId(out var stageId)
                 ? stageId
                 : 0;
@@ -358,7 +359,7 @@ namespace Nekoyume.UI.Scroller
                 return true;
             }
 
-            return States.Instance.CurrentAvatarState.level < requirementRow.Level;
+            return ClientStateViewProvider.Current.CurrentAvatarStateRaw.level < requirementRow.Level;
         }
 
         public void ShowAsEventConsumable()
@@ -454,7 +455,7 @@ namespace Nekoyume.UI.Scroller
             {
                 openAllRecipeArea.costText.text = _openCost.ToCurrencyNotation();
 
-                var hasEnoughBalance = States.Instance.CrystalBalance.MajorUnit >= _openCost;
+                var hasEnoughBalance = ClientStateViewProvider.Current.CurrentAgentCrystalBalanceMajorUnit >= _openCost;
                 openAllRecipeArea.costText.color = hasEnoughBalance
                     ? Palette.GetColor(ColorType.ButtonEnabled)
                     : Palette.GetColor(ColorType.ButtonDisabled);

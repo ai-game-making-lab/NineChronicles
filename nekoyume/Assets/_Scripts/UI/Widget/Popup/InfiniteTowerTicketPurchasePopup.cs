@@ -10,6 +10,7 @@ using Nekoyume.UI.Scroller;
 using UnityEngine.UI;
 using Nekoyume.Model.Item;
 using Nekoyume.Game;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.Helper;
 
@@ -163,7 +164,7 @@ namespace Nekoyume.UI
                     // Material 인벤토리 체크를 위한 커스텀 조건 추가
                     materialPurchaseButton.SetCondition(() =>
                     {
-                        var inventory = States.Instance.CurrentAvatarState?.inventory;
+                        var inventory = ClientStateViewProvider.Current.CurrentAvatarStateRaw?.inventory;
                         if (inventory == null)
                         {
                             NcDebug.Log($"[InfiniteTowerTicketPurchasePopup] Inventory is null");

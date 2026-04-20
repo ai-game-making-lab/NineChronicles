@@ -14,7 +14,10 @@ using Nekoyume.L10n;
 using Nekoyume.Model.Item;
 using Nekoyume.Model.Mail;
 using Nekoyume.Model.Market;
+using Nekoyume.SingleClient.Blockchain;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
+using FungibleAssetValue = Libplanet.Types.Assets.FungibleAssetValue;
 using Nekoyume.UI.Model;
 using Nekoyume.UI.Module;
 using Nekoyume.UI.Scroller;
@@ -170,7 +173,7 @@ namespace Nekoyume.UI
             }
 
             var sumPrice = GetSumPrice(models);
-            if (States.Instance.GoldBalanceState.Gold < sumPrice)
+            if (ClientStateViewProvider.Current.CurrentGoldBalanceStateRaw.Gold < sumPrice)
             {
                 Find<PaymentPopup>().ShowLackPaymentNCG(sumPrice.ToString());
                 return;
@@ -188,8 +191,8 @@ namespace Nekoyume.UI
         private void Buy(List<ShopItem> models)
         {
             var productInfos = new List<IProductInfo>();
-            var avatarAddress = States.Instance.CurrentAvatarState.address;
-            var currency = States.Instance.GoldBalanceState.Gold.Currency;
+            var avatarAddress = ClientStateViewProvider.Current.CurrentAvatar?.Address.ToLibplanet() ?? default;
+            var currency = ClientStateViewProvider.Current.CurrentGoldBalanceStateRaw.Gold.Currency;
             foreach (var model in models)
             {
                 var itemProduct = model.Product;
@@ -236,8 +239,8 @@ namespace Nekoyume.UI
                 var props = new Dictionary<string, Value>()
                 {
                     ["Count"] = models.Count,
-                    ["AvatarAddress"] = States.Instance.CurrentAvatarState.address.ToString(),
-                    ["AgentAddress"] = States.Instance.AgentState.address.ToString()
+                    ["AvatarAddress"] = (ClientStateViewProvider.Current.CurrentAvatar?.Address.ToString() ?? string.Empty),
+                    ["AgentAddress"] = ClientStateViewProvider.Current.CurrentAgent.Address.ToString()
                 };
                 Analyzer.Instance.Track("Unity/Number of Purchased Items", props);
             }
@@ -248,8 +251,8 @@ namespace Nekoyume.UI
                 var props = new Dictionary<string, Value>()
                 {
                     ["Price"] = price,
-                    ["AvatarAddress"] = States.Instance.CurrentAvatarState.address.ToString(),
-                    ["AgentAddress"] = States.Instance.AgentState.address.ToString()
+                    ["AvatarAddress"] = (ClientStateViewProvider.Current.CurrentAvatar?.Address.ToString() ?? string.Empty),
+                    ["AgentAddress"] = ClientStateViewProvider.Current.CurrentAgent.Address.ToString()
                 };
                 Analyzer.Instance.Track("Unity/BuyProduct", props);
 
@@ -279,23 +282,23 @@ namespace Nekoyume.UI
 
         private static async Task<PurchaseInfo> GetPurchaseInfo(System.Guid orderId)
         {
-            var order = await Util.GetOrder(orderId);
+            var order = await Util.GetClientOrder(orderId);
             return new PurchaseInfo(orderId, order.TradableId, order.SellerAgentAddress,
                 order.SellerAvatarAddress, order.ItemSubType, order.Price);
         }
 
         public static FungibleAssetValue GetSumPrice(List<ShopItem> models)
         {
-            var sumPrice = new FungibleAssetValue(States.Instance.GoldBalanceState.Gold.Currency, 0, 0);
+            var sumPrice = new FungibleAssetValue(ClientStateViewProvider.Current.CurrentGoldBalanceStateRaw.Gold.Currency, 0, 0);
             foreach (var model in models)
             {
                 if (model.ItemBase is not null)
                 {
-                    sumPrice += (BigInteger)model.Product.Price * States.Instance.GoldBalanceState.Gold.Currency;
+                    sumPrice += (BigInteger)model.Product.Price * ClientStateViewProvider.Current.CurrentGoldBalanceStateRaw.Gold.Currency;
                 }
                 else
                 {
-                    sumPrice += (BigInteger)model.FungibleAssetProduct.Price * States.Instance.GoldBalanceState.Gold.Currency;
+                    sumPrice += (BigInteger)model.FungibleAssetProduct.Price * ClientStateViewProvider.Current.CurrentGoldBalanceStateRaw.Gold.Currency;
                 }
             }
 

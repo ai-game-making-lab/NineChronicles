@@ -6,6 +6,7 @@ using Nekoyume.Game.Avatar;
 using Nekoyume.Helper;
 using Nekoyume.Model;
 using Nekoyume.Model.Item;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.TableData;
 using Nekoyume.UI;
@@ -173,8 +174,8 @@ namespace Nekoyume.Game.Character
 
             var isDcc = Dcc.instance.IsVisible(avatarAddress, out var id, out var isVisible);
             if (isDcc && !isFriendCharacter &&
-                States.Instance.CurrentAvatarState is not null &&
-                avatarAddress == States.Instance.CurrentAvatarState.address)
+                ClientStateViewProvider.Current.CurrentAvatarStateRaw is not null &&
+                avatarAddress == ClientStateViewProvider.Current.CurrentAvatarStateRaw.address)
             {
                 isDcc = isVisible;
             }

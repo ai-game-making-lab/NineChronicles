@@ -1,6 +1,7 @@
 using Nekoyume.Game;
 using Nekoyume.Helper;
 using Nekoyume.Model.State;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.TableData.Pet;
 using System;
@@ -87,7 +88,7 @@ namespace Nekoyume.UI.Module
 
         public void Show()
         {
-            UpdateView(States.Instance.PetStates);
+            UpdateView(ClientStateViewProvider.Current.PetStatesRaw);
 
             if (_disposableOnDisabled != null)
             {
@@ -95,7 +96,7 @@ namespace Nekoyume.UI.Module
                 _disposableOnDisabled = null;
             }
 
-            _disposableOnDisabled = States.Instance.PetStates.PetStatesSubject
+            _disposableOnDisabled = ClientStateViewProvider.Current.PetStatesRaw.PetStatesSubject
                 .Subscribe(state => UpdateView(state));
             gameObject.SetActive(true);
             InitScrollPosition();
@@ -109,7 +110,7 @@ namespace Nekoyume.UI.Module
                 return;
             }
 
-            UpdateView(States.Instance.PetStates, craftInfo);
+            UpdateView(ClientStateViewProvider.Current.PetStatesRaw, craftInfo);
 
             if (_disposableOnDisabled != null)
             {
@@ -117,7 +118,7 @@ namespace Nekoyume.UI.Module
                 _disposableOnDisabled = null;
             }
 
-            _disposableOnDisabled = States.Instance.PetStates.PetStatesSubject
+            _disposableOnDisabled = ClientStateViewProvider.Current.PetStatesRaw.PetStatesSubject
                 .Subscribe(state => UpdateView(state, craftInfo));
             gameObject.SetActive(true);
             InitScrollPosition();
@@ -199,7 +200,7 @@ namespace Nekoyume.UI.Module
 
             if (equipped)
             {
-                var combinationState = States.Instance.GetUsedCombinationSlotState();
+                var combinationState = ClientStateViewProvider.Current.GetUsedCombinationSlotState();
                 var equippedSlot = combinationState.FirstOrDefault(x => x.Value.PetId == petId);
                 viewData.CombinationSlotIndex =
                     equippedSlot.Equals(default(KeyValuePair<int, CombinationSlotState>)) ? int.MaxValue : equippedSlot.Key;
@@ -211,14 +212,14 @@ namespace Nekoyume.UI.Module
                     optionInfo,
                     craftInfo.Value,
                     petState,
-                    States.Instance.GameConfigState);
+                    ClientStateViewProvider.Current.CurrentGameConfigStateRaw);
                 viewData.Description = description;
                 viewData.IsAppliable = applied;
             }
             else
             {
                 viewData.Description = PetFrontHelper.GetDefaultDescriptionText(
-                    optionInfo, States.Instance.GameConfigState);
+                    optionInfo, ClientStateViewProvider.Current.CurrentGameConfigStateRaw);
                 // If craftInfo is null, it should not be dimmed. (for displaying description)
                 viewData.IsAppliable = !craftInfo.HasValue;
             }

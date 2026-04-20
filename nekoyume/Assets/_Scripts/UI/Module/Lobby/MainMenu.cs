@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using Nekoyume.L10n;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.UI.AnimatedGraphics;
 using Nekoyume.UI.Tween;
@@ -138,8 +139,8 @@ namespace Nekoyume.UI.Module.Lobby
         {
             if (_requireStage > 0)
             {
-                if (States.Instance.CurrentAvatarState.worldInformation != null &&
-                    States.Instance.CurrentAvatarState.worldInformation
+                if (ClientStateViewProvider.Current.CurrentAvatarStateRaw.worldInformation != null &&
+                    ClientStateViewProvider.Current.CurrentAvatarStateRaw.worldInformation
                         .TryGetUnlockedWorldByStageClearedBlockIndex(out var world))
                 {
                     IsUnlocked = _requireStage <= world.StageClearedId;

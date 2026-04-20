@@ -6,6 +6,7 @@ using Nekoyume.Model.Item;
 using Nekoyume.Model.Mail;
 using Nekoyume.SingleClient.Models.Items;
 using ItemSubType = Nekoyume.Model.Item.ItemSubType;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.UI.Module;
 using UnityEngine;
@@ -221,7 +222,7 @@ namespace Nekoyume.UI
                 return;
             }
 
-            if (States.Instance.GoldBalanceState.Gold.MajorUnit < _costNcg)
+            if (ClientStateViewProvider.Current.CurrentGoldBalanceStateRaw.Gold.MajorUnit < _costNcg)
             {
                 Find<PaymentPopup>().ShowLackPaymentNCG(_costNcg.ToString());
                 return;
@@ -448,9 +449,11 @@ namespace Nekoyume.UI
                         return hammerExp * inventoryItem.SelectedMaterialCount.Value;
                     }
 
-                    return (inventoryItem.ItemBase as Equipment).GetRealExp(
-                        equipmentItemSheet,
-                        enhancementCostSheet);
+                    if (inventoryItem.ItemBase.ToPolySnapshot() is EquipmentSnapshot matEqSnap)
+                    {
+                        return matEqSnap.GetRealExp(equipmentItemSheet, enhancementCostSheet);
+                    }
+                    return 0L;
                 });
 
                 // Get Target Level

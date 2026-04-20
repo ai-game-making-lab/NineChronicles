@@ -10,6 +10,8 @@ using Nekoyume.L10n;
 using Nekoyume.Model.EnumType;
 using Nekoyume.Model.Item;
 using Nekoyume.Model.Mail;
+using Nekoyume.SingleClient.Models.Items;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.UI.Model;
 using Nekoyume.UI.Module;
@@ -18,6 +20,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Inventory = Nekoyume.Model.Item.Inventory;
 using ToggleGroup = Nekoyume.UI.Module.ToggleGroup;
+using ItemSubType = Nekoyume.Model.Item.ItemSubType;
 
 namespace Nekoyume.UI
 {
@@ -216,7 +219,7 @@ namespace Nekoyume.UI
         {
             if (_cachedInventory == null)
             {
-                _cachedInventory = States.Instance.CurrentAvatarState.inventory;
+                _cachedInventory = ClientStateViewProvider.Current.CurrentAvatarStateRaw.inventory;
 
                 if (_cachedInventory == null)
                 {
@@ -344,9 +347,9 @@ namespace Nekoyume.UI
 
         public static bool IsStrong(ItemBase itemBase)
         {
-            if (itemBase is Equipment equipment)
+            if (itemBase.ToPolySnapshot() is EquipmentSnapshot eqSnap)
             {
-                return equipment.level > 0;
+                return eqSnap.Level > 0;
             }
 
             return false;

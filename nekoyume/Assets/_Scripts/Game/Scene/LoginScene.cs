@@ -19,6 +19,8 @@ using Nekoyume.Multiplanetary;
 using Nekoyume.Game.Factory;
 using Nekoyume.Helper;
 using Nekoyume.L10n;
+using Nekoyume.SingleClient;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.UI;
 using UnityEngine;
@@ -336,11 +338,17 @@ namespace Nekoyume.Game.Scene
         private async UniTask EnterNext()
         {
             NcDebug.Log("[LoginScene] EnterNext() invoked");
+            if (TryGetStoredSingleClientSlotIndex(out var singleClientSlotIndex))
+            {
+                await EnterGame(singleClientSlotIndex);
+                return;
+            }
+
             if (!GameConfig.IsEditor)
             {
-                if (States.Instance.AgentState.avatarAddresses.Any() &&
+                if (ClientStateViewProvider.Current.CurrentAgentStateRaw.avatarAddresses.Any() &&
                     Helper.Util.TryGetStoredAvatarSlotIndex(out var slotIndex) &&
-                    States.Instance.AvatarStates.ContainsKey(slotIndex))
+                    ClientStateViewProvider.Current.AvatarStatesRaw.ContainsKey(slotIndex))
                 {
                     await EnterGame(slotIndex);
                 }
@@ -354,9 +362,9 @@ namespace Nekoyume.Game.Scene
                 PlayerFactory.Create();
 
                 if (Helper.Util.TryGetStoredAvatarSlotIndex(out var slotIndex) &&
-                    States.Instance.AvatarStates.ContainsKey(slotIndex))
+                    ClientStateViewProvider.Current.AvatarStatesRaw.ContainsKey(slotIndex))
                 {
-                    var avatarState = States.Instance.AvatarStates[slotIndex];
+                    var avatarState = ClientStateViewProvider.Current.AvatarStatesRaw[slotIndex];
                     if (avatarState?.inventory == null ||
                         avatarState.questList == null ||
                         avatarState.worldInformation == null)
@@ -403,7 +411,18 @@ namespace Nekoyume.Game.Scene
                 LoadingScreen.LoadingType.Entering,
                 L10nManager.Localize("UI_LOADING_BOOTSTRAP_START"));
             sw.Start();
-            await RxProps.SelectAvatarAsync(slotIndex, Game.instance.Agent.BlockTipStateRootHash, forceNewSelection);
+            if (TrySelectSingleClientAvatar(slotIndex))
+            {
+                await UniTask.CompletedTask;
+            }
+            else
+            {
+                await RxProps.SelectAvatarAsync(
+                    slotIndex,
+                    Game.instance.Agent.BlockTipStateRootHash,
+                    forceNewSelection);
+            }
+
             sw.Stop();
             NcDebug.Log($"[LoginScene] EnterNext()... SelectAvatarAsync() finished in {sw.ElapsedMilliseconds}ms.(elapsed)");
 
@@ -412,6 +431,36 @@ namespace Nekoyume.Game.Scene
 
             Lobby.Enter();
             Event.OnUpdateAddresses.Invoke();
+        }
+
+        private static bool TryGetStoredSingleClientSlotIndex(out int slotIndex)
+        {
+            slotIndex = 0;
+            var game = Game.instance;
+            if (game is null ||
+                !SingleClientMode.IsEnabled(game.CommandLineOptions) ||
+                !Helper.Util.TryGetStoredAvatarSlotIndex(out slotIndex))
+            {
+                return false;
+            }
+
+            var storedSlotIndex = slotIndex;
+            return game.ClientRuntime?.State?.Avatars.Any(
+                avatar => avatar.SlotIndex == storedSlotIndex) == true;
+        }
+
+        private static bool TrySelectSingleClientAvatar(int slotIndex)
+        {
+            var game = Game.instance;
+            if (game is null ||
+                !SingleClientMode.IsEnabled(game.CommandLineOptions) ||
+                game.ClientRuntime is null)
+            {
+                return false;
+            }
+
+            game.ClientRuntime.SelectAvatar(slotIndex);
+            return true;
         }
 
         private async UniTask CoLogin(PlanetContext planetContext, Action<bool> loginCallback)

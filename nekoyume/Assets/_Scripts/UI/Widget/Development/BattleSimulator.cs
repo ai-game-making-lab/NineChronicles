@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Lib9c.Renderers;
 using Libplanet.Action;
 using Nekoyume;
 using Nekoyume.Action;
@@ -10,10 +9,11 @@ using Nekoyume.EnumType;
 using Nekoyume.Game;
 using Nekoyume.Game.Battle;
 using Nekoyume.Model.BattleStatus;
-using Nekoyume.Model.EnumType;
 using Nekoyume.Model.Item;
+using Nekoyume.SingleClient.Models.EnumType;
 using Nekoyume.Model.Stat;
 using Nekoyume.Model.State;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.TableData;
 using Nekoyume.UI;
@@ -148,7 +148,7 @@ public class BattleSimulator : Widget
     private BattleLog Simulate()
     {
         var tableSheets = Game.instance.TableSheets;
-        var avatarState = new AvatarState(States.Instance.CurrentAvatarState) { level = TextToInt(level.text) };
+        var avatarState = new AvatarState(ClientStateViewProvider.Current.CurrentAvatarStateRaw) { level = TextToInt(level.text) };
         var skillSheet = tableSheets.SkillSheet;
         var equipmentItemSheet = tableSheets.EquipmentItemSheet;
         var optionSheet = tableSheets.EquipmentItemOptionSheet;
@@ -221,8 +221,8 @@ public class BattleSimulator : Widget
             random,
             avatarState,
             consumables,
-            States.Instance.AllRuneState,
-            States.Instance.CurrentRuneSlotStates[BattleType.Adventure],
+            ClientStateViewProvider.Current.AllRuneStateRaw,
+            ClientStateViewProvider.Current.CurrentRuneSlotStatesRaw[BattleType.Adventure.ToLib9c()],
             new List<Skill>(),
             worldId,
             stageId,
@@ -238,7 +238,7 @@ public class BattleSimulator : Widget
             tableSheets.BuffLimitSheet,
             tableSheets.BuffLinkSheet,
             true,
-            States.Instance.GameConfigState.ShatterStrikeMaxDamage);
+            ClientStateViewProvider.Current.CurrentGameConfigStateRaw.ShatterStrikeMaxDamage);
 
         simulator.Simulate();
 

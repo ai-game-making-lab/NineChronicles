@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Nekoyume.Game.Controller;
 using Nekoyume.Model.Item;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.TableData.Event;
 using Nekoyume.UI.Model;
@@ -63,7 +64,7 @@ namespace Nekoyume.UI
             selectCountText.text = "0";
             requiredCountText.text = $"/{requiredItemCount}";
 
-            var inventoryItems = States.Instance.CurrentAvatarState.inventory.Items;
+            var inventoryItems = ClientStateViewProvider.Current.CurrentAvatarStateRaw.inventory.Items;
             var lastSelectedMaterials = _selectedMaterialsByRecipe.GetValueOrDefault(recipeRow.Id);
             var models = recipeRow.RequiredMaterialsId
                 .Select(id =>

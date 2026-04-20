@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Linq;
 using System.Collections.Generic;
-using Lib9c.Model.Order;
 using Libplanet.Types.Assets;
 using MarketService.Response;
 using Nekoyume.Game;
 using Nekoyume.Helper;
 using Nekoyume.Model.Item;
+using Nekoyume.SingleClient;
 using Nekoyume.State;
 using Nekoyume.TableData;
 using TMPro;
@@ -282,7 +282,7 @@ namespace Nekoyume.UI.Module
                 var isExpired = false;
                 if (model.Product is not null && model.Product.Legacy)
                 {
-                    isExpired = model.Product.RegisteredBlockIndex + Order.ExpirationInterval - blockIndex <= 0;
+                    isExpired = model.Product.RegisteredBlockIndex + ClientOrder.ExpirationInterval - blockIndex <= 0;
                 }
 
                 model.Expired.Value = isExpired;

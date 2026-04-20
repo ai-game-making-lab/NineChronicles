@@ -58,6 +58,8 @@ namespace Nekoyume.Helper
 
         private bool rpcClient;
 
+        private bool singleClient;
+
         private string rpcServerHost;
 
         private string[] rpcServerHosts = { };
@@ -287,6 +289,17 @@ namespace Nekoyume.Helper
             set
             {
                 rpcClient = value;
+                Empty = false;
+            }
+        }
+
+        [Option("single-client", Required = false, HelpText = "Run without RPC or a remote headless node.")]
+        public bool SingleClient
+        {
+            get => singleClient;
+            set
+            {
+                singleClient = value;
                 Empty = false;
             }
         }

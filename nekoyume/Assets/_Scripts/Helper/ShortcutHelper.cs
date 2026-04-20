@@ -10,6 +10,7 @@ using Nekoyume.Game.LiveAsset;
 using Nekoyume.L10n;
 using Nekoyume.Model.Item;
 using Nekoyume.Model.Mail;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.TableData;
 using Nekoyume.TableData.Event;
@@ -193,7 +194,7 @@ namespace Nekoyume.Helper
             {
                 // If can get this item from quest...
                 if (
-                    States.Instance.CurrentAvatarState.questList.Any(quest =>
+                    ClientStateViewProvider.Current.CurrentAvatarStateRaw.questList.Any(quest =>
                         !quest.Complete && quest.Reward.ItemMap.Any(r => r.Item1 == itemId)
                     )
                 )
@@ -205,7 +206,7 @@ namespace Nekoyume.Helper
             // If can get this item from patrol reward...
             try
             {
-                var level = States.Instance.CurrentAvatarState.level;
+                var level = ClientStateViewProvider.Current.CurrentAvatarStateRaw.level;
                 var blockIndex = Game.Game.instance.Agent.BlockIndex;
                 var patrolRow = TableSheets.Instance.PatrolRewardSheet.FindByLevel(level, blockIndex);
                 if (patrolRow.Rewards.Any(r => r.ItemId == itemId))
@@ -595,7 +596,7 @@ namespace Nekoyume.Helper
             bool isEventStageRows = false
         )
         {
-            States.Instance.CurrentAvatarState.worldInformation.TryGetLastClearedStageId(
+            ClientStateViewProvider.Current.CurrentAvatarStateRaw.worldInformation.TryGetLastClearedStageId(
                 out var lastClearedStageId
             );
 
@@ -673,7 +674,7 @@ namespace Nekoyume.Helper
             Game.Game.instance.Stage.GetPlayer().gameObject.SetActive(false);
 
             var worldMap = Widget.Find<WorldMap>();
-            worldMap.SetWorldInformation(States.Instance.CurrentAvatarState.worldInformation);
+            worldMap.SetWorldInformation(ClientStateViewProvider.Current.CurrentAvatarStateRaw.worldInformation);
             worldMap.Show(worldId, stageId, false);
             worldMap.SharedViewModel.WorldInformation.TryGetWorld(worldId, out var worldModel);
 
@@ -698,7 +699,7 @@ namespace Nekoyume.Helper
             Game.Game.instance.Stage.GetPlayer().gameObject.SetActive(false);
 
             var worldMap = Widget.Find<WorldMap>();
-            worldMap.SetWorldInformation(States.Instance.CurrentAvatarState.worldInformation);
+            worldMap.SetWorldInformation(ClientStateViewProvider.Current.CurrentAvatarStateRaw.worldInformation);
             worldMap.ShowEventDungeonStage(RxProps.EventDungeonRow, false);
 
             Widget.Find<HeaderMenuStatic>().Show(true);
@@ -720,7 +721,7 @@ namespace Nekoyume.Helper
         public static void ShortcutActionForAdventureBoss(Widget caller)
         {
             var adventureBossData = Game.Game.instance.AdventureBossData;
-            var worldInformation = States.Instance.CurrentAvatarState.worldInformation;
+            var worldInformation = ClientStateViewProvider.Current.CurrentAvatarStateRaw.worldInformation;
             switch (adventureBossData.CurrentState.Value)
             {
                 case AdventureBossData.AdventureBossSeasonState.Ready:
@@ -831,7 +832,7 @@ namespace Nekoyume.Helper
             caller.CloseWithOtherWidgets();
 
             var worldMap = Widget.Find<WorldMap>();
-            worldMap.SetWorldInformation(States.Instance.CurrentAvatarState.worldInformation);
+            worldMap.SetWorldInformation(ClientStateViewProvider.Current.CurrentAvatarStateRaw.worldInformation);
             worldMap.ShowEventDungeonStage(RxProps.EventDungeonRow, false);
         }
 
@@ -861,7 +862,7 @@ namespace Nekoyume.Helper
 
                     var sharedViewModel = Widget.Find<WorldMap>().SharedViewModel;
                     if (
-                        States.Instance.CurrentAvatarState.worldInformation.TryGetWorldByStageId(
+                        ClientStateViewProvider.Current.CurrentAvatarStateRaw.worldInformation.TryGetWorldByStageId(
                             stageId,
                             out var world
                         )
@@ -876,14 +877,14 @@ namespace Nekoyume.Helper
 #if UNITY_ANDROID || UNITY_IOS
                     return false;
 #else
-                    return States.Instance.CurrentAvatarState.worldInformation.IsStageCleared(
+                    return ClientStateViewProvider.Current.CurrentAvatarStateRaw.worldInformation.IsStageCleared(
                         Game.LiveAsset.GameConfig.RequiredStage.Shop
                     );
 #endif
                 case PlaceType.MobileShop:
                     return true;
                 case PlaceType.Arena:
-                    return States.Instance.CurrentAvatarState.worldInformation.IsStageCleared(
+                    return ClientStateViewProvider.Current.CurrentAvatarStateRaw.worldInformation.IsStageCleared(
                         Game.LiveAsset.GameConfig.RequiredStage.Arena
                     );
                 case PlaceType.Quest:
@@ -895,7 +896,7 @@ namespace Nekoyume.Helper
                 case PlaceType.Grinding:
                     return true;
                 case PlaceType.Collection:
-                    var worldInformation = States.Instance.CurrentAvatarState.worldInformation;
+                    var worldInformation = ClientStateViewProvider.Current.CurrentAvatarStateRaw.worldInformation;
                     if (worldInformation is null)
                     {
                         return false;
@@ -907,7 +908,7 @@ namespace Nekoyume.Helper
                 case PlaceType.AdventureBoss:
                     return !Game.LiveAsset.GameConfig.IsKoreanBuild;
                 case PlaceType.WorldBoss:
-                    return States.Instance.CurrentAvatarState.worldInformation.IsStageCleared(
+                    return ClientStateViewProvider.Current.CurrentAvatarStateRaw.worldInformation.IsStageCleared(
                         Game.LiveAsset.GameConfig.RequiredStage.WorldBoss
                     );
                 case PlaceType.EventDungeon:

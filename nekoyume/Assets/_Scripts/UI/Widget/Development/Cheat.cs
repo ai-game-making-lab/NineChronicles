@@ -10,9 +10,10 @@ using Nekoyume.Battle;
 using Nekoyume.EnumType;
 using Nekoyume.Game.Character;
 using Nekoyume.Model.BattleStatus;
-using Nekoyume.Model.EnumType;
 using Nekoyume.Model.Skill;
+using Nekoyume.SingleClient.Models.EnumType;
 using Nekoyume.Model.State;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.UI;
 using TMPro;
@@ -417,13 +418,13 @@ namespace Nekoyume
 
             var tableSheets = Game.Game.instance.TableSheets;
             var random = new DebugRandom();
-            var avatarState = States.Instance.CurrentAvatarState;
+            var avatarState = ClientStateViewProvider.Current.CurrentAvatarStateRaw;
             var simulator = new StageSimulator(
                 random,
                 avatarState,
                 new List<Guid>(),
-                States.Instance.AllRuneState,
-                States.Instance.CurrentRuneSlotStates[BattleType.Adventure],
+                ClientStateViewProvider.Current.AllRuneStateRaw,
+                ClientStateViewProvider.Current.CurrentRuneSlotStatesRaw[BattleType.Adventure.ToLib9c()],
                 new List<Skill>(),
                 worldRow.Id,
                 stageId,
@@ -438,11 +439,11 @@ namespace Nekoyume
                     random,
                     tableSheets.StageSheet[stageId],
                     tableSheets.MaterialItemSheet),
-                States.Instance.CollectionState.GetEffects(tableSheets.CollectionSheet),
+                ClientStateViewProvider.Current.CollectionStateRaw.GetEffects(tableSheets.CollectionSheet),
                 tableSheets.BuffLimitSheet,
                 tableSheets.BuffLinkSheet,
                 true,
-                States.Instance.GameConfigState.ShatterStrikeMaxDamage
+                ClientStateViewProvider.Current.CurrentGameConfigStateRaw.ShatterStrikeMaxDamage
             );
             simulator.Simulate();
             simulator.Log.result = _result;

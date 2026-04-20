@@ -10,6 +10,8 @@ using Cysharp.Threading.Tasks;
 using System.Numerics;
 using Nekoyume.ApiClient;
 using Nekoyume.L10n;
+using Nekoyume.SingleClient.Blockchain;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.Model.Mail;
 using Nekoyume.UI.Scroller;
@@ -135,7 +137,7 @@ namespace Nekoyume.UI
                 switch (_data.ProductType)
                 {
                     case InAppPurchaseServiceClient.ProductType.IAP:
-                        ApiClients.Instance.IAPServiceManager.CheckProductAvailable(_data.Sku(), States.Instance.AgentState.address, Game.Game.instance.CurrentPlanetId.ToString(),
+                        ApiClients.Instance.IAPServiceManager.CheckProductAvailable(_data.Sku(), ClientStateViewProvider.Current.CurrentAgent.Address.ToLibplanet(), Game.Game.instance.CurrentPlanetId.ToString(),
                             //success
                             () => { Game.Game.instance.IAPStoreManager.OnPurchaseClicked(_data.Sku()); },
                             //failed
@@ -297,7 +299,7 @@ namespace Nekoyume.UI
             }
             else if (_data.RequiredLevel != null)
             {
-                buttonDisableObj.SetActive(_data.RequiredLevel > States.Instance.CurrentAvatarState.level);
+                buttonDisableObj.SetActive(_data.RequiredLevel > (ClientStateViewProvider.Current.CurrentAvatar?.Level ?? 0));
                 buyButton.interactable = !buttonDisableObj.activeSelf;
             }
             else

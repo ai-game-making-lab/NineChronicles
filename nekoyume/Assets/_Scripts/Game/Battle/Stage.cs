@@ -14,7 +14,6 @@ using System.Linq;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using JetBrains.Annotations;
-using Lib9c;
 using mixpanel;
 using Nekoyume.Battle;
 using Nekoyume.Blockchain;
@@ -36,6 +35,8 @@ using Nekoyume.Model.Item;
 using Nekoyume.Model.Mail;
 using Nekoyume.Model.Skill;
 using Nekoyume.Model.State;
+using Nekoyume.SingleClient;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.TableData.AdventureBoss;
 using Nekoyume.UI;
@@ -402,7 +403,7 @@ namespace Nekoyume.Game.Battle
 #if TEST_LOG
             NcDebug.Log($"[{nameof(Stage)}] {nameof(CoPlayStage)}() enter");
 #endif
-            var avatarState = States.Instance.CurrentAvatarState;
+            var avatarState = ClientStateViewProvider.Current.CurrentAvatarStateRaw;
             prevFood = avatarState.inventory.Items
                 .Select(i => i.item)
                 .OfType<Consumable>()
@@ -719,7 +720,7 @@ namespace Nekoyume.Game.Battle
             }
 
             yield return new WaitUntil(() => IsAvatarStateUpdatedAfterBattle);
-            var avatarState = States.Instance.CurrentAvatarState;
+            var avatarState = ClientStateViewProvider.Current.CurrentAvatarStateRaw;
 
             if (StageType != StageType.AdventureBoss && StageType != StageType.InfiniteTower)
             {
@@ -923,15 +924,15 @@ namespace Nekoyume.Game.Battle
 
             var characterSheet = TableSheets.Instance.CharacterSheet;
             var costumeStatSheet = TableSheets.Instance.CostumeStatSheet;
-            var cp = CPHelper.GetCPV2(States.Instance.CurrentAvatarState, characterSheet, costumeStatSheet);
+            var cp = CPHelper.GetCPV2(ClientStateViewProvider.Current.CurrentAvatarStateRaw, characterSheet, costumeStatSheet);
             var props = new Dictionary<string, Value>()
             {
                 ["StageId"] = log.stageId,
                 ["ClearedWave"] = log.clearedWaveNumber,
                 ["CP"] = cp,
                 ["FoodCount"] = foodCount,
-                ["AvatarAddress"] = States.Instance.CurrentAvatarState.address.ToString(),
-                ["AgentAddress"] = States.Instance.AgentState.address.ToString()
+                ["AvatarAddress"] = ClientStateViewProvider.Current.CurrentAvatarStateRaw.address.ToString(),
+                ["AgentAddress"] = ClientStateViewProvider.Current.CurrentAgentStateRaw.address.ToString()
             };
             Analyzer.Instance.Track("Unity/Stage End", props);
         }
@@ -970,7 +971,7 @@ namespace Nekoyume.Game.Battle
 #if TEST_LOG
             NcDebug.Log($"[{nameof(Stage)}] {nameof(CoSpawnPlayer)}() enter");
 #endif
-            var avatarState = States.Instance.CurrentAvatarState;
+            var avatarState = ClientStateViewProvider.Current.CurrentAvatarStateRaw;
             var playerCharacter = _stageRunningPlayer;
             playerCharacter.ShowSpeech("PLAYER_INIT");
 
@@ -1433,7 +1434,7 @@ namespace Nekoyume.Game.Battle
             {
                 if (amount > 0)
                 {
-                    var currency = Currencies.GetMinterlessCurrency(ticker);
+                    var currency = ClientCurrencies.GetMinterlessCurrency(ticker);
                     var fungibleAsset = currency * amount;
                     var countableItem = new CountableItem(fungibleAsset, amount, true);
                     if (StageType == StageType.InfiniteTower)
@@ -1653,7 +1654,7 @@ namespace Nekoyume.Game.Battle
                 objectPool.Remove<Model.Player>(SelectedPlayer.gameObject);
             }
 
-            var go = PlayerFactory.Create(States.Instance.CurrentAvatarState);
+            var go = PlayerFactory.Create(ClientStateViewProvider.Current.CurrentAvatarStateRaw);
             SelectedPlayer = go.GetComponent<Player>();
 
             if (SelectedPlayer is null)
@@ -1674,7 +1675,7 @@ namespace Nekoyume.Game.Battle
         private Player RunPlayer(bool chasePlayer = true)
         {
             _stageRunningPlayer = GetPlayer();
-            _stageRunningPlayer.Set(States.Instance.CurrentAvatarState);
+            _stageRunningPlayer.Set(ClientStateViewProvider.Current.CurrentAvatarStateRaw);
             var playerTransform = _stageRunningPlayer.transform;
             Vector2 position = playerTransform.position;
             position.y = StageStartPosition;

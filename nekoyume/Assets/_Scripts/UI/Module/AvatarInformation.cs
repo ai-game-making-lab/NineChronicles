@@ -15,10 +15,14 @@ using Nekoyume.Model.Item;
 using Nekoyume.Model.Mail;
 using Nekoyume.Model.Stat;
 using Nekoyume.SingleClient.Models.Elemental;
+using Nekoyume.SingleClient.Models.Items;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.TableData;
 using Nekoyume.UI.Model;
 using TMPro;
+using ItemType = Nekoyume.Model.Item.ItemType;
+using ItemSubType = Nekoyume.Model.Item.ItemSubType;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -232,8 +236,8 @@ namespace Nekoyume.UI.Module
         {
             // 무한의 탑에서는 룬을 InfiniteTower 타입으로 가져옴
             var runeBattleType = _battleType;
-            var states = States.Instance.CurrentRuneSlotStates[runeBattleType].GetRuneSlot();
-            var equippedRuneStates = States.Instance.GetEquippedRuneStates(runeBattleType);
+            var states = ClientStateViewProvider.Current.CurrentRuneSlotStatesRaw[runeBattleType].GetRuneSlot();
+            var equippedRuneStates = ClientStateViewProvider.Current.GetEquippedRuneStates(runeBattleType);
             var sheet = Game.Game.instance.TableSheets.RuneListSheet;
 
             List<RuneType> forbiddenRuneTypes = null;
@@ -256,9 +260,9 @@ namespace Nekoyume.UI.Module
 
         private void UpdateItemView()
         {
-            var avatarState = States.Instance.CurrentAvatarState;
+            var avatarState = ClientStateViewProvider.Current.CurrentAvatarStateRaw;
             var level = avatarState.level;
-            var (equipments, costumes) = States.Instance.GetEquippedItems(_battleType);
+            var (equipments, costumes) = ClientStateViewProvider.Current.GetEquippedItems(_battleType);
             Game.Game.instance.Lobby.Character.Set(avatarState, equipments, costumes);
 
             costumeSlots.SetPlayerCostumes(level, costumes, OnClickSlot, OnDoubleClickSlot);
@@ -269,7 +273,7 @@ namespace Nekoyume.UI.Module
                 consumeSlots.SetPlayerConsumables(level, consumables, OnClickSlot, OnDoubleClickSlot);
             }
 
-            var itemSlotState = States.Instance.CurrentItemSlotStates[_battleType];
+            var itemSlotState = ClientStateViewProvider.Current.CurrentItemSlotStatesRaw[_battleType];
             inventory.UpdateCostumes(itemSlotState.Costumes);
             inventory.UpdateEquipments(itemSlotState.Equipments);
             inventory.UpdateConsumables(_consumableIds);
@@ -278,9 +282,9 @@ namespace Nekoyume.UI.Module
 
         private void UpdateItemViewForInfiniteTower()
         {
-            var avatarState = States.Instance.CurrentAvatarState;
+            var avatarState = ClientStateViewProvider.Current.CurrentAvatarStateRaw;
             var level = avatarState.level;
-            var (equipments, costumes) = States.Instance.GetEquippedItems(_battleType);
+            var (equipments, costumes) = ClientStateViewProvider.Current.GetEquippedItems(_battleType);
             // 무한의 탑에서는 캐릭터 모델을 설정하지 않음
             // Game.Game.instance.Lobby.Character.Set(avatarState, equipments, costumes);
 
@@ -292,7 +296,7 @@ namespace Nekoyume.UI.Module
                 consumeSlots.SetPlayerConsumables(level, consumables, OnClickSlot, OnDoubleClickSlot);
             }
 
-            var itemSlotState = States.Instance.CurrentItemSlotStates[_battleType];
+            var itemSlotState = ClientStateViewProvider.Current.CurrentItemSlotStatesRaw[_battleType];
             inventory.UpdateCostumes(itemSlotState.Costumes, _floorData);
             inventory.UpdateEquipments(itemSlotState.Equipments, _floorData);
             inventory.UpdateConsumables(_consumableIds);
@@ -312,7 +316,7 @@ namespace Nekoyume.UI.Module
                 return;
             }
 
-            var (_, costumes) = States.Instance.GetEquippedItems(_battleType);
+            var (_, costumes) = ClientStateViewProvider.Current.GetEquippedItems(_battleType);
             var title = costumes.FirstOrDefault(x => x.ItemSubType == ItemSubType.Title);
             if (title is null)
             {
@@ -327,7 +331,7 @@ namespace Nekoyume.UI.Module
         public List<Consumable> GetEquippedConsumables()
         {
             var consumablesInventory =
-                States.Instance.CurrentAvatarState.inventory.Consumables.ToArray();
+                ClientStateViewProvider.Current.CurrentAvatarStateRaw.inventory.Consumables.ToArray();
 
             var equippedConsumables = new List<Consumable>();
             foreach (var id in _consumableIds)
@@ -366,10 +370,10 @@ namespace Nekoyume.UI.Module
                 {
                     case RuneSlotType.Ncg:
                         costType = CostType.NCG;
-                        balance = States.Instance.GoldBalanceState.Gold;
+                        balance = ClientStateViewProvider.Current.CurrentGoldBalanceStateRaw.Gold;
                         cost = isStatSlot
-                            ? States.Instance.GameConfigState.RuneStatSlotUnlockCost
-                            : States.Instance.GameConfigState.RuneSkillSlotUnlockCost;
+                            ? ClientStateViewProvider.Current.CurrentGameConfigStateRaw.RuneStatSlotUnlockCost
+                            : ClientStateViewProvider.Current.CurrentGameConfigStateRaw.RuneSkillSlotUnlockCost;
                         notEnoughContent =
                             L10nManager.Localize("UI_NOT_ENOUGH_NCG_WITH_SUPPLIER_INFO");
                         attractMessage = L10nManager.Localize("UI_SHOP");
@@ -377,10 +381,10 @@ namespace Nekoyume.UI.Module
                         break;
                     case RuneSlotType.Crystal:
                         costType = CostType.Crystal;
-                        balance = States.Instance.CrystalBalance;
+                        balance = ClientStateViewProvider.Current.CrystalBalanceRaw;
                         cost = isStatSlot
-                            ? States.Instance.GameConfigState.RuneStatSlotCrystalUnlockCost
-                            : States.Instance.GameConfigState.RuneSkillSlotCrystalUnlockCost;
+                            ? ClientStateViewProvider.Current.CurrentGameConfigStateRaw.RuneStatSlotCrystalUnlockCost
+                            : ClientStateViewProvider.Current.CurrentGameConfigStateRaw.RuneSkillSlotCrystalUnlockCost;
                         notEnoughContent = L10nManager.Localize("UI_NOT_ENOUGH_CRYSTAL");
                         attractMessage = L10nManager.Localize("UI_GO_GRINDING");
                         onAttractWhenNotEnough = GoToGrinding;
@@ -508,14 +512,14 @@ namespace Nekoyume.UI.Module
                 return;
             }
 
-            var avatarState = States.Instance.CurrentAvatarState;
-            var gameConfig = States.Instance.GameConfigState;
+            var avatarState = ClientStateViewProvider.Current.CurrentAvatarStateRaw;
+            var gameConfig = ClientStateViewProvider.Current.CurrentGameConfigStateRaw;
             if (!inventoryItem.IsValid(avatarState.level, gameConfig))
             {
                 return;
             }
 
-            var states = States.Instance.CurrentItemSlotStates[_battleType];
+            var states = ClientStateViewProvider.Current.CurrentItemSlotStatesRaw[_battleType];
             switch (inventoryItem.ItemBase.ItemType)
             {
                 case ItemType.Equipment:
@@ -574,9 +578,10 @@ namespace Nekoyume.UI.Module
                         }
                     }
 
-                    if (inventoryItem.ItemBase is Equipment equip)
+                    if (inventoryItem.ItemBase.ToPolySnapshot() is EquipmentSnapshot equipSnap &&
+                        equipSnap.NonFungibleId is Guid equipId)
                     {
-                        equipments.Add(equip.ItemId);
+                        equipments.Add(equipId);
                     }
 
                     inventory.UpdateEquipments(equipments);
@@ -608,9 +613,10 @@ namespace Nekoyume.UI.Module
                         costumes.Remove(guid);
                     }
 
-                    if (inventoryItem.ItemBase is Costume costume)
+                    if (inventoryItem.ItemBase.ToPolySnapshot() is CostumeSnapshot costumeSnap &&
+                        costumeSnap.NonFungibleId is Guid costumeId)
                     {
-                        costumes.Add(costume.ItemId);
+                        costumes.Add(costumeId);
                     }
 
                     inventory.UpdateCostumes(costumes);
@@ -663,9 +669,9 @@ namespace Nekoyume.UI.Module
                         }
                     }
 
-                    if (inventoryItem.ItemBase is Consumable consumable)
+                    if (inventoryItem.ItemBase.ToPolySnapshot() is ConsumableSnapshot consumableSnap)
                     {
-                        _consumableIds.Add(consumable.Id);
+                        _consumableIds.Add(consumableSnap.Id);
                         inventoryItem.Count.Value--;
                     }
 
@@ -683,31 +689,33 @@ namespace Nekoyume.UI.Module
                 return;
             }
 
-            var states = States.Instance.CurrentItemSlotStates[_battleType];
+            var states = ClientStateViewProvider.Current.CurrentItemSlotStatesRaw[_battleType];
             switch (inventoryItem.ItemBase.ItemType)
             {
                 case ItemType.Equipment:
-                    if (inventoryItem.ItemBase is Equipment equipment)
+                    if (inventoryItem.ItemBase.ToPolySnapshot() is EquipmentSnapshot equipmentSnap &&
+                        equipmentSnap.NonFungibleId is Guid unequipEqId)
                     {
-                        states.Equipments.Remove(equipment.ItemId);
+                        states.Equipments.Remove(unequipEqId);
                     }
 
                     inventory.UpdateEquipments(states.Equipments);
                     break;
 
                 case ItemType.Costume:
-                    if (inventoryItem.ItemBase is Costume costume)
+                    if (inventoryItem.ItemBase.ToPolySnapshot() is CostumeSnapshot costumeUneqSnap &&
+                        costumeUneqSnap.NonFungibleId is Guid unequipCsId)
                     {
-                        states.Costumes.Remove(costume.ItemId);
+                        states.Costumes.Remove(unequipCsId);
                     }
 
                     inventory.UpdateCostumes(states.Costumes);
                     break;
 
                 case ItemType.Consumable:
-                    if (inventoryItem.ItemBase is Consumable consumable)
+                    if (inventoryItem.ItemBase.ToPolySnapshot() is ConsumableSnapshot consumableUneqSnap)
                     {
-                        _consumableIds.Remove(consumable.Id);
+                        _consumableIds.Remove(consumableUneqSnap.Id);
                         inventoryItem.Count.Value++;
                     }
 
@@ -722,7 +730,7 @@ namespace Nekoyume.UI.Module
         {
             // 무한의 탑에서는 룬을 InfiniteTower 타입으로 가져옴
             var runeBattleType = _battleType;
-            var states = States.Instance.CurrentRuneSlotStates[runeBattleType].GetRuneSlot();
+            var states = ClientStateViewProvider.Current.CurrentRuneSlotStatesRaw[runeBattleType].GetRuneSlot();
             var sheet = Game.Game.instance.TableSheets.RuneListSheet;
             if (!sheet.TryGetValue(inventoryItem.RuneState.RuneId, out var row))
             {
@@ -735,7 +743,7 @@ namespace Nekoyume.UI.Module
                 .ToDictionary(x => x.Index, x => x);
 
             // 룬 아이디가 없거나, 현재 보유중인룬ID 가 아닌경우
-            var selectedSlot = slots.Values.FirstOrDefault(x => !x.RuneId.HasValue || !States.Instance.AllRuneState.TryGetRuneState(x.RuneId.Value, out var runeState));
+            var selectedSlot = slots.Values.FirstOrDefault(x => !x.RuneId.HasValue || !ClientStateViewProvider.Current.AllRuneStateRaw.TryGetRuneState(x.RuneId.Value, out var runeState));
             if (selectedSlot != null) // 비어있으면
             {
                 selectedSlot.Equip(inventoryItem.RuneState.RuneId);
@@ -757,7 +765,7 @@ namespace Nekoyume.UI.Module
                     }
 
                     var firstRuneId = firstSlot.Value.RuneId.Value;
-                    if (!States.Instance.AllRuneState.TryGetRuneState(firstRuneId, out var firstState))
+                    if (!ClientStateViewProvider.Current.AllRuneStateRaw.TryGetRuneState(firstRuneId, out var firstState))
                     {
                         NcDebug.LogError("First rune state is null.");
                         return;
@@ -773,7 +781,7 @@ namespace Nekoyume.UI.Module
                         }
 
                         var runeId = runeSlot.RuneId.Value;
-                        if (!States.Instance.AllRuneState.TryGetRuneState(runeId, out var state))
+                        if (!ClientStateViewProvider.Current.AllRuneStateRaw.TryGetRuneState(runeId, out var state))
                         {
                             NcDebug.LogError("Rune state is null.");
                             return;
@@ -809,7 +817,7 @@ namespace Nekoyume.UI.Module
 
             // 무한의 탑에서는 룬을 InfiniteTower 타입으로 가져옴
             var runeBattleType = _battleType;
-            var states = States.Instance.CurrentRuneSlotStates[runeBattleType].GetRuneSlot();
+            var states = ClientStateViewProvider.Current.CurrentRuneSlotStatesRaw[runeBattleType].GetRuneSlot();
             bool found = false;
             foreach (var slot in states)
             {
@@ -1084,13 +1092,13 @@ namespace Nekoyume.UI.Module
 
             var characterStats = new CharacterStats(row, avatarState.level);
             var consumables = GetEquippedConsumables();
-            var (equipments, costumes) = States.Instance.GetEquippedItems(_battleType);
+            var (equipments, costumes) = ClientStateViewProvider.Current.GetEquippedItems(_battleType);
 
             // 무한의 탑에서는 룬을 InfiniteTower 타입에서 가져옴 (EquipRune/UnequipRune과 동일한 로직)
             var runeBattleType = _battleType;
-            var equippedRuneStates = States.Instance.GetEquippedRuneStates(runeBattleType);
+            var equippedRuneStates = ClientStateViewProvider.Current.GetEquippedRuneStates(runeBattleType);
 
-            var allRuneState = States.Instance.AllRuneState;
+            var allRuneState = ClientStateViewProvider.Current.AllRuneStateRaw;
             var runeListSheet = Game.Game.instance.TableSheets.RuneListSheet;
             var runeLevelBonusSheet = Game.Game.instance.TableSheets.RuneLevelBonusSheet;
             var runeLevelBonus = RuneHelper.CalculateRuneLevelBonus(allRuneState,
@@ -1192,12 +1200,13 @@ namespace Nekoyume.UI.Module
             foreach (var slot in equipmentSlots)
             {
                 bool shouldDim = false;
-                if (slot.Item != null && slot.Item is Equipment equipment)
+                if (slot.Item != null && slot.Item.ToPolySnapshot() is EquipmentSnapshot slotEqSnap &&
+                    slotEqSnap.NonFungibleId is Guid slotEqId)
                 {
-                    shouldDim = invalidEquipmentIds.Contains(equipment.ItemId);
+                    shouldDim = invalidEquipmentIds.Contains(slotEqId);
                     if (shouldDim)
                     {
-                        NcDebug.Log($"[AvatarInformation] Dimming equipment: {equipment.ItemId}");
+                        NcDebug.Log($"[AvatarInformation] Dimming equipment: {slotEqId}");
                     }
                 }
                 slot.SetConditionDim(shouldDim);
@@ -1207,12 +1216,13 @@ namespace Nekoyume.UI.Module
             foreach (var slot in costumeSlots)
             {
                 bool shouldDim = false;
-                if (slot.Item != null && slot.Item is Costume costume)
+                if (slot.Item != null && slot.Item.ToPolySnapshot() is CostumeSnapshot slotCsSnap &&
+                    slotCsSnap.NonFungibleId is Guid slotCsId)
                 {
-                    shouldDim = invalidCostumeIds.Contains(costume.ItemId);
+                    shouldDim = invalidCostumeIds.Contains(slotCsId);
                     if (shouldDim)
                     {
-                        NcDebug.Log($"[AvatarInformation] Dimming costume: {costume.ItemId}");
+                        NcDebug.Log($"[AvatarInformation] Dimming costume: {slotCsId}");
                     }
                 }
                 slot.SetDim(shouldDim);

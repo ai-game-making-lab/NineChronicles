@@ -1,6 +1,6 @@
 using Nekoyume.Game;
 using Nekoyume.Helper;
-using Nekoyume.Model.Item;
+using Nekoyume.SingleClient.Models.Items;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -12,9 +12,14 @@ namespace Nekoyume.UI.Module
         [SerializeField] private Image iconImage;
         [SerializeField] private TextMeshProUGUI countText;
 
-        public void Set(ItemBase itemBase, int count)
+        /// <summary>
+        /// Snapshot-facing primary overload. Callers that still hold a lib9c <c>ItemBase</c>
+        /// should project via <c>ItemSnapshotMapper.ToPolySnapshot()</c> before calling; this
+        /// view no longer depends on <c>Nekoyume.Model.Item</c> types.
+        /// </summary>
+        public void Set(IItemSnapshot snapshot, int count)
         {
-            iconImage.sprite = BaseItemView.GetItemIcon(itemBase);
+            iconImage.sprite = BaseItemView.GetItemIcon(snapshot);
             countText.text = $"+{count}";
         }
 

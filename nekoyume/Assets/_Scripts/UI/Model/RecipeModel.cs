@@ -10,6 +10,7 @@ using Nekoyume.L10n;
 using Nekoyume.Model.Item;
 using Nekoyume.Model.Stat;
 using Nekoyume.Model.State;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.TableData;
 using Nekoyume.TableData.Event;
@@ -166,7 +167,7 @@ namespace Nekoyume.UI.Model
                 ? recipeState.ToList(StateExtensions.ToInteger)
                 : new List<int> { 1 };
             SetUnlockedRecipes(result);
-            States.Instance.UpdateHammerPointStates(result);
+            ClientStateViewProvider.Current.UpdateHammerPointStates(result);
         }
 
         public void SetUnlockedRecipes(List<int> recipeIds)
@@ -176,7 +177,7 @@ namespace Nekoyume.UI.Model
 
         public void UpdateUnlockableRecipes()
         {
-            if (!States.Instance.CurrentAvatarState.worldInformation.TryGetLastClearedStageId(
+            if (!ClientStateViewProvider.Current.CurrentAvatarStateRaw.worldInformation.TryGetLastClearedStageId(
                 out var lastClearedStageId))
             {
                 lastClearedStageId = 1;
@@ -193,7 +194,7 @@ namespace Nekoyume.UI.Model
                 .OrderBy(x => x.UnlockStage);
 
             var unlockableRecipes = new List<int>();
-            var balance = States.Instance.CrystalBalance.MajorUnit;
+            var balance = ClientStateViewProvider.Current.CurrentAgentCrystalBalanceMajorUnit;
             var totalCost = 0;
             foreach (var availableRecipe in availableRecipes)
             {

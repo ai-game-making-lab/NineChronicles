@@ -8,6 +8,7 @@ using Nekoyume.Helper;
 using Nekoyume.L10n;
 using Nekoyume.Model.Item;
 using Nekoyume.Model.State;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.TableData;
 using Nekoyume.UI.Model;
@@ -416,17 +417,17 @@ namespace Nekoyume.UI
             var diff = state.WorkCompleteBlockIndex - currentBlockIndex;
             int cost;
             if (state.PetId.HasValue &&
-                States.Instance.PetStates.TryGetPetState(state.PetId.Value, out var petState))
+                ClientStateViewProvider.Current.PetStatesRaw.TryGetPetState(state.PetId.Value, out var petState))
             {
                 cost = PetHelper.CalculateDiscountedHourglass(
                     diff,
-                    States.Instance.GameConfigState.HourglassPerBlock,
+                    ClientStateViewProvider.Current.CurrentGameConfigStateRaw.HourglassPerBlock,
                     petState,
                     TableSheets.Instance.PetOptionSheet);
             }
             else
             {
-                cost = RapidCombination0.CalculateHourglassCount(States.Instance.GameConfigState, diff);
+                cost = RapidCombination0.CalculateHourglassCount(ClientStateViewProvider.Current.CurrentGameConfigStateRaw, diff);
             }
 
             rapidCombinationButton.SetCost(CostType.Hourglass, cost);

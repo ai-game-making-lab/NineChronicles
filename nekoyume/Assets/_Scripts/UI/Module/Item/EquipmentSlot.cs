@@ -2,6 +2,10 @@ using System;
 using Nekoyume.Helper;
 using Nekoyume.L10n;
 using Nekoyume.Model.Item;
+using Nekoyume.SingleClient.Models.Items;
+using Nekoyume.SingleClient.State;
+using ItemType = Nekoyume.Model.Item.ItemType;
+using ItemSubType = Nekoyume.Model.Item.ItemSubType;
 using Nekoyume.UI.AnimatedGraphics;
 using TMPro;
 using UniRx.Triggers;
@@ -141,7 +145,7 @@ namespace Nekoyume.UI.Module
 
         private void UpdateRequireLevel()
         {
-            var gameConfig = States.Instance.GameConfigState;
+            var gameConfig = ClientStateViewProvider.Current.CurrentGameConfigStateRaw;
 
             switch (ItemSubType)
             {
@@ -213,7 +217,7 @@ namespace Nekoyume.UI.Module
                     throw new ArgumentOutOfRangeException();
             }
 
-            var avatarState = States.Instance.CurrentAvatarState;
+            var avatarState = ClientStateViewProvider.Current.CurrentAvatarStateRaw;
             if (avatarState != null)
             {
                 Set(avatarState.level);
@@ -255,22 +259,23 @@ namespace Nekoyume.UI.Module
 
             optionTagBg.gameObject.SetActive(false);
             enhancementImage.gameObject.SetActive(false);
-            if (itemBase is Equipment equip)
+            if (itemBase.ToPolySnapshot() is EquipmentSnapshot equip)
             {
-                var isUpgraded = equip.level > 0;
+                var isUpgraded = equip.Level > 0;
                 enhancementText.enabled = isUpgraded;
                 if (isUpgraded)
                 {
-                    enhancementText.text = $"+{equip.level}";
+                    enhancementText.text = $"+{equip.Level}";
                 }
 
-                if (equip.level >= Util.VisibleEnhancementEffectLevel)
+                if (equip.Level >= Util.VisibleEnhancementEffectLevel)
                 {
                     enhancementImage.gameObject.SetActive(true);
                     enhancementImage.material = gradeData.EnhancementMaterial;
                 }
 
-                if (equip.GetOptionCountFromCombination() <= 0)
+                var optionInfo = equip.ToItemOptionInfoSnapshot();
+                if (optionInfo.OptionCountFromCombination <= 0)
                 {
                     optionTagBg.gameObject.SetActive(false);
                     return;
@@ -288,10 +293,8 @@ namespace Nekoyume.UI.Module
                 optionTagBg.saturation = data.GradeHsvSaturation;
                 optionTagBg.value = data.GradeHsvValue;
 
-                var optionInfo = new ItemOptionInfo(Item as Equipment);
-                var optionCount = optionInfo.StatOptions.Sum(x => x.count);
                 var index = 0;
-                for (var i = 0; i < optionCount; ++i)
+                for (var i = 0; i < optionInfo.StatOptionTotalCount; ++i)
                 {
                     var image = optionTagImages[index];
                     image.gameObject.SetActive(true);
@@ -299,7 +302,7 @@ namespace Nekoyume.UI.Module
                     ++index;
                 }
 
-                for (var i = 0; i < optionInfo.SkillOptions.Count; ++i)
+                for (var i = 0; i < optionInfo.SkillOptionCount; ++i)
                 {
                     var image = optionTagImages[index];
                     image.gameObject.SetActive(true);
@@ -333,7 +336,7 @@ namespace Nekoyume.UI.Module
             if (Item is { ItemType: ItemType.Equipment })
             {
                 isDim |= Util.GetItemRequirementLevel(Item) >
-                    States.Instance.CurrentAvatarState.level;
+                    (ClientStateViewProvider.Current.CurrentAvatar?.Level ?? 0);
             }
 
             gradeImage.color = isDim ? DimmedColor : OriginColor;

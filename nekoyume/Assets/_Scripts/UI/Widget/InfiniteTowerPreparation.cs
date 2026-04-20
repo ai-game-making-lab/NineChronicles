@@ -18,6 +18,9 @@ using Nekoyume.Model.InfiniteTower;
 using Nekoyume.Model.Item;
 using Nekoyume.Model.Mail;
 using Nekoyume.SingleClient.Models.Elemental;
+using Nekoyume.SingleClient.Models.Items;
+using ItemType = Nekoyume.Model.Item.ItemType;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.TableData;
 using TMPro;
@@ -158,8 +161,8 @@ namespace Nekoyume.UI
 
             Analyzer.Instance.Track("Unity/Click InfiniteTower Preparation", new Dictionary<string, Value>()
             {
-                ["AvatarAddress"] = States.Instance.CurrentAvatarState.address.ToString(),
-                ["AgentAddress"] = States.Instance.AgentState.address.ToString(),
+                ["AvatarAddress"] = ClientStateViewProvider.Current.CurrentAvatarStateRaw.address.ToString(),
+                ["AgentAddress"] = ClientStateViewProvider.Current.CurrentAgentStateRaw.address.ToString(),
                 ["InfiniteTowerId"] = infiniteTowerId,
                 ["FloorId"] = floorId
             });
@@ -427,12 +430,12 @@ namespace Nekoyume.UI
             startButton.gameObject.SetActive(false);
 
             // InfiniteTower BattleType으로 장비/코스튬 가져오기
-            var itemSlotState = States.Instance.CurrentItemSlotStates[BattleType.InfiniteTower];
+            var itemSlotState = ClientStateViewProvider.Current.CurrentItemSlotStatesRaw[BattleType.InfiniteTower];
             var costumes = itemSlotState.Costumes;
             var equipments = itemSlotState.Equipments;
 
             // InfiniteTower BattleType으로 룬 가져오기
-            var runeInfos = States.Instance.CurrentRuneSlotStates[BattleType.InfiniteTower]
+            var runeInfos = ClientStateViewProvider.Current.CurrentRuneSlotStatesRaw[BattleType.InfiniteTower]
                 .GetEquippedRuneSlotInfos();
 
             var consumables = information.GetEquippedConsumables().Select(x => x.ItemId).ToList();
@@ -522,7 +525,7 @@ namespace Nekoyume.UI
             }
 
             // InfiniteTower BattleType으로 장비 확인
-            var (equipments, costumes) = States.Instance.GetEquippedItems(BattleType.InfiniteTower);
+            var (equipments, costumes) = ClientStateViewProvider.Current.GetEquippedItems(BattleType.InfiniteTower);
             var consumables = information.GetEquippedConsumables().Select(x => x.Id).ToList();
             var canBattle = Util.CanBattle(equipments, costumes, consumables);
 
@@ -625,10 +628,10 @@ namespace Nekoyume.UI
             try
             {
                 // 현재 장착된 장비/코스튬 가져오기
-                var (equipments, costumes) = States.Instance.GetEquippedItems(BattleType.InfiniteTower);
+                var (equipments, costumes) = ClientStateViewProvider.Current.GetEquippedItems(BattleType.InfiniteTower);
 
                 // 현재 장착된 룬 정보 가져오기
-                var runeInfos = States.Instance.CurrentRuneSlotStates[BattleType.InfiniteTower]
+                var runeInfos = ClientStateViewProvider.Current.CurrentRuneSlotStatesRaw[BattleType.InfiniteTower]
                     .GetEquippedRuneSlotInfos();
 
                 // CP 계산
@@ -802,8 +805,8 @@ namespace Nekoyume.UI
                 return;
             }
 
-            var itemSlotState = States.Instance.CurrentItemSlotStates[BattleType.InfiniteTower];
-            var (equipments, costumes) = States.Instance.GetEquippedItems(BattleType.InfiniteTower);
+            var itemSlotState = ClientStateViewProvider.Current.CurrentItemSlotStatesRaw[BattleType.InfiniteTower];
+            var (equipments, costumes) = ClientStateViewProvider.Current.GetEquippedItems(BattleType.InfiniteTower);
 
             bool anyUnequipped = false;
 
@@ -858,7 +861,7 @@ namespace Nekoyume.UI
         {
             // 무한의 탑에서는 룬을 InfiniteTower 타입으로 사용
             var runeBattleType = BattleType.InfiniteTower;
-            var states = States.Instance.CurrentRuneSlotStates[runeBattleType].GetRuneSlot();
+            var states = ClientStateViewProvider.Current.CurrentRuneSlotStatesRaw[runeBattleType].GetRuneSlot();
 
             bool anyUnequipped = false;
             foreach (var slot in states)
@@ -893,14 +896,16 @@ namespace Nekoyume.UI
             {
                 NcDebug.Log($"[InfiniteTowerPreparation] Adding equipment dim conditions for {invalidEquipmentIds.Count} items");
                 dimConditions.Add((ItemType.Equipment, item =>
-                    item.ItemBase is Equipment eq && invalidEquipmentIds.Contains(eq.ItemId)));
+                    item.ItemBase.ToPolySnapshot() is EquipmentSnapshot eq &&
+                    eq.NonFungibleId is Guid eqId && invalidEquipmentIds.Contains(eqId)));
             }
 
             if (invalidCostumeIds != null && invalidCostumeIds.Count > 0)
             {
                 NcDebug.Log($"[InfiniteTowerPreparation] Adding costume dim conditions for {invalidCostumeIds.Count} items");
                 dimConditions.Add((ItemType.Costume, item =>
-                    item.ItemBase is Costume cs && invalidCostumeIds.Contains(cs.ItemId)));
+                    item.ItemBase.ToPolySnapshot() is CostumeSnapshot cs &&
+                    cs.NonFungibleId is Guid csId && invalidCostumeIds.Contains(csId)));
             }
 
             // ForbiddenItemSubTypes 조건 추가 (아우라 등 금지된 아이템 타입)
@@ -1068,9 +1073,9 @@ namespace Nekoyume.UI
                 NcDebug.Log($"[InfiniteTowerTest] Using {conditions.Count} conditions (Guaranteed: {floorRow.GuaranteedConditionId}, Random: {conditions.Count - (floorRow.GuaranteedConditionId > 0 ? 1 : 0)})");
 
                 // 아바타 상태 준비
-                var avatar = States.Instance.CurrentAvatarState;
-                var equipments = States.Instance.CurrentItemSlotStates[BattleType.InfiniteTower].Equipments;
-                var costumes = States.Instance.CurrentItemSlotStates[BattleType.InfiniteTower].Costumes;
+                var avatar = ClientStateViewProvider.Current.CurrentAvatarStateRaw;
+                var equipments = ClientStateViewProvider.Current.CurrentItemSlotStatesRaw[BattleType.InfiniteTower].Equipments;
+                var costumes = ClientStateViewProvider.Current.CurrentItemSlotStatesRaw[BattleType.InfiniteTower].Costumes;
                 avatar.EquipItems(equipments.Concat(costumes).ToList());
 
                 // 시뮬레이터 생성 및 실행
@@ -1078,8 +1083,8 @@ namespace Nekoyume.UI
                     random,
                     avatar,
                     new List<Guid>(), // foods
-                    States.Instance.AllRuneState,
-                    States.Instance.CurrentRuneSlotStates[BattleType.InfiniteTower],
+                    ClientStateViewProvider.Current.AllRuneStateRaw,
+                    ClientStateViewProvider.Current.CurrentRuneSlotStatesRaw[BattleType.InfiniteTower],
                     infiniteTowerId,
                     floorRow.Id,
                     floorRow,
@@ -1090,11 +1095,11 @@ namespace Nekoyume.UI
                     tableSheets.EnemySkillSheet,
                     tableSheets.CostumeStatSheet,
                     tableSheets.ItemSheet,
-                    States.Instance.CollectionState.GetEffects(tableSheets.CollectionSheet),
+                    ClientStateViewProvider.Current.CollectionStateRaw.GetEffects(tableSheets.CollectionSheet),
                     tableSheets.BuffLimitSheet,
                     tableSheets.BuffLinkSheet,
                     conditions,
-                    (int)States.Instance.GameConfigState.ShatterStrikeMaxDamage,
+                    (int)ClientStateViewProvider.Current.CurrentGameConfigStateRaw.ShatterStrikeMaxDamage,
                     logEvent: true
                 );
                 Game.Game.instance.Stage.OnEnterToStageEnd

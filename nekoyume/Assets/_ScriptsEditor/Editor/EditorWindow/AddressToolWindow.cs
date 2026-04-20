@@ -1,3 +1,4 @@
+#if LIB9C_TOOLS
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
@@ -260,3 +261,4 @@ namespace NekoyumeEditor
         }
     }
 }
+#endif

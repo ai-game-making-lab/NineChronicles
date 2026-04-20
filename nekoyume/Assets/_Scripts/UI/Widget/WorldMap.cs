@@ -12,6 +12,7 @@ using Nekoyume.Game;
 using Nekoyume.Helper;
 using Nekoyume.L10n;
 using Nekoyume.Model.Mail;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.TableData;
 using Nekoyume.TableData.Event;
@@ -643,7 +644,7 @@ namespace Nekoyume.UI
                     worldButton.Lock();
                 }
 
-                SetWorldOpenCostTextColor(States.Instance.CrystalBalance);
+                SetWorldOpenCostTextColor(ClientStateViewProvider.Current.CrystalBalanceRaw);
             }
 
             if (!worldInformation.TryGetFirstWorld(out _))
@@ -675,8 +676,8 @@ namespace Nekoyume.UI
             {
                 Analyzer.Instance.Track("Unity/Click Yggdrasil", new Dictionary<string, Value>()
                 {
-                    ["AvatarAddress"] = States.Instance.CurrentAvatarState.address.ToString(),
-                    ["AgentAddress"] = States.Instance.AgentState.address.ToString()
+                    ["AvatarAddress"] = (ClientStateViewProvider.Current.CurrentAvatar?.Address.ToString() ?? string.Empty),
+                    ["AgentAddress"] = ClientStateViewProvider.Current.CurrentAgent.Address.ToString()
                 });
             }
 
@@ -800,7 +801,7 @@ namespace Nekoyume.UI
                     new[] { worldId },
                     TableSheets.Instance.WorldUnlockSheet)
                 .MajorUnit;
-            var balance = States.Instance.CrystalBalance;
+            var balance = ClientStateViewProvider.Current.CrystalBalanceRaw;
             var usageMessage = L10nManager.Localize(
                 "UI_UNLOCK_WORLD_FORMAT",
                 L10nManager.LocalizeWorldName(worldId));
@@ -893,7 +894,7 @@ namespace Nekoyume.UI
             var cost = CrystalCalculator.CalculateWorldUnlockCost(worldIdListForUnlock,
                 tableSheets.WorldUnlockSheet).MajorUnit;
             paymentPopup.ShowCheckPaymentCrystal(
-                States.Instance.CrystalBalance.MajorUnit,
+                ClientStateViewProvider.Current.CurrentAgentCrystalBalanceMajorUnit,
                 cost,
                 L10nManager.Localize("CRYSTAL_MIGRATION_WORLD_ALL_OPEN_FORMAT", cost.ToCurrencyNotation()),
                 () =>

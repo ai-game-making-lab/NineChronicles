@@ -9,8 +9,9 @@ using Nekoyume.EnumType;
 using Nekoyume.Game.Controller;
 using Nekoyume.Helper;
 using Nekoyume.L10n;
-using Nekoyume.Model.EnumType;
 using Nekoyume.Model.Mail;
+using Nekoyume.SingleClient.Models.EnumType;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.UI.Model;
 using Nekoyume.UI.Module;
@@ -63,7 +64,7 @@ namespace Nekoyume.UI
 
             public void UpdateTryCount(int tryCount)
             {
-                var allRuneState = States.Instance.AllRuneState;
+                var allRuneState = ClientStateViewProvider.Current.AllRuneStateRaw;
                 if (allRuneState is null)
                 {
                     return;
@@ -227,7 +228,7 @@ namespace Nekoyume.UI
                 random,
                 cp);
 
-            States.Instance.UpdateRuneSlotState();
+            ClientStateViewProvider.Current.UpdateRuneSlotState();
             _selectedRuneItem.RuneStone = fav;
             SetRuneLevelBonus();
             SetInventory();
@@ -241,7 +242,7 @@ namespace Nekoyume.UI
             _disposables.DisposeAllAndClear();
             _runeItems.Clear();
 
-            var allRuneState = States.Instance.AllRuneState;
+            var allRuneState = ClientStateViewProvider.Current.AllRuneStateRaw;
             var runeListSheet = Game.Game.instance.TableSheets.RuneListSheet;
             var items = new List<RuneStoneEnhancementInventoryItem>();
             foreach (var runeRow in runeListSheet)
@@ -283,7 +284,7 @@ namespace Nekoyume.UI
         private void SetRuneLevelBonus()
         {
             var bonus = RuneFrontHelper.CalculateRuneLevelBonus(
-                States.Instance.AllRuneState,
+                ClientStateViewProvider.Current.AllRuneStateRaw,
                 Game.Game.instance.TableSheets.RuneListSheet);
             var reward = RuneFrontHelper.CalculateRuneLevelBonusReward(
                 bonus,
@@ -369,7 +370,7 @@ namespace Nekoyume.UI
             gradeText.text = L10nManager.Localize($"UI_ITEM_GRADE_{item.Row.Grade}");
             levelBonusCoef.text = item.Row.BonusCoef.ToString();
 
-            runeOptionView.Set(item.OptionRow, item.Level, (RuneUsePlace)item.Row.UsePlace);
+            runeOptionView.Set(item.OptionRow, item.Level, ((RuneUsePlace)item.Row.UsePlace).ToLib9c());
             runeLevelBonus.reward.Set(
                 item.Level < item.CostRow.Cost.Max(c => c.LevelEnd),
                 _selectedRuneItem.Row.Id, _selectedRuneItem.Level);
@@ -431,8 +432,8 @@ namespace Nekoyume.UI
             tryCountSlider.container.SetActive(true);
 
             _maxTryCount = item.CostRow.GetMaxTryCount(item.Level, (
-                States.Instance.GoldBalanceState.Gold,
-                States.Instance.CrystalBalance,
+                ClientStateViewProvider.Current.CurrentGoldBalanceStateRaw.Gold,
+                ClientStateViewProvider.Current.CrystalBalanceRaw,
                 item.RuneStone), 30);
 
             var sliderMaxValue = _maxTryCount > 0 ? _maxTryCount : 1;

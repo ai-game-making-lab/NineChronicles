@@ -1,5 +1,6 @@
 ﻿using System;
 using Nekoyume.Game;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.UI.Module;
 using TMPro;
@@ -76,10 +77,10 @@ namespace Nekoyume.UI
                 IsBuyingTicket.SetValueAndForceNotify(true);
 
                 var ticketCount = _ticketCountToBuy.Value;
-                var goldCurrency = States.Instance.GoldBalanceState.Gold.Currency;
+                var goldCurrency = ClientStateViewProvider.Current.CurrentGoldBalanceStateRaw.Gold.Currency;
                 var cost = Libplanet.Types.Assets.FungibleAssetValue.Parse(goldCurrency, _ticketPrice.ToString(CultureInfo.InvariantCulture));
 
-                if (States.Instance.GoldBalanceState.Gold < cost)
+                if (ClientStateViewProvider.Current.CurrentGoldBalanceStateRaw.Gold < cost)
                 {
                     NcDebug.LogError("[ArenaTicketPopup] Ticket purchase failed. Not Enough Cost");
                     Find<IconAndButtonSystem>().Show(
@@ -93,7 +94,7 @@ namespace Nekoyume.UI
                 try
                 {
                     logId = await ActionManager.Instance.TransferAssetsForBattleTicketPurchase(
-                        States.Instance.AgentState.address,
+                        ClientStateViewProvider.Current.CurrentAgentStateRaw.address,
                         new Address(RxProps.OperationAccountAddress),
                         ticketCount,
                         cost

@@ -4,6 +4,7 @@ using Nekoyume.UI;
 using UniRx;
 using UnityEngine;
 using UnityEngine.UI;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Convert = System.Convert;
 
@@ -43,7 +44,7 @@ namespace Nekoyume
         public void OnClickCreateArenaDummy()
         {
 #if LIB9C_DEV_EXTENSIONS || UNITY_EDITOR
-            var inventory = States.Instance.CurrentAvatarState.inventory;
+            var inventory = ClientStateViewProvider.Current.CurrentAvatarStateRaw.inventory;
 
             Game.Game.instance.ActionManager.CreateArenaDummy(
                 inventory.Costumes

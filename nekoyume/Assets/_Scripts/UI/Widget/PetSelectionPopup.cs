@@ -1,6 +1,7 @@
 using Nekoyume.UI.Module;
 using System;
 using System.Linq;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using UnityEngine;
 
@@ -36,7 +37,7 @@ namespace Nekoyume.UI
             bool ignoreShowAnimation = false)
         {
 #if UNITY_ANDROID || UNITY_IOS
-            var petCount = States.Instance.PetStates.GetPetStatesAll()
+            var petCount = ClientStateViewProvider.Current.PetStatesRaw.GetPetStatesAll()
                 .Where(petState => petState != null);
             if (!petCount.Any())
             {
@@ -58,7 +59,7 @@ namespace Nekoyume.UI
                 {
                     if (petId != null)
                     {
-                        var petStates = States.Instance.PetStates;
+                        var petStates = ClientStateViewProvider.Current.PetStatesRaw;
                         var petStateList = petStates.GetPetStatesAll();
                             
                         var equippablePet = petStateList.Where(petState => 

@@ -8,6 +8,7 @@ using DG.Tweening.Plugins.Options;
 using mixpanel;
 using Nekoyume.Game.Controller;
 using Nekoyume.Game.Factory;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Spine.Unity;
 using TMPro;
@@ -378,7 +379,7 @@ namespace Nekoyume.UI
         {
             PlayerFactory.Create();
             if (Util.TryGetStoredAvatarSlotIndex(out var slotIndex) &&
-                States.Instance.AvatarStates.ContainsKey(slotIndex))
+                ClientStateViewProvider.Current.Avatars.ContainsKey(slotIndex))
             {
                 try
                 {

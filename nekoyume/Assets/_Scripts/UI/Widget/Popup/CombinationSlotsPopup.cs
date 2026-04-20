@@ -8,6 +8,7 @@ using Nekoyume.Helper;
 using Nekoyume.L10n;
 using Nekoyume.Model.Item;
 using Nekoyume.Model.State;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.UI.Module;
 using Nekoyume.UI.Scroller;
@@ -132,7 +133,7 @@ namespace Nekoyume.UI
         public bool TryGetEmptyCombinationSlot(out int slotIndex)
         {
             var blockIndex = Game.instance.Agent.BlockIndex;
-            var slotDict = States.Instance.GetCombinationSlotState(States.Instance.CurrentAvatarState);
+            var slotDict = ClientStateViewProvider.Current.GetCombinationSlotState(ClientStateViewProvider.Current.CurrentAvatarStateRaw);
             var states = slotDict?.Values.ToList();
             if (states == null)
             {
@@ -230,8 +231,8 @@ namespace Nekoyume.UI
 
         private void UpdateSlots(long blockIndex, IDictionary<int, CombinationSlotState> states)
         {
-            var avatarState = States.Instance.CurrentAvatarState;
-            states ??= States.Instance.GetCombinationSlotState(avatarState);
+            var avatarState = ClientStateViewProvider.Current.CurrentAvatarStateRaw;
+            states ??= ClientStateViewProvider.Current.GetCombinationSlotState(avatarState);
             
             for (var i = 0; i < slots.Count; i++)
             {
@@ -270,17 +271,17 @@ namespace Nekoyume.UI
             foreach (var state in stateList)
             {
                 var diff = state.WorkCompleteBlockIndex - currentBlockIndex;
-                if (state.PetId.HasValue && States.Instance.PetStates.TryGetPetState(state.PetId.Value, out var petState))
+                if (state.PetId.HasValue && ClientStateViewProvider.Current.PetStatesRaw.TryGetPetState(state.PetId.Value, out var petState))
                 {
                     cost += PetHelper.CalculateDiscountedHourglass(
                         diff,
-                        States.Instance.GameConfigState.HourglassPerBlock,
+                        ClientStateViewProvider.Current.CurrentGameConfigStateRaw.HourglassPerBlock,
                         petState,
                         TableSheets.Instance.PetOptionSheet);
                 }
                 else
                 {
-                    cost += RapidCombination0.CalculateHourglassCount(States.Instance.GameConfigState, diff);
+                    cost += RapidCombination0.CalculateHourglassCount(ClientStateViewProvider.Current.CurrentGameConfigStateRaw, diff);
                 }
             }
 

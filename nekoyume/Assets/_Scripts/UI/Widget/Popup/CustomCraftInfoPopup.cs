@@ -105,8 +105,10 @@ namespace Nekoyume.UI
             {
                 SkillName = L10nManager.Localize($"SKILL_NAME_{tuple.Item1.SkillId}"),
                 SkillRatio = $"{tuple.Ratio / sumRatio * 100f:F4}%",
-                OptionRow = tuple.Item1,
-                SkillRow = TableSheets.Instance.SkillSheet[tuple.Item1.SkillId]
+                // Project at the sheet-access boundary — the cell model now stores
+                // client-owned row views (see CustomCraftSkillCell.Model).
+                OptionRow = tuple.Item1.ToView(),
+                SkillRow = TableSheets.Instance.SkillSheet[tuple.Item1.SkillId].ToView()
             }));
             skillScroll.gameObject.SetActive(true);
             statScroll.gameObject.SetActive(false);
@@ -117,7 +119,9 @@ namespace Nekoyume.UI
             skillPositionTooltip.transform.SetParent(model.Item2);
             skillPositionTooltip.transform.localPosition = Vector3.zero;
             skillPositionTooltip.transform.SetParent(transform);
-            skillPositionTooltip.Show(model.Item1.SkillRow.ToView(), model.Item1.OptionRow.ToView());
+            // Model fields are already SkillSheetRowView / EquipmentItemOptionRowView —
+            // pass straight through without an extra projection.
+            skillPositionTooltip.Show(model.Item1.SkillRow, model.Item1.OptionRow);
         }
     }
 }

@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Lib9c.DevExtensions;
 using UnityEngine;
 using UnityEditor;
 using UnityEditor.Build.Reporting;
@@ -360,7 +359,14 @@ namespace NekoyumeEditor
 
         private static void CopyJsonDataFile(string fileName)
         {
-            var sourcePath = TestbedHelper.GetDataPath(fileName);
+            var sourcePath = Path.Combine(
+                Application.dataPath,
+                "_Scripts",
+                "Lib9c",
+                "lib9c",
+                "Lib9c.DevExtensions",
+                "Data",
+                $"{fileName}.json");
             var destPath = Path.Combine(Application.streamingAssetsPath, $"{fileName}.json");
             File.Copy(sourcePath, destPath, true);
             Debug.Log($"Copy json data file : {fileName}");
@@ -564,7 +570,7 @@ namespace NekoyumeEditor
                 {
                     var aab = outPath.EndsWith(".aab");
                     EditorUserBuildSettings.buildAppBundle = aab;
-                    PlayerSettings.Android.useAPKExpansionFiles = aab;
+                    PlayerSettings.Android.splitApplicationBinary = aab;
                 }
 
                 if (cliOptions.TryGetValue("identifier", out var outIdentifier) &&

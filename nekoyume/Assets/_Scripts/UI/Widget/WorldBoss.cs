@@ -10,7 +10,10 @@ using Nekoyume.Game.Controller;
 using Nekoyume.Helper;
 using Nekoyume.L10n;
 using Nekoyume.Model.State;
+using Nekoyume.SingleClient.Blockchain;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
+using Address = Libplanet.Crypto.Address;
 using Nekoyume.TableData;
 using Nekoyume.UI.Module;
 using Nekoyume.UI.Module.Common;
@@ -213,11 +216,11 @@ namespace Nekoyume.UI
             bool ignoreHeaderMenuAnimation = false,
             bool ignoreHeaderMenu = false)
         {
-            var avatarAddress = States.Instance.CurrentAvatarState.address;
+            var avatarAddress = ClientStateViewProvider.Current.CurrentAvatar?.Address.ToLibplanet() ?? default;
             await UpdateWorldBossState(currentBlockIndex, avatarAddress, forceUpdateState, ignoreHeaderMenuAnimation, ignoreHeaderMenu);
 
             var raiderState = WorldBossStates.GetRaiderState(avatarAddress);
-            var refillInterval = States.Instance.GameConfigState.DailyWorldBossInterval;
+            var refillInterval = ClientStateViewProvider.Current.CurrentGameConfigStateRaw.DailyWorldBossInterval;
             _headerMenu.WorldBossTickets.UpdateTicket(raiderState, currentBlockIndex, refillInterval);
             UpdateRemainTimer(_period, currentBlockIndex, Nekoyume.Helper.Util.BlockInterval);
             SetActiveQueryLoading(false);
@@ -400,7 +403,7 @@ namespace Nekoyume.UI
                     ? new WorldBossState(worldBossList)
                     : null;
 
-                var avatarAddress = States.Instance.CurrentAvatarState.address;
+                var avatarAddress = ClientStateViewProvider.Current.CurrentAvatar?.Address.ToLibplanet() ?? default;
                 var raiderAddress = Addresses.GetRaiderAddress(avatarAddress, row.Id);
                 var raiderState = await Game.Game.instance.Agent.GetStateAsync(
                     ReservedAddresses.LegacyAccount,

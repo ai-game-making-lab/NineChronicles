@@ -8,8 +8,8 @@ using Libplanet.Action.State;
 using Nekoyume.ApiClient;
 using Nekoyume.Helper;
 using Nekoyume.Model.Arena;
-using Nekoyume.Model.EnumType;
 using Nekoyume.Model.State;
+using Nekoyume.SingleClient.Models.EnumType;
 using Nekoyume.UI.Model;
 using GeneratedApiNamespace.ArenaServiceClient;
 using Nekoyume.Game;
@@ -164,8 +164,8 @@ namespace Nekoyume.State
                 return null;
             }
             var currentAvatarAddr = currentAvatar.address;
-            var portraitId = Util.GetPortraitId(BattleType.Arena);
-            var cp = Util.TotalCP(BattleType.Arena);
+            var portraitId = Util.GetPortraitId(BattleType.Arena.ToLib9c());
+            var cp = Util.TotalCP(BattleType.Arena.ToLib9c());
             return await ApiClients.Instance.Arenaservicemanager.PostUsersAsync(currentAvatarAddr.ToString(), currentAvatar.NameWithHash, portraitId, cp, currentAvatar.level);
         }
 

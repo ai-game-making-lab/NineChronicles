@@ -3,7 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using Nekoyume.Model.EnumType;
+using Nekoyume.SingleClient.Models.EnumType;
 using Nekoyume.UI.Model;
 using UnityEngine;
 
@@ -35,7 +35,7 @@ namespace Nekoyume.UI.Scroller
 
             foreach (var synthesizeModel in synthesizeModels)
             {
-                if (!_cells.TryGetValue(synthesizeModel.Grade, out var cell))
+                if (!_cells.TryGetValue(synthesizeModel.Grade.ToView(), out var cell))
                 {
                     NcDebug.LogError($"Failed to get SynthesisCell for {synthesizeModel.Grade}.", this);
                     continue;

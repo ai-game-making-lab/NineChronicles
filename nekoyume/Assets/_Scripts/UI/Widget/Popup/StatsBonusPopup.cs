@@ -4,6 +4,7 @@ using Nekoyume.Game.Controller;
 using Nekoyume.Helper;
 using Nekoyume.L10n;
 using Nekoyume.Model.Mail;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.UI.Module;
 using Nekoyume.UI.Scroller;
@@ -73,7 +74,7 @@ namespace Nekoyume.UI
                 collectionState.GetEffects(collectionSheet));
 
             var bonus = RuneFrontHelper.CalculateRuneLevelBonus(
-                States.Instance.AllRuneState,
+                ClientStateViewProvider.Current.AllRuneStateRaw,
                 Game.Game.instance.TableSheets.RuneListSheet);
             var reward = RuneFrontHelper.CalculateRuneLevelBonusReward(
                 bonus,
@@ -84,7 +85,7 @@ namespace Nekoyume.UI
 
         private void GoToCollection()
         {
-            var clearedStageId = States.Instance.CurrentAvatarState
+            var clearedStageId = ClientStateViewProvider.Current.CurrentAvatarStateRaw
                 .worldInformation.TryGetLastClearedStageId(out var id)
                 ? id
                 : 1;
@@ -112,7 +113,7 @@ namespace Nekoyume.UI
 
         private void GoToRune()
         {
-            var clearedStageId = States.Instance.CurrentAvatarState
+            var clearedStageId = ClientStateViewProvider.Current.CurrentAvatarStateRaw
                 .worldInformation.TryGetLastClearedStageId(out var id)
                 ? id
                 : 1;

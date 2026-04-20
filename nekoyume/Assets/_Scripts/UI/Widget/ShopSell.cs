@@ -10,6 +10,10 @@ using mixpanel;
 using Nekoyume.Action;
 using Nekoyume.ApiClient;
 using Nekoyume.Game;
+using Nekoyume.SingleClient.Blockchain;
+using Nekoyume.SingleClient.State;
+using FungibleAssetValue = Libplanet.Types.Assets.FungibleAssetValue;
+using Currency = Libplanet.Types.Assets.Currency;
 using Nekoyume.Game.Controller;
 using Nekoyume.L10n;
 using Nekoyume.Model.Item;
@@ -174,7 +178,7 @@ namespace Nekoyume.UI
 
         private void ShowSellTooltip(ShopItem model)
         {
-            var inventory = States.Instance.CurrentAvatarState.inventory;
+            var inventory = ClientStateViewProvider.Current.CurrentAvatarStateRaw.inventory;
             var blockIndex = Game.Game.instance.Agent?.BlockIndex ?? -1;
             var apStoneCount = inventory.GetUsableItemCount(CostType.ApPotion, blockIndex);
 
@@ -212,7 +216,7 @@ namespace Nekoyume.UI
         private static void SubscribeConditionalButtonForChargeAp(ConditionalButton.State state,
             string key, Action<bool> action)
         {
-            var inventory = States.Instance.CurrentAvatarState.inventory;
+            var inventory = ClientStateViewProvider.Current.CurrentAvatarStateRaw.inventory;
             var blockIndex = Game.Game.instance.Agent?.BlockIndex ?? -1;
             var apStoneCount = inventory.GetUsableItemCount(CostType.ApPotion, blockIndex);
 
@@ -287,7 +291,7 @@ namespace Nekoyume.UI
             }
 
             var data = SharedModel.ItemCountableAndPricePopup.Value;
-            var currency = States.Instance.GoldBalanceState.Gold.Currency;
+            var currency = ClientStateViewProvider.Current.CurrentGoldBalanceStateRaw.Gold.Currency;
             data.Price.Value = new FungibleAssetValue(currency, Shop.MinimumPrice, 0);
             data.UnitPrice.Value = new FungibleAssetValue(currency, Shop.MinimumPrice, 0);
             data.Count.Value = 1;
@@ -332,7 +336,7 @@ namespace Nekoyume.UI
                 var unitPrice = price / model.Product.Quantity;
                 var majorUnit = (int)unitPrice;
                 var minorUnit = (int)((unitPrice - majorUnit) * 100);
-                var currency = States.Instance.GoldBalanceState.Gold.Currency;
+                var currency = ClientStateViewProvider.Current.CurrentGoldBalanceStateRaw.Gold.Currency;
                 data.UnitPrice.Value = new FungibleAssetValue(currency, majorUnit, minorUnit);
 
                 data.ProductId.Value = model.Product.ProductId;
@@ -356,7 +360,7 @@ namespace Nekoyume.UI
                 var unitPrice = price / model.FungibleAssetProduct.Quantity;
                 var majorUnit = (int)unitPrice;
                 var minorUnit = (int)((unitPrice - majorUnit) * 100);
-                var currency = States.Instance.GoldBalanceState.Gold.Currency;
+                var currency = ClientStateViewProvider.Current.CurrentGoldBalanceStateRaw.Gold.Currency;
                 data.UnitPrice.Value = new FungibleAssetValue(currency, majorUnit, minorUnit);
 
                 data.ProductId.Value = model.FungibleAssetProduct.ProductId;
@@ -393,7 +397,7 @@ namespace Nekoyume.UI
 
             // view.SetLoading(itemProducts);
             var oneLineSystemInfos = new List<(string name, int count)>();
-            var avatarAddress = States.Instance.CurrentAvatarState.address;
+            var avatarAddress = ClientStateViewProvider.Current.CurrentAvatar?.Address.ToLibplanet() ?? default;
             var reRegisterInfos = new List<(IProductInfo, IRegisterInfo)>();
             await foreach (var product in itemProducts)
             {
@@ -414,8 +418,8 @@ namespace Nekoyume.UI
             Analyzer.Instance.Track("Unity/ReRegisterProductAll", new Dictionary<string, Value>()
             {
                 ["Quantity"] = reRegisterInfos.Count,
-                ["AvatarAddress"] = States.Instance.CurrentAvatarState.address.ToString(),
-                ["AgentAddress"] = States.Instance.AgentState.address.ToString()
+                ["AvatarAddress"] = (ClientStateViewProvider.Current.CurrentAvatar?.Address.ToString() ?? string.Empty),
+                ["AgentAddress"] = ClientStateViewProvider.Current.CurrentAgent.Address.ToString()
             });
 
             string message;
@@ -458,8 +462,8 @@ namespace Nekoyume.UI
                 return;
             }
 
-            var avatarAddress = States.Instance.CurrentAvatarState.address;
-            var goldCurrency = States.Instance.GoldBalanceState.Gold.Currency;
+            var avatarAddress = ClientStateViewProvider.Current.CurrentAvatarStateRaw.address;
+            var goldCurrency = ClientStateViewProvider.Current.CurrentGoldBalanceStateRaw.Gold.Currency;
 
             var oneLineSystemInfos = new List<(string name, int count)>();
             var productInfos = new List<IProductInfo>();
@@ -503,8 +507,8 @@ namespace Nekoyume.UI
             Analyzer.Instance.Track("Unity/CancelRegisterProductAll", new Dictionary<string, Value>()
             {
                 ["Quantity"] = productInfos.Count,
-                ["AvatarAddress"] = States.Instance.CurrentAvatarState.address.ToString(),
-                ["AgentAddress"] = States.Instance.AgentState.address.ToString()
+                ["AvatarAddress"] = (ClientStateViewProvider.Current.CurrentAvatar?.Address.ToString() ?? string.Empty),
+                ["AgentAddress"] = ClientStateViewProvider.Current.CurrentAgent.Address.ToString()
             });
 
             string message;
@@ -545,7 +549,7 @@ namespace Nekoyume.UI
             SharedModel.ItemCountAndPricePopup.Value.CountEnabled.Value = true;
             SharedModel.ItemCountAndPricePopup.Value.ProductId.Value = productId;
             SharedModel.ItemCountAndPricePopup.Value.Price.Value = (BigInteger)price *
-                States.Instance.GoldBalanceState.Gold.Currency;
+                ClientStateViewProvider.Current.CurrentGoldBalanceStateRaw.Gold.Currency;
             SharedModel.ItemCountAndPricePopup.Value.PriceInteractable.Value = false;
             SharedModel.ItemCountAndPricePopup.Value.ChargeAp.Value = chargeAp;
             var itemCount = (int)quantity;
@@ -598,7 +602,7 @@ namespace Nekoyume.UI
 
             if (data.Item.Value.ItemBase.Value is not null)
             {
-                var avatarAddress = States.Instance.CurrentAvatarState.address;
+                var avatarAddress = ClientStateViewProvider.Current.CurrentAvatarStateRaw.address;
                 var itemBase = data.Item.Value.ItemBase.Value;
                 var type = itemBase.ItemType is ItemType.Material
                     ? ProductType.Fungible
@@ -611,7 +615,7 @@ namespace Nekoyume.UI
                 if (type == ProductType.NonFungible && count > 1) // reference: RegisterInfo.Validate()
                 {
                     var consumablesInventory =
-                        States.Instance.CurrentAvatarState.inventory.Consumables.ToArray();
+                        ClientStateViewProvider.Current.CurrentAvatarStateRaw.inventory.Consumables.ToArray();
 
                     var id = itemBase.Id;
                     // If the item is consumable, it need to sell the same item multiple times.
@@ -672,7 +676,7 @@ namespace Nekoyume.UI
             else
             {
                 var count = data.Count.Value;
-                var avatarAddress = States.Instance.CurrentAvatarState.address;
+                var avatarAddress = ClientStateViewProvider.Current.CurrentAvatarStateRaw.address;
                 var currency = data.Item.Value.FungibleAssetValue.Value.Currency;
                 var fungibleAsset = new FungibleAssetValue(currency, count, 0);
                 var info = new AssetInfo
@@ -686,8 +690,8 @@ namespace Nekoyume.UI
 
                 Game.Game.instance.ActionManager
                     .RegisterProduct(avatarAddress, infos, data.ChargeAp.Value).Subscribe();
-                var preBalance = States.Instance.CurrentAvatarBalances[currency.Ticker];
-                States.Instance.SetCurrentAvatarBalance(preBalance - fungibleAsset);
+                var preBalance = ClientStateViewProvider.Current.CurrentAvatarBalancesRaw[currency.Ticker];
+                ClientStateViewProvider.Current.SetCurrentAvatarBalance(preBalance - fungibleAsset);
                 inventory.UpdateFungibleAssets();
                 PostRegisterProduct(fungibleAsset.GetLocalizedName());
             }
@@ -709,7 +713,7 @@ namespace Nekoyume.UI
                 throw new InvalidSellingPriceException(data);
             }
 
-            var avatarAddress = States.Instance.CurrentAvatarState.address;
+            var avatarAddress = ClientStateViewProvider.Current.CurrentAvatarStateRaw.address;
             var reRegisterInfos = new List<(IProductInfo, IRegisterInfo)>
             {
                 GetReRegisterInfo(data.ProductId.Value, (int)data.Price.Value.MajorUnit)
@@ -726,14 +730,14 @@ namespace Nekoyume.UI
             Analyzer.Instance.Track("Unity/ReRegisterProduct", new Dictionary<string, Value>()
             {
                 ["AvatarAddress"] = avatarAddress.ToString(),
-                ["AgentAddress"] = States.Instance.AgentState.address.ToString()
+                ["AgentAddress"] = ClientStateViewProvider.Current.CurrentAgentStateRaw.address.ToString()
             }, true);
         }
 
         private static (IProductInfo, IRegisterInfo) GetReRegisterInfo(Guid productId, int newPrice)
         {
-            var avatarAddress = States.Instance.CurrentAvatarState.address;
-            var goldCurrency = States.Instance.GoldBalanceState.Gold.Currency;
+            var avatarAddress = ClientStateViewProvider.Current.CurrentAvatarStateRaw.address;
+            var goldCurrency = ClientStateViewProvider.Current.CurrentGoldBalanceStateRaw.Gold.Currency;
             var itemProduct = ReactiveShopState.GetSellItemProduct(productId);
             if (itemProduct is not null)
             {

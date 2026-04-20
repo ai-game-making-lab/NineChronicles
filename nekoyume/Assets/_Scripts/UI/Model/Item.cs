@@ -2,6 +2,7 @@ using System;
 using Libplanet.Types.Assets;
 using Nekoyume.Helper;
 using Nekoyume.Model.Item;
+using Nekoyume.SingleClient.Models.Items;
 using UniRx;
 
 namespace Nekoyume.UI.Model
@@ -25,12 +26,12 @@ namespace Nekoyume.UI.Model
         {
             ItemBase.Value = value;
 
-            if (ItemBase.Value is Equipment equipment &&
-                equipment.level > 0)
+            if (ItemBase.Value.ToPolySnapshot() is EquipmentSnapshot eqSnap &&
+                eqSnap.Level > 0)
             {
-                Enhancement.Value = $"+{equipment.level}";
+                Enhancement.Value = $"+{eqSnap.Level}";
                 EnhancementEnabled.Value = true;
-                EnhancementEffectEnabled.Value = equipment.level >= Util.VisibleEnhancementEffectLevel;
+                EnhancementEffectEnabled.Value = eqSnap.Level >= Util.VisibleEnhancementEffectLevel;
             }
             else
             {

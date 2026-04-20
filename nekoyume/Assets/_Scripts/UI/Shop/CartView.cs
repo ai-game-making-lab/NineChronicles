@@ -6,6 +6,7 @@ using Nekoyume.EnumType;
 using Nekoyume.Game.Controller;
 using Nekoyume.L10n;
 using Nekoyume.Model.Mail;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.UI.Model;
 using Nekoyume.UI.Scroller;
@@ -59,13 +60,13 @@ namespace Nekoyume.UI.Module
 
         public void UpdateCart(List<ShopItem> selectedItems, System.Action onClick)
         {
-            if (States.Instance.GoldBalanceState is null)
+            if (ClientStateViewProvider.Current.CurrentGoldBalanceStateRaw is null)
             {
                 return;
             }
 
             var sortedItems = selectedItems.Where(x => !x.Expired.Value).ToList();
-            var price = new FungibleAssetValue(States.Instance.GoldBalanceState.Gold.Currency, 0, 0);
+            var price = new FungibleAssetValue(ClientStateViewProvider.Current.CurrentGoldBalanceStateRaw.Gold.Currency, 0, 0);
             for (var i = 0; i < cartItems.Count; i++)
             {
                 if (i < sortedItems.Count)
@@ -73,7 +74,7 @@ namespace Nekoyume.UI.Module
                     var p = sortedItems[i].ItemBase is not null
                         ? (BigInteger)sortedItems[i].Product.Price
                         : (BigInteger)sortedItems[i].FungibleAssetProduct.Price;
-                    price += p * States.Instance.GoldBalanceState.Gold.Currency;
+                    price += p * ClientStateViewProvider.Current.CurrentGoldBalanceStateRaw.Gold.Currency;
                     cartItems[i].gameObject.SetActive(true);
                     cartItems[i].Set(sortedItems[i], (item) =>
                     {

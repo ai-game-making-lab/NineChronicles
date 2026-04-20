@@ -1,33 +1,56 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using Nekoyume.Model.State;
+using UnityEngine;
 
 namespace Nekoyume.State.Modifiers
 {
     [Serializable]
     public class AvatarInventoryTradableItemRemover : AvatarStateModifier
     {
+        [Serializable]
         private class InnerModel
         {
-            public long RequiredBlockIndex { get; }
-            public int Count { get; set; }
+            [SerializeField]
+            private string tradableId;
 
-            public InnerModel(long requiredBlockIndex, int count)
+            [SerializeField]
+            private long requiredBlockIndex;
+
+            [SerializeField]
+            private int count;
+
+            public Guid TradableId => Guid.Parse(tradableId);
+            public long RequiredBlockIndex => requiredBlockIndex;
+
+            public int Count
             {
-                RequiredBlockIndex = requiredBlockIndex;
-                Count = count;
+                get => count;
+                set => count = value;
+            }
+
+            public InnerModel()
+            {
+            }
+
+            public InnerModel(Guid tradableId, long requiredBlockIndex, int count)
+            {
+                this.tradableId = tradableId.ToString();
+                this.requiredBlockIndex = requiredBlockIndex;
+                this.count = count;
             }
 
             public InnerModel(InnerModel model)
+                : this(model.TradableId, model.RequiredBlockIndex, model.Count)
             {
-                RequiredBlockIndex = model.RequiredBlockIndex;
-                Count = model.Count;
             }
         }
 
-        private Dictionary<Guid, InnerModel> _items = new();
+        [SerializeField]
+        private List<InnerModel> items = new();
 
-        public override bool IsEmpty => _items.Count == 0;
+        public override bool IsEmpty => items.Count == 0;
 
         public AvatarInventoryTradableItemRemover()
         {
@@ -35,18 +58,19 @@ namespace Nekoyume.State.Modifiers
 
         public AvatarInventoryTradableItemRemover(Guid tradableId, long requiredBlockIndex, int count)
         {
-            _items.Add(tradableId, new InnerModel(requiredBlockIndex, count));
+            items.Add(new InnerModel(tradableId, requiredBlockIndex, count));
         }
 
         public void AddItem(Guid tradableId, long requiredBlockIndex, int count)
         {
-            if (_items.TryGetValue(tradableId, out var item))
+            var item = FindItem(tradableId);
+            if (item is not null)
             {
                 item.Count += count;
             }
             else
             {
-                _items.Add(tradableId, new InnerModel(requiredBlockIndex, count));
+                items.Add(new InnerModel(tradableId, requiredBlockIndex, count));
             }
         }
 
@@ -57,15 +81,16 @@ namespace Nekoyume.State.Modifiers
                 return;
             }
 
-            foreach (var item in m._items)
+            foreach (var item in m.items)
             {
-                if (_items.ContainsKey(item.Key))
+                var existing = FindItem(item.TradableId);
+                if (existing is not null)
                 {
-                    _items[item.Key].Count += item.Value.Count;
+                    existing.Count += item.Count;
                 }
                 else
                 {
-                    _items.Add(item.Key, new InnerModel(item.Value));
+                    items.Add(new InnerModel(item));
                 }
             }
         }
@@ -77,15 +102,18 @@ namespace Nekoyume.State.Modifiers
                 return;
             }
 
-            foreach (var item in m._items)
+            foreach (var item in m.items)
             {
-                if (_items.ContainsKey(item.Key))
+                var existing = FindItem(item.TradableId);
+                if (existing is null)
                 {
-                    _items[item.Key].Count -= item.Value.Count;
-                    if (_items[item.Key].Count <= 0)
-                    {
-                        _items.Remove(item.Key);
-                    }
+                    continue;
+                }
+
+                existing.Count -= item.Count;
+                if (existing.Count <= 0)
+                {
+                    items.Remove(existing);
                 }
             }
         }
@@ -97,12 +125,20 @@ namespace Nekoyume.State.Modifiers
                 return null;
             }
 
-            foreach (var item in _items)
+            foreach (var item in items)
             {
-                state.inventory.RemoveTradableItem(item.Key, item.Value.RequiredBlockIndex, item.Value.Count);
+                state.inventory.RemoveTradableItem(
+                    item.TradableId,
+                    item.RequiredBlockIndex,
+                    item.Count);
             }
 
             return state;
+        }
+
+        private InnerModel FindItem(Guid tradableId)
+        {
+            return items.FirstOrDefault(item => item.TradableId == tradableId);
         }
     }
 }

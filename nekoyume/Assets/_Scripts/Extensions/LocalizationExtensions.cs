@@ -20,6 +20,7 @@ using Nekoyume.Model.Mail;
 using Nekoyume.Model.Market;
 using Nekoyume.Model.Quest;
 using Nekoyume.Model.Stat;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.TableData;
 using Nekoyume.TableData.Crystal;
@@ -201,7 +202,7 @@ namespace Nekoyume
 
                 case ProductCancelMail productCancelMail:
                     if (productCancelMail.Product is ItemProduct itemPrd &&
-                        States.Instance.CurrentAvatarState.inventory.TryGetTradableItem(itemPrd.TradableItem.TradableId, itemPrd.TradableItem.RequiredBlockIndex, 1, out var canceledItem))
+                        ClientStateViewProvider.Current.CurrentAvatarStateRaw.inventory.TryGetTradableItem(itemPrd.TradableItem.TradableId, itemPrd.TradableItem.RequiredBlockIndex, 1, out var canceledItem))
                     {
                         return L10nManager.Localize("UI_SELL_CANCEL_MAIL_FORMAT", canceledItem.item.GetLocalizedName());
                     }
@@ -217,7 +218,7 @@ namespace Nekoyume
                 case ProductBuyerMail productBuyerMail:
                     // 아이템을 구매한 경우
                     if (productBuyerMail.Product is ItemProduct itemProd &&
-                        States.Instance.CurrentAvatarState.inventory.TryGetTradableItem(itemProd.TradableItem.TradableId, itemProd.TradableItem.RequiredBlockIndex, 1, out var realItem))
+                        ClientStateViewProvider.Current.CurrentAvatarStateRaw.inventory.TryGetTradableItem(itemProd.TradableItem.TradableId, itemProd.TradableItem.RequiredBlockIndex, 1, out var realItem))
                     {
                         return L10nManager.Localize("UI_BUYER_MAIL_FORMAT", realItem.item.GetLocalizedName());
                     }
@@ -240,7 +241,7 @@ namespace Nekoyume
                     var price = (int)productSellerMail.Product.Price.MajorUnit;
                     var tax = decimal.Divide(price, 100) * Buy.TaxRate;
                     var tp = price - tax;
-                    var currency = States.Instance.GoldBalanceState.Gold.Currency;
+                    var currency = ClientStateViewProvider.Current.CurrentGoldBalanceStateRaw.Gold.Currency;
                     var majorUnit = (int)tp;
                     var minorUnit = (int)((tp - majorUnit) * 100);
                     var fungibleAsset = new FungibleAssetValue(currency, majorUnit, minorUnit);

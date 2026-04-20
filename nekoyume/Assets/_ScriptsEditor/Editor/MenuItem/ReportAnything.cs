@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿#if LIB9C_TOOLS
+using System.Linq;
 using System.Reflection;
 using System.Text;
 using Nekoyume.Game;
@@ -82,3 +83,4 @@ namespace NekoyumeEditor
         }
     }
 }
+#endif

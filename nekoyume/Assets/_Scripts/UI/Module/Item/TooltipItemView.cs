@@ -1,10 +1,12 @@
 using Nekoyume.Helper;
 using Nekoyume.Model.Item;
+using Nekoyume.SingleClient.Models.Items;
 using System.Collections.Generic;
 using Coffee.UIEffects;
 using Nekoyume.TableData;
 using Spine.Unity;
 using UnityEngine;
+using ItemType = Nekoyume.Model.Item.ItemType;
 
 namespace Nekoyume.UI.Module
 {
@@ -51,11 +53,12 @@ namespace Nekoyume.UI.Module
             baseItemView.GradeHsv.saturation = data.GradeHsvSaturation;
             baseItemView.GradeHsv.value = data.GradeHsvValue;
 
-            if (itemBase is Equipment equipment && equipment.level > 0)
+            var polySnap = itemBase.ToPolySnapshot();
+            if (polySnap is EquipmentSnapshot eqSnap && eqSnap.Level > 0)
             {
                 baseItemView.EnhancementText.gameObject.SetActive(true);
-                baseItemView.EnhancementText.text = $"+{equipment.level}";
-                if (equipment.level >= Util.VisibleEnhancementEffectLevel)
+                baseItemView.EnhancementText.text = $"+{eqSnap.Level}";
+                if (eqSnap.Level >= Util.VisibleEnhancementEffectLevel)
                 {
                     baseItemView.EnhancementImage.material = data.EnhancementMaterial;
                     baseItemView.EnhancementImage.gameObject.SetActive(true);
@@ -69,11 +72,11 @@ namespace Nekoyume.UI.Module
                     baseItemView.EnhancementImage.gameObject.SetActive(false);
                 }
             }
-            else if (itemBase is Costume costume)
+            else if (polySnap is CostumeSnapshot costumeSnap)
             {
                 baseItemView.EnhancementText.gameObject.SetActive(false);
                 baseItemView.EnhancementImage.gameObject.SetActive(false);
-                var tooltipData = tooltipDataScriptableObject.GetSpineTooltipData(costume.Id);
+                var tooltipData = tooltipDataScriptableObject.GetSpineTooltipData(costumeSnap.Id);
                 if (tooltipData != null)
                 {
                     if (_costumeSpineObject)

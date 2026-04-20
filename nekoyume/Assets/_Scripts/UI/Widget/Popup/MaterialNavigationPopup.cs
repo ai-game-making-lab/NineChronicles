@@ -10,6 +10,7 @@ using Nekoyume.Game.Controller;
 using Nekoyume.Game.LiveAsset;
 using Nekoyume.Helper;
 using Nekoyume.L10n;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.UI.Module;
 using TMPro;
@@ -246,7 +247,7 @@ namespace Nekoyume.UI
             {
                 case CostType.NCG:
                     itemId = 9999999;
-                    count = States.Instance.GoldBalanceState.Gold.GetQuantityString();
+                    count = ClientStateViewProvider.Current.CurrentGoldBalanceStateRaw.Gold.GetQuantityString();
                     buttonText = L10nManager.Localize("UI_SHOP");
                     if (PaymentPopup.CanAttractShop())
                     {
@@ -269,7 +270,7 @@ namespace Nekoyume.UI
                     break;
                 case CostType.Crystal:
                     itemId = 9999998;
-                    count = States.Instance.CrystalBalance.MajorUnit.ToString();
+                    count = ClientStateViewProvider.Current.CurrentAgentCrystalBalanceMajorUnit.ToString();
                     buttonText = L10nManager.Localize("GRIND_UI_BUTTON");
                     callback = () =>
                     {
@@ -285,7 +286,7 @@ namespace Nekoyume.UI
                     break;
                 case CostType.Hourglass:
                     itemId = 9999997;
-                    var hourglassCount = States.Instance.CurrentAvatarState.inventory
+                    var hourglassCount = ClientStateViewProvider.Current.CurrentAvatarStateRaw.inventory
                         .GetUsableItemCount(costType, Game.Game.instance.Agent.BlockIndex);
                     count = hourglassCount.ToString();
                     buttonText = L10nManager.Localize("UI_COMBINATION");
@@ -299,7 +300,7 @@ namespace Nekoyume.UI
                 case CostType.ApPotion:
                     itemId = (int)costType;
                     var materialCount =
-                        States.Instance.CurrentAvatarState.inventory.GetMaterialCount(itemId);
+                        ClientStateViewProvider.Current.CurrentAvatarStateRaw.inventory.GetMaterialCount(itemId);
                     count = materialCount.ToString();
 
                     if (costType == CostType.SilverDust)
@@ -361,7 +362,7 @@ namespace Nekoyume.UI
 
             var ticker = Game.Game.instance.TableSheets.RuneSheet[runeStoneId].Ticker;
             var icon = SpriteHelper.GetFavIcon(ticker);
-            var count = States.Instance.CurrentAvatarBalances[ticker].GetQuantityString();
+            var count = ClientStateViewProvider.Current.CurrentAvatarBalancesRaw[ticker].GetQuantityString();
 
             string buttonText;
             System.Action callback;

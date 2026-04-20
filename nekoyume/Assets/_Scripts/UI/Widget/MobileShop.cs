@@ -8,6 +8,8 @@ using Nekoyume.Game;
 using Nekoyume.Game.Controller;
 using Nekoyume.Helper;
 using Nekoyume.L10n;
+using Nekoyume.SingleClient.Blockchain;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.UI.Module;
 using UnityEngine;
@@ -322,7 +324,7 @@ namespace Nekoyume.UI
         public static async Task<IReadOnlyList<InAppPurchaseServiceClient.CategorySchema>> GetCategorySchemas()
         {
             return await ApiClients.Instance.IAPServiceManager
-                .GetProductsAsync(States.Instance.AgentState.address, Game.Game.instance.CurrentPlanetId.ToString());
+                .GetProductsAsync(ClientStateViewProvider.Current.CurrentAgent.Address.ToLibplanet(), Game.Game.instance.CurrentPlanetId.ToString());
         }
 
         public void RefreshGrid()

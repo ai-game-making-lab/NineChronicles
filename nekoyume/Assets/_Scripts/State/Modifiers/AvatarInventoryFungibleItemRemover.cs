@@ -132,11 +132,17 @@ namespace Nekoyume.State.Modifiers
             {
                 state.inventory.RemoveFungibleItem(
                     pair.Key.Value,
-                    Game.Game.instance.Agent.BlockIndex,
+                    GetCurrentBlockIndex(),
                     pair.Value);
             }
 
             return state;
+        }
+
+        private static long GetCurrentBlockIndex()
+        {
+            var game = UnityEngine.Object.FindObjectOfType<Game.Game>();
+            return game?.Agent?.BlockIndex ?? 0L;
         }
     }
 }

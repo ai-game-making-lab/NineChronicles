@@ -8,6 +8,7 @@ using Nekoyume.Extensions;
 using Nekoyume.Game;
 using Nekoyume.Game.Controller;
 using Nekoyume.Model.BattleStatus;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.UI.Module;
 using TMPro;
@@ -18,9 +19,12 @@ using Nekoyume.Game.Battle;
 using Nekoyume.Helper;
 using Nekoyume.L10n;
 using Nekoyume.Model.Mail;
-using Nekoyume.Model.Elemental;
 using Nekoyume.Model.EnumType;
+using Nekoyume.Model.Item;
+using Nekoyume.SingleClient.Models.Elemental;
+using Nekoyume.SingleClient;
 using Nekoyume.TableData;
+using Nekoyume.State.Subjects;
 using EventType = Nekoyume.EnumType.EventType;
 using Toggle = Nekoyume.UI.Module.Toggle;
 
@@ -218,8 +222,8 @@ namespace Nekoyume.UI
 
             Analyzer.Instance.Track("Unity/Click Stage", new Dictionary<string, Value>()
             {
-                ["AvatarAddress"] = States.Instance.CurrentAvatarState.address.ToString(),
-                ["AgentAddress"] = States.Instance.AgentState.address.ToString()
+                ["AvatarAddress"] = ClientStateViewProvider.Current.CurrentAvatarStateRaw.address.ToString(),
+                ["AgentAddress"] = ClientStateViewProvider.Current.CurrentAgentStateRaw.address.ToString()
             });
 
             repeatToggle.isOn = false;
@@ -241,7 +245,7 @@ namespace Nekoyume.UI
             sweepButtonText.text = _stageType switch
             {
                 StageType.EventDungeon => "Sweep", // Event dungeon always shows "Sweep"
-                _ => States.Instance.CurrentAvatarState.worldInformation.IsStageCleared(stageId)
+                _ => ClientStateViewProvider.Current.CurrentAvatarStateRaw.worldInformation.IsStageCleared(stageId)
                     ? "Sweep"
                     : "Repeat"
             };
@@ -334,7 +338,7 @@ namespace Nekoyume.UI
                 return;
             }
 
-            randomBuffButton.SetData(States.Instance.CrystalRandomSkillState, _stageId);
+            randomBuffButton.SetData(ClientStateViewProvider.Current.CrystalRandomSkillStateRaw, _stageId);
         }
 
         public override void Close(bool ignoreCloseAnimation = false)
@@ -398,7 +402,7 @@ namespace Nekoyume.UI
                     _requiredCost = stage.CostAP;
                     _entryCostItemId = stage.EntryCostItemId;
                     _entryCostItemCount = stage.EntryCostItemCount;
-                    var stakingLevel = States.Instance.StakingLevel;
+                    var stakingLevel = ClientStateViewProvider.Current.StakingLevel;
                     if (_stageType is StageType.HackAndSlash && stakingLevel > 0)
                     {
                         _requiredCost =
@@ -409,6 +413,7 @@ namespace Nekoyume.UI
                                     stakingLevel);
                     }
 
+                    startButton.SetCostChecker(IsSingleClientStageCostEnough);
                     if (_entryCostItemId > 0 && _entryCostItemCount > 0)
                     {
                         startButton.SetCost(
@@ -428,12 +433,81 @@ namespace Nekoyume.UI
                     _requiredCost = 1;
                     _entryCostItemId = 0;
                     _entryCostItemCount = 0;
+                    startButton.SetCostChecker(null);
                     startButton.SetCost(CostType.EventDungeonTicket, _requiredCost);
                     startButton.SetCondition(null);
                     break;
                 }
                 default:
                     throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        private bool IsSingleClientStageCostEnough(CostType type, long cost)
+        {
+            if (!TryGetSingleClientStagePlayPreview(out var preview))
+            {
+                return ConditionalCostButton.CheckCostOfType(type, cost);
+            }
+
+            if (type == CostType.ActionPoint)
+            {
+                return preview.HasEnoughActionPoint;
+            }
+
+            if (preview.HasEntryCost &&
+                int.TryParse(preview.EntryCostItemId, out var entryCostItemId) &&
+                entryCostItemId == (int)type)
+            {
+                return preview.HasEnoughEntryCostItem;
+            }
+
+            return ConditionalCostButton.CheckCostOfType(type, cost);
+        }
+
+        private bool TryGetSingleClientStagePlayPreview(
+            out ClientStagePlayPreview preview,
+            int playCount = 1,
+            int apStoneCount = 0)
+        {
+            preview = null;
+            if (_stageType is not StageType.HackAndSlash and not StageType.Mimisbrunnr)
+            {
+                return false;
+            }
+
+            var game = Game.Game.instance;
+            if (game is null ||
+                !SingleClientMode.IsEnabled(game.CommandLineOptions) ||
+                game.ClientRuntime is null)
+            {
+                return false;
+            }
+
+            try
+            {
+                var (actionPointCost, itemCosts) =
+                    GetSingleClientStagePlayCosts(playCount, apStoneCount);
+                preview = game.ClientRuntime.PreviewStagePlay(
+                    _stageId,
+                    actionPointCost,
+                    itemCosts);
+                return true;
+            }
+            catch (ArgumentException e)
+            {
+                NcDebug.LogException(e);
+                return false;
+            }
+            catch (InvalidOperationException e)
+            {
+                NcDebug.LogException(e);
+                return false;
+            }
+            catch (OverflowException e)
+            {
+                NcDebug.LogException(e);
+                return false;
             }
         }
 
@@ -493,7 +567,7 @@ namespace Nekoyume.UI
                     var cost = RxProps.EventScheduleRowForDungeon.Value
                         .GetDungeonTicketCost(
                             RxProps.EventDungeonInfo.Value?.NumberOfTicketPurchases ?? 0,
-                            States.Instance.GoldBalanceState.Gold.Currency);
+                            ClientStateViewProvider.Current.CurrentGoldBalanceStateRaw.Gold.Currency);
                     var purchasedCount = RxProps.EventDungeonInfo.Value?.NumberOfTicketPurchases ?? 0;
 
                     Find<TicketPurchasePopup>().Show(
@@ -563,10 +637,10 @@ namespace Nekoyume.UI
                 return;
             }
 
-            var itemSlotState = States.Instance.CurrentItemSlotStates[BattleType.Adventure];
+            var itemSlotState = ClientStateViewProvider.Current.CurrentItemSlotStatesRaw[BattleType.Adventure];
             var costumes = itemSlotState.Costumes;
             var equipments = itemSlotState.Equipments;
-            var runeInfos = States.Instance.CurrentRuneSlotStates[BattleType.Adventure]
+            var runeInfos = ClientStateViewProvider.Current.CurrentRuneSlotStatesRaw[BattleType.Adventure]
                 .GetEquippedRuneSlotInfos();
             var consumables = information.GetEquippedConsumables();
             var stage = Game.Game.instance.Stage;
@@ -596,10 +670,15 @@ namespace Nekoyume.UI
             Find<LoadingScreen>().Show(LoadingScreen.LoadingType.Adventure);
 
             startButton.gameObject.SetActive(false);
-            var itemSlotState = States.Instance.CurrentItemSlotStates[BattleType.Adventure];
+            if (TrySendSingleClientBattleAction(stageType, playCount, apStoneCount))
+            {
+                return;
+            }
+
+            var itemSlotState = ClientStateViewProvider.Current.CurrentItemSlotStatesRaw[BattleType.Adventure];
             var costumes = itemSlotState.Costumes;
             var equipments = itemSlotState.Equipments;
-            var runeInfos = States.Instance.CurrentRuneSlotStates[BattleType.Adventure]
+            var runeInfos = ClientStateViewProvider.Current.CurrentRuneSlotStatesRaw[BattleType.Adventure]
                 .GetEquippedRuneSlotInfos();
             var consumables = information.GetEquippedConsumables();
 
@@ -612,8 +691,8 @@ namespace Nekoyume.UI
             {
                 case StageType.HackAndSlash:
                 {
-                    var skillState = States.Instance.CrystalRandomSkillState;
-                    var avatarAddress = States.Instance.CurrentAvatarState.address;
+                    var skillState = ClientStateViewProvider.Current.CrystalRandomSkillStateRaw;
+                    var avatarAddress = ClientStateViewProvider.Current.CurrentAvatarStateRaw.address;
                     var key = string.Format("HackAndSlash.SelectedBonusSkillId.{0}", avatarAddress);
                     var skillId = PlayerPrefs.GetInt(key, 0);
                     if (skillId == 0)
@@ -692,6 +771,207 @@ namespace Nekoyume.UI
             }
         }
 
+        private bool TrySendSingleClientBattleAction(
+            StageType stageType,
+            int playCount,
+            int apStoneCount)
+        {
+            if (stageType is not StageType.HackAndSlash and not StageType.Mimisbrunnr)
+            {
+                return false;
+            }
+
+            var game = Game.Game.instance;
+            if (game is null ||
+                !SingleClientMode.IsEnabled(game.CommandLineOptions) ||
+                game.ClientRuntime is null)
+            {
+                return false;
+            }
+
+            if (!game.ClientRuntime.IsStarted)
+            {
+                NcDebug.LogError("Single-client runtime is not started.");
+                RestoreSingleClientBattleStartUi();
+                return true;
+            }
+
+            try
+            {
+                var result = PlaySingleClientStage(
+                    game.ClientRuntime,
+                    playCount,
+                    apStoneCount);
+                ApplySingleClientStagePlayResult(result);
+            }
+            catch (InvalidOperationException e)
+            {
+                NcDebug.LogException(e);
+                NotifySingleClientStagePlayFailure(playCount, apStoneCount);
+                RestoreSingleClientBattleStartUi();
+            }
+            catch (ArgumentException e)
+            {
+                NcDebug.LogException(e);
+                RestoreSingleClientBattleStartUi();
+            }
+            catch (OverflowException e)
+            {
+                NcDebug.LogException(e);
+                RestoreSingleClientBattleStartUi();
+            }
+
+            return true;
+        }
+
+        private ClientStagePlayResult PlaySingleClientStage(
+            IClientRuntime runtime,
+            int playCount,
+            int apStoneCount)
+        {
+            var (actionPointCost, itemCosts) =
+                GetSingleClientStagePlayCosts(playCount, apStoneCount);
+
+            return runtime.PlayStage(
+                _stageId,
+                actionPointCost,
+                itemCosts);
+        }
+
+        private (long actionPointCost, IReadOnlyList<ClientItemCost> itemCosts)
+            GetSingleClientStagePlayCosts(int playCount, int apStoneCount)
+        {
+            var normalizedPlayCount = Math.Max(1, playCount);
+            var apPlayCount = normalizedPlayCount;
+            if (apStoneCount > 0)
+            {
+                if (_requiredCost <= 0)
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid AP cost for stage {_stageId}: {_requiredCost}");
+                }
+
+                var apStonePlayCount =
+                    checked(apStoneCount * (ClientStateViewProvider.Current.CurrentGameConfigStateRaw.ActionPointMax / _requiredCost));
+                apPlayCount = checked(normalizedPlayCount - apStonePlayCount);
+                if (apPlayCount < 0)
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid single-client repeat play count. " +
+                        $"playCount={normalizedPlayCount}, apStoneCount={apStoneCount}, " +
+                        $"apStonePlayCount={apStonePlayCount}");
+                }
+            }
+
+            var actionPointCost = checked((long)_requiredCost * apPlayCount);
+            var itemCosts = new List<ClientItemCost>();
+            var entryCostItemId = _entryCostItemId > 0 && _entryCostItemCount > 0
+                ? _entryCostItemId.ToString()
+                : null;
+            var entryCostItemCount = entryCostItemId is null
+                ? 0
+                : checked((long)_entryCostItemCount * normalizedPlayCount);
+            if (entryCostItemId is not null)
+            {
+                itemCosts.Add(new ClientItemCost(entryCostItemId, entryCostItemCount));
+            }
+
+            if (apStoneCount > 0)
+            {
+                itemCosts.Add(new ClientItemCost(GetSingleClientApStoneItemId(), apStoneCount));
+            }
+
+            return (actionPointCost, itemCosts);
+        }
+
+        private static string GetSingleClientApStoneItemId()
+        {
+            return TableSheets.Instance.MaterialItemSheet.Values
+                .First(row => row.ItemSubType == ItemSubType.ApStone)
+                .Id
+                .ToString();
+        }
+
+        private void ApplySingleClientStagePlayResult(ClientStagePlayResult result)
+        {
+            var game = Game.Game.instance;
+            var avatarState = ClientStateViewProvider.Current.CurrentAvatarStateRaw;
+            if (avatarState is not null)
+            {
+                avatarState.actionPoint = checked((int)result.ActionPointAfter);
+                avatarState.worldInformation?.ClearStage(
+                    _worldId,
+                    result.StageId,
+                    result.State.BlockIndex,
+                    TableSheets.Instance.WorldSheet,
+                    TableSheets.Instance.WorldUnlockSheet);
+
+                ReactiveAvatarState.Initialize(avatarState);
+                ReactiveAvatarState.UpdateActionPoint(result.ActionPointAfter);
+
+                if (GameConfigStateSubject.ActionPointState.ContainsKey(avatarState.address))
+                {
+                    GameConfigStateSubject.ActionPointState.Remove(avatarState.address);
+                }
+
+                if (Widget.TryFind<WorldMap>(out var worldMap) &&
+                    avatarState.worldInformation is not null)
+                {
+                    worldMap.SetWorldInformation(avatarState.worldInformation);
+                }
+            }
+
+            ActionRenderHandler.Instance.Pending = false;
+            BattleRenderer.Instance.IsOnBattle = false;
+            if (game is not null)
+            {
+                game.Stage.IsShowHud = false;
+            }
+
+            Find<LoadingScreen>().Close();
+            Close(true);
+        }
+
+        private void NotifySingleClientStagePlayFailure(int playCount, int apStoneCount)
+        {
+            if (TryGetSingleClientStagePlayPreview(out var preview, playCount, apStoneCount) &&
+                !preview.HasEnoughEntryCostItem)
+            {
+                OneLineSystem.Push(
+                    MailType.System,
+                    L10nManager.Localize("NOTIFICATION_NOT_ENOUGH_MATERIALS"),
+                    NotificationCell.NotificationType.Alert);
+                return;
+            }
+
+            OneLineSystem.Push(
+                MailType.System,
+                L10nManager.Localize("ERROR_ACTION_POINT"),
+                NotificationCell.NotificationType.Alert);
+        }
+
+        private void RestoreSingleClientBattleStartUi()
+        {
+            if (Widget.TryFind<LoadingScreen>(out var loadingScreen))
+            {
+                loadingScreen.Close();
+            }
+
+            ActionRenderHandler.Instance.Pending = false;
+            BattleRenderer.Instance.IsOnBattle = false;
+
+            var game = Game.Game.instance;
+            if (game is not null)
+            {
+                game.Stage.IsShowHud = false;
+            }
+
+            startButton.gameObject.SetActive(true);
+            repeatToggle.interactable = true;
+            coverToBlockClick.SetActive(false);
+            UpdateStartButton();
+        }
+
         private void GoToPrepareStage(BattleLog battleLog)
         {
             if (!IsActive() || !Find<LoadingScreen>().IsActive())
@@ -750,10 +1030,10 @@ namespace Nekoyume.UI
 
         private bool CheckEquipmentElementalType()
         {
-            var (equipments, _) = States.Instance.GetEquippedItems(BattleType.Adventure);
+            var (equipments, _) = ClientStateViewProvider.Current.GetEquippedItems(BattleType.Adventure);
             var elementalTypes = GetElementalTypes();
             return equipments.All(x =>
-                elementalTypes.Contains(x.ElementalType));
+                elementalTypes.Contains(x.ElementalType.ToView()));
         }
 
         private void UpdateStartButton()
@@ -772,10 +1052,10 @@ namespace Nekoyume.UI
             }
 
             const int requiredStage = Game.LiveAsset.GameConfig.RequiredStage.Sweep;
-            var (equipments, costumes) = States.Instance.GetEquippedItems(BattleType.Adventure);
+            var (equipments, costumes) = ClientStateViewProvider.Current.GetEquippedItems(BattleType.Adventure);
             var consumables = information.GetEquippedConsumables().Select(x => x.Id).ToList();
             var canBattle = Util.CanBattle(equipments, costumes, consumables);
-            var canSweep = States.Instance.CurrentAvatarState.worldInformation.IsStageCleared(requiredStage);
+            var canSweep = ClientStateViewProvider.Current.CurrentAvatarStateRaw.worldInformation.IsStageCleared(requiredStage);
 
             startButton.gameObject.SetActive(canBattle);
 
@@ -805,13 +1085,13 @@ namespace Nekoyume.UI
         {
             if (_stageType != StageType.Mimisbrunnr)
             {
-                return ElementalTypeExtension.GetAllTypes();
+                return ElementalRules.GetAllTypes().ToList();
             }
 
             var mimisbrunnrSheet = TableSheets.Instance.MimisbrunnrSheet;
             return mimisbrunnrSheet.TryGetValue(_stageId, out var mimisbrunnrSheetRow)
-                ? mimisbrunnrSheetRow.ElementalTypes
-                : ElementalTypeExtension.GetAllTypes();
+                ? mimisbrunnrSheetRow.ElementalTypes.Select(e => e.ToView()).ToList()
+                : ElementalRules.GetAllTypes().ToList();
         }
 
         public void TutorialActionClickBattlePreparationFirstInventoryCellView()

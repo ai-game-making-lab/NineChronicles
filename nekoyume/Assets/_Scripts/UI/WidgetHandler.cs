@@ -1,5 +1,4 @@
 ﻿using Nekoyume.UI.Module;
-using UnityEditor;
 
 namespace Nekoyume.UI
 {

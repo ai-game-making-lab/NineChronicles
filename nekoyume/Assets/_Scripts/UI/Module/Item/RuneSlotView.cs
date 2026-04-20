@@ -10,6 +10,8 @@ using Nekoyume.Game.Controller;
 using Nekoyume.Model.EnumType;
 using Nekoyume.Model.Rune;
 using Nekoyume.Model.State;
+using Nekoyume.SingleClient.Models.TableData;
+using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.TableData;
 using Nekoyume.TableData.Rune;
@@ -147,15 +149,15 @@ namespace Nekoyume.UI.Module
                 if (runeSlot.RuneSlotType == RuneSlotType.Ncg)
                 {
                     cost = runeSlot.RuneType == RuneType.Stat
-                        ? States.Instance.GameConfigState.RuneStatSlotUnlockCost
-                        : States.Instance.GameConfigState.RuneSkillSlotUnlockCost;
+                        ? ClientStateViewProvider.Current.CurrentGameConfigStateRaw.RuneStatSlotUnlockCost
+                        : ClientStateViewProvider.Current.CurrentGameConfigStateRaw.RuneSkillSlotUnlockCost;
                     priceIconImage.sprite = SpriteHelper.GetFavIcon("NCG");
                 }
                 else if (runeSlot.RuneSlotType == RuneSlotType.Crystal)
                 {
                     cost = runeSlot.RuneType == RuneType.Stat
-                        ? States.Instance.GameConfigState.RuneStatSlotCrystalUnlockCost
-                        : States.Instance.GameConfigState.RuneSkillSlotCrystalUnlockCost;
+                        ? ClientStateViewProvider.Current.CurrentGameConfigStateRaw.RuneStatSlotCrystalUnlockCost
+                        : ClientStateViewProvider.Current.CurrentGameConfigStateRaw.RuneSkillSlotCrystalUnlockCost;
                     priceIconImage.sprite = SpriteHelper.GetFavIcon("CRYSTAL");
                 }
 
@@ -170,7 +172,7 @@ namespace Nekoyume.UI.Module
 
         private void Equip(int runeId)
         {
-            if (!States.Instance.AllRuneState.TryGetRuneState(runeId, out var state))
+            if (!ClientStateViewProvider.Current.AllRuneStateRaw.TryGetRuneState(runeId, out var state))
             {
                 return;
             }
@@ -203,7 +205,7 @@ namespace Nekoyume.UI.Module
             itemImage.SetNativeSize();
 
             UpdateGrade(row);
-            UpdateOptionTag(option, row.Grade);
+            UpdateOptionTag(option.ToView(), row.Grade);
         }
 
         private void Equip(RuneState runeState)
@@ -241,7 +243,7 @@ namespace Nekoyume.UI.Module
             itemImage.SetNativeSize();
 
             UpdateGrade(row);
-            UpdateOptionTag(option, row.Grade);
+            UpdateOptionTag(option.ToView(), row.Grade);
         }
 
         private void Unequip()
@@ -264,7 +266,11 @@ namespace Nekoyume.UI.Module
             gradeHsv.value = data.GradeHsvValue;
         }
 
-        private void UpdateOptionTag(RuneOptionSheet.Row.RuneOptionInfo option, int grade)
+        // Accepts the client-owned <see cref="RuneOptionInfoView"/> mirror so the lib9c
+        // <c>RuneOptionSheet.Row.RuneOptionInfo</c> only crosses the sheet-access seam in
+        // <see cref="Equip(int)"/> / <see cref="Equip(RuneState)"/> where it is projected
+        // via <c>.ToView()</c>.
+        private void UpdateOptionTag(RuneOptionInfoView option, int grade)
         {
             optionTagBg.gameObject.SetActive(option.SkillId != 0);
             if (option.SkillId != 0)

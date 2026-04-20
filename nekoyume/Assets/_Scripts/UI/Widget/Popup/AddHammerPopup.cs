@@ -121,6 +121,24 @@ namespace Nekoyume.UI
             }).AddTo(gameObject);
         }
 
+        /// <summary>
+        /// ItemBase-accepting overload so callers (EnhancementInventory) can pass the poly base
+        /// reference without an explicit lib9c-typed downcast at the call site. The guard is
+        /// null-safe: non-equipment inputs abort Show, matching the prior <c>baseModel.ItemBase</c>
+        /// pattern's silent fallthrough.
+        /// </summary>
+        public void Show(
+            ItemBase baseModelItemBase,
+            List<EnhancementInventoryItem> materialModels,
+            EnhancementInventoryItem hammerItem,
+            Action<int> onApply)
+        {
+            if (baseModelItemBase is Equipment baseModel)
+            {
+                Show(baseModel, materialModels, hammerItem, onApply);
+            }
+        }
+
         public void Show(
             Equipment baseModel,
             List<EnhancementInventoryItem> materialModels,
@@ -173,13 +191,12 @@ namespace Nekoyume.UI
                     return hammerExp * inventoryItem.SelectedMaterialCount.Value;
                 }
                 
-                var equipment = inventoryItem.ItemBase as Equipment;
-                if (equipment == null)
+                if (inventoryItem.ItemBase.ToPolySnapshot() is not EquipmentSnapshot eqSnap)
                 {
                     return 0;
                 }
 
-                return equipment.GetRealExp(
+                return eqSnap.GetRealExp(
                     equipmentItemSheet,
                     enhancementCostSheet);
             });
