@@ -1,4 +1,3 @@
-#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using System;
 using System.Globalization;
 using System.Numerics;
@@ -163,5 +162,3 @@ namespace Nekoyume.SingleClient.Blockchain
         public static bool operator >=(FungibleAssetValue a, FungibleAssetValue b) => a.CompareTo(b) >= 0;
     }
 }
-
-#endif

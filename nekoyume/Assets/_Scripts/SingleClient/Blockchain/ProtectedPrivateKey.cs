@@ -1,4 +1,3 @@
-#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using System;
 using System.IO;
 using System.Security.Cryptography;
@@ -253,5 +252,3 @@ namespace Nekoyume.SingleClient.Blockchain
         }
     }
 }
-
-#endif

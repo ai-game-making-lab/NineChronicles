@@ -1,4 +1,3 @@
-#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using System;
 using System.Security.Cryptography;
 using System.Text;
@@ -109,5 +108,3 @@ namespace Nekoyume.SingleClient.Blockchain
         public static bool operator !=(TxId left, TxId right) => !left.Equals(right);
     }
 }
-
-#endif

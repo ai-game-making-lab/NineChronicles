@@ -1,4 +1,3 @@
-#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using System;
 using System.Collections.Immutable;
 using System.Numerics;
@@ -119,5 +118,3 @@ namespace Nekoyume.SingleClient.Blockchain
         public override string ToString() => $"{Ticker}:{DecimalPlaces}";
     }
 }
-
-#endif

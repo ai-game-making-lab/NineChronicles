@@ -1,4 +1,3 @@
-#if LIB9C_RESTORED // stubbed out after lib9c deletion
 using System;
 using System.Security.Cryptography;
 using System.Text;
@@ -121,5 +120,3 @@ namespace Nekoyume.SingleClient.Blockchain
         public static bool operator !=(HashDigest<T> left, HashDigest<T> right) => !left.Equals(right);
     }
 }
-
-#endif
