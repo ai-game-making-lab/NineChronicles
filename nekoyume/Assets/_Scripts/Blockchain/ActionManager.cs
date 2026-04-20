@@ -174,6 +174,11 @@ namespace Nekoyume.Blockchain
             int ear = 0,
             int tail = 0)
         {
+            if (IsSingleClientActive())
+            {
+                return SingleClientNoOp<CreateAvatar>();
+            }
+
             if (States.Instance.AvatarStates.ContainsKey(index))
             {
                 throw new Exception($"Already contains {index} in {States.Instance.AvatarStates}");
@@ -1545,6 +1550,11 @@ namespace Nekoyume.Blockchain
             CombinationSlotState state,
             int slotIndex)
         {
+            if (IsSingleClientActive())
+            {
+                return SingleClientNoOp<RapidCombination>();
+            }
+
             return RapidCombination(new List<CombinationSlotState> { state }, new List<int> { slotIndex });
         }
 
