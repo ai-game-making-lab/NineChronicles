@@ -8,6 +8,8 @@ using Nekoyume.Helper;
 using Nekoyume.L10n;
 using Nekoyume.Model.Item;
 using Nekoyume.Model.State;
+using Nekoyume.SingleClient.Models.Items;
+using Nekoyume.SingleClient.Models.TableData;
 using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.TableData;
@@ -16,6 +18,8 @@ using Nekoyume.UI.Module;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Lib9cSkillType = Nekoyume.Model.Skill.SkillType;
+using Lib9cStatType = Nekoyume.Model.Stat.StatType;
 
 namespace Nekoyume.UI
 {
@@ -319,22 +323,28 @@ namespace Nekoyume.UI
             Information information,
             ItemEnhancement13.ResultModel resultModel)
         {
-            if (resultModel.itemUsable is not Equipment equipment)
+            if (resultModel.itemUsable.ToPolySnapshot() is not EquipmentSnapshot eqSnap)
             {
                 NcDebug.LogError("resultModel.itemUsable is not Equipment");
                 return;
             }
 
-            if (resultModel.preItemUsable is not Equipment preEquipment)
+            if (resultModel.preItemUsable.ToPolySnapshot() is not EquipmentSnapshot preEqSnap)
             {
                 NcDebug.LogError("resultModel.preItemUsable is not Equipment");
                 return;
             }
 
-            var itemOptionInfoPre = new ItemOptionInfo(preEquipment);
-            var itemOptionInfo = new ItemOptionInfo(equipment);
+            var skillSheet = TableSheets.Instance.SkillSheet;
+            System.Func<int, SkillSheetRowView?> skillRowLookup = skillId =>
+                skillSheet.TryGetValue(skillId, out var row) ? SkillSheetRowMapper.ToView(row) : (SkillSheetRowView?)null;
+            var itemOptionInfoPre = preEqSnap.ToItemOptionInfoRichSnapshot(skillRowLookup);
+            var itemOptionInfo = eqSnap.ToItemOptionInfoRichSnapshot(skillRowLookup);
 
-            var statType = itemOptionInfo.MainStat.type;
+            // lib9c StatType/SkillType are needed by StatExtensions.ValueToString and
+            // SkillExtensions.EffectToString. The rich snapshot carries the client-owned mirror
+            // enums — we cast at the single boundary here.
+            var statType = (Lib9cStatType)(int)itemOptionInfo.MainStat.type;
             var statValueString = statType.ValueToString(itemOptionInfo.MainStat.totalValue);
             var statRate = RateOfChange(
                 itemOptionInfoPre.MainStat.totalValue,
@@ -362,8 +372,9 @@ namespace Nekoyume.UI
                 var rate = RateOfChange(preValue, value);
                 var rateString = rate > 0 ? $" (+{rate}%)" : string.Empty;
 
+                var lib9cType = (Lib9cStatType)(int)type;
                 optionView.UpdateView(
-                    $"{type} +{type.ValueToString(value)}{rateString}",
+                    $"{lib9cType} +{lib9cType.ValueToString(value)}{rateString}",
                     string.Empty, count);
                 optionView.Show();
             }
@@ -394,7 +405,9 @@ namespace Nekoyume.UI
                 var chancePlus = chance - preChance;
                 var powerRateString = powerRate > 0 ? $" (+{powerRate}%)" : string.Empty;
                 var chanceRateString = chancePlus > 0 ? $" (+{chancePlus}%p)" : string.Empty;
-                var powerText = SkillExtensions.EffectToString(skillRow.Id, skillRow.SkillType, power, ratio, type);
+                var lib9cSkillType = (Lib9cSkillType)(int)skillRow.SkillType;
+                var lib9cRefStat = (Lib9cStatType)(int)type;
+                var powerText = SkillExtensions.EffectToString(skillRow.Id, lib9cSkillType, power, ratio, lib9cRefStat);
                 optionView.UpdateView(
                     $"{skillRow.GetLocalizedName()} {powerText}{powerRateString} / {chance}%{chanceRateString}",
                     string.Empty);

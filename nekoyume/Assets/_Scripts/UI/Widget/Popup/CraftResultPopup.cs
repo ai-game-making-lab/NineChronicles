@@ -7,9 +7,14 @@ using Nekoyume.Game.Battle;
 using Nekoyume.Helper;
 using Nekoyume.Model.Item;
 using Nekoyume.Model.Stat;
+using Nekoyume.SingleClient.Models.Items;
+using Nekoyume.SingleClient.Models.TableData;
 using Nekoyume.UI.Module;
 using TMPro;
 using UnityEngine;
+using ClientStatType = Nekoyume.SingleClient.Models.Stats.StatType;
+using Lib9cSkillType = Nekoyume.Model.Skill.SkillType;
+using Lib9cStatType = Nekoyume.Model.Stat.StatType;
 
 namespace Nekoyume.UI
 {
@@ -59,7 +64,10 @@ namespace Nekoyume.UI
             optionViews.ForEach(view => view.Hide(true));
             skillView.Hide(true);
 
-            var itemOptionInfo = new ItemOptionInfo(resultEquipment);
+            var eqSnap = resultEquipment.ToEquipmentSnapshot();
+            var skillSheet = TableSheets.Instance.SkillSheet;
+            var itemOptionInfo = eqSnap.ToItemOptionInfoRichSnapshot(skillId =>
+                skillSheet.TryGetValue(skillId, out var row) ? SkillSheetRowMapper.ToView(row) : (SkillSheetRowView?)null);
             var statOptions = GatherStatOptionsFromType(itemOptionInfo);
             var statOptionsCount = statOptions.Count;
             var skillOptions = itemOptionInfo.SkillOptions;
@@ -75,7 +83,9 @@ namespace Nekoyume.UI
                 }
 
                 var (type, value, _) = statOptions[i];
-                optionView.UpdateAsStatWithCount(type, value, GetStatRating(type, value, subRecipeId));
+                // optionView.UpdateAsStatWithCount expects lib9c StatType; downcast at the boundary.
+                var lib9cType = (Lib9cStatType)(int)type;
+                optionView.UpdateAsStatWithCount(lib9cType, value, GetStatRating(lib9cType, value, subRecipeId));
             }
 
             if (skillOptionsCount == 0)
@@ -85,17 +95,19 @@ namespace Nekoyume.UI
             else
             {
                 var (skillRow, power, chance, ratio, type) = skillOptions[0];
-                var powerText = SkillExtensions.EffectToString(skillRow.Id, skillRow.SkillType, power, ratio, type);
+                var lib9cSkillType = (Lib9cSkillType)(int)skillRow.SkillType;
+                var lib9cRefStat = (Lib9cStatType)(int)type;
+                var powerText = SkillExtensions.EffectToString(skillRow.Id, lib9cSkillType, power, ratio, lib9cRefStat);
                 skillView.UpdateAsSkill(skillRow.GetLocalizedName(), powerText, chance, GetSkillRating(skillRow.Id, power, ratio, subRecipeId));
             }
 
             base.Show();
         }
 
-        private List<(StatType type, long value, int count)> GatherStatOptionsFromType(ItemOptionInfo itemOptionInfo)
+        private List<(ClientStatType type, long value, int count)> GatherStatOptionsFromType(ItemOptionInfoRichSnapshot itemOptionInfo)
         {
             var statOptions = itemOptionInfo.StatOptions;
-            var result = new Dictionary<StatType, (long value, int count)>();
+            var result = new Dictionary<ClientStatType, (long value, int count)>();
 
             foreach (var (type, value, count) in statOptions)
             {

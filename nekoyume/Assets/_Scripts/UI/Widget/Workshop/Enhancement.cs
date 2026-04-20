@@ -5,6 +5,7 @@ using Nekoyume.L10n;
 using Nekoyume.Model.Item;
 using Nekoyume.Model.Mail;
 using Nekoyume.SingleClient.Models.Items;
+using Nekoyume.SingleClient.Models.TableData;
 using ItemSubType = Nekoyume.Model.Item.ItemSubType;
 using Nekoyume.SingleClient.State;
 using Nekoyume.State;
@@ -21,6 +22,8 @@ using Nekoyume.UI.Model;
 using Nekoyume.UI.Scroller;
 using TMPro;
 using UnityEngine.UI;
+using Lib9cSkillType = Nekoyume.Model.Skill.SkillType;
+using Lib9cStatType = Nekoyume.Model.Stat.StatType;
 
 namespace Nekoyume.UI
 {
@@ -428,16 +431,28 @@ namespace Nekoyume.UI
 
                 var equipmentItemSheet = Game.Game.instance.TableSheets.EquipmentItemSheet;
                 var enhancementCostSheet = Game.Game.instance.TableSheets.EnhancementCostSheetV3;
-                var equipment = baseModel.ItemBase as Equipment;
+                // Poly-dispatch the base inventory item to a snapshot; if it's not Equipment we
+                // abort UI updates cleanly (the UpdateInformation contract relies on the caller
+                // always having filtered down to Equipment, so this effectively replaces the prior
+                // `as Equipment` + implicit null deref with a defensive guard).
+                if (baseModel.ItemBase.ToPolySnapshot() is not EquipmentSnapshot eqSnap)
+                {
+                    NcDebug.LogError("[Enhancement] baseModel.ItemBase is not Equipment");
+                    return;
+                }
+
+                // Cast once at the lib9c sheet boundary — EnhancementCostSheetV3 rows key on the
+                // lib9c enum; the snapshot carries the client mirror.
+                var lib9cSubType = (Nekoyume.Model.Item.ItemSubType)(int)eqSnap.ItemSubType;
                 var baseItemCostRows = enhancementCostSheet.Values
-                    .Where(row => row.ItemSubType == equipment.ItemSubType &&
-                        row.Grade == equipment.Grade).ToList();
+                    .Where(row => row.ItemSubType == lib9cSubType &&
+                        row.Grade == eqSnap.Grade).ToList();
                 var baseItemCostRow =
-                    baseItemCostRows.FirstOrDefault(row => row.Level == equipment.level) ??
+                    baseItemCostRows.FirstOrDefault(row => row.Level == eqSnap.Level) ??
                     new EnhancementCostSheetV3.Row();
 
                 // Get Target Exp
-                var baseModelExp = equipment.GetRealExp(
+                var baseModelExp = eqSnap.GetRealExp(
                     equipmentItemSheet,
                     enhancementCostSheet);
                 var targetExp = baseModelExp + materialModels.Sum(inventoryItem =>
@@ -481,13 +496,18 @@ namespace Nekoyume.UI
                 itemInformationContainer.SetActive(true);
                 ClearInformation();
 
-                itemNameText.text = equipment.GetLocalizedNonColoredName();
-                currentLevelText.text = $"+{equipment.level}";
+                // GetLocalizedNonColoredName remains on lib9c ItemBase; keep one reference alive
+                // just for this view-side call. Max-level helper is also a lib9c-typed static,
+                // so we pass the Equipment reference there too. All other reads (Level, Grade,
+                // options) route through the snapshot.
+                var equipmentRef = (Equipment)baseModel.ItemBase;
+                itemNameText.text = equipmentRef.GetLocalizedNonColoredName();
+                currentLevelText.text = $"+{eqSnap.Level}";
                 nextLevelText.text = $"+{targetRow.Level}";
 
-                levelStateText.text = $"Lv. {targetRow.Level}/{ItemEnhancement.GetEquipmentMaxLevel(equipment, enhancementCostSheet)}";
+                levelStateText.text = $"Lv. {targetRow.Level}/{ItemEnhancement.GetEquipmentMaxLevel(equipmentRef, enhancementCostSheet)}";
 
-                currentEquipmentCP.text = TextHelper.FormatNumber(CPHelper.GetCP(equipment));
+                currentEquipmentCP.text = TextHelper.FormatNumber(eqSnap.GetCP());
 
                 long requiredBlockIndex =
                     targetRow.RequiredBlockIndex - baseItemCostRow.RequiredBlockIndex;
@@ -497,25 +517,30 @@ namespace Nekoyume.UI
 
                 // Get Target Range Rows
                 var targetRangeRows = baseItemCostRows
-                    .Where(row => row.Level >= equipment.level &&
+                    .Where(row => row.Level >= eqSnap.Level &&
                         row.Level <= targetRow.Level + 1).ToList();
-                if (equipment.level == 0)
+                if (eqSnap.Level == 0)
                 {
                     targetRangeRows.Insert(0, new EnhancementCostSheetV3.Row());
                 }
 
                 if (targetRangeRows.Count >= 2)
                 {
-                    enhancementExpSlider.SetEquipment(equipment.ToEquipmentSnapshot());
+                    enhancementExpSlider.SetEquipment(eqSnap);
                     enhancementExpSlider.SliderGageEffect(targetExp, targetRow.Level);
                 }
                 else
                 {
-                    NcDebug.LogError($"[Enhancement] Failed Get TargetRangeRows : {equipment.level} -> {targetRow.Level}");
+                    NcDebug.LogError($"[Enhancement] Failed Get TargetRangeRows : {eqSnap.Level} -> {targetRow.Level}");
                 }
 
-                // Get ItemOptionInfo
-                var itemOptionInfo = new ItemOptionInfo(equipment);
+                // Get ItemOptionInfo via the rich snapshot mapper — same tuple shape as lib9c
+                // ItemOptionInfo, but StatType/SkillType/SkillRow now sit on the client surface.
+                var skillSheet = Game.Game.instance.TableSheets.SkillSheet;
+                var itemOptionInfo = eqSnap.ToItemOptionInfoRichSnapshot(skillId =>
+                    skillSheet.TryGetValue(skillId, out var row)
+                        ? SkillSheetRowMapper.ToView(row)
+                        : (SkillSheetRowView?)null);
                 var baseStatMin = itemOptionInfo.MainStat.baseValue;
                 var baseStatMax = itemOptionInfo.MainStat.baseValue;
                 var statOptionsMin = itemOptionInfo.StatOptions.Select(v => v.value).ToList();
@@ -527,7 +552,7 @@ namespace Nekoyume.UI
                 var skillStatPowerRatioMin = itemOptionInfo.SkillOptions.Select(v => v.statPowerRatio).ToList();
                 var skillStatPowerRatioMax = itemOptionInfo.SkillOptions.Select(v => v.statPowerRatio).ToList();
 
-                if (equipment.level != targetRow.Level)
+                if (eqSnap.Level != targetRow.Level)
                 {
                     for (var i = 1; i < targetRangeRows.Count - 1; i++)
                     {
@@ -555,8 +580,11 @@ namespace Nekoyume.UI
                     }
                 }
 
-                // Update StatView
-                var (mainStatType, baseValue, _) = itemOptionInfo.MainStat;
+                // Update StatView — the rich snapshot carries the client StatType mirror; cast
+                // once here because StatExtensions.ValueToString/ValueToShortString still sit on
+                // the lib9c enum surface.
+                var (clientMainStatType, baseValue, _) = itemOptionInfo.MainStat;
+                var mainStatType = (Lib9cStatType)(int)clientMainStatType;
                 mainStatView.gameObject.SetActive(true);
                 mainStatView.Set(
                     mainStatType.ToString(),
@@ -571,7 +599,8 @@ namespace Nekoyume.UI
 
                 for (var statIndex = 0; statIndex < itemOptionInfo.StatOptions.Count; statIndex++)
                 {
-                    var (optionStatType, value, count) = itemOptionInfo.StatOptions[statIndex];
+                    var (clientOptionStatType, value, count) = itemOptionInfo.StatOptions[statIndex];
+                    var optionStatType = (Lib9cStatType)(int)clientOptionStatType;
                     var statView = statViews[statIndex];
                     statView.gameObject.SetActive(true);
                     statView.Set(
@@ -596,30 +625,33 @@ namespace Nekoyume.UI
                     var skillView = skillViews[skillIndex];
                     skillView.gameObject.SetActive(true);
 
+                    // EffectToString is the single boundary to lib9c enums — feed it the casts.
+                    var lib9cSkillType = (Lib9cSkillType)(int)skillRow.SkillType;
+                    var lib9cRefStat = (Lib9cStatType)(int)refStatType;
                     var currentEffect = SkillExtensions.EffectToString(
                         skillRow.Id,
-                        skillRow.SkillType,
+                        lib9cSkillType,
                         power,
                         statPowerRatio,
-                        refStatType);
+                        lib9cRefStat);
                     var targetEffectMin = SkillExtensions.EffectToString(
                         skillRow.Id,
-                        skillRow.SkillType,
+                        lib9cSkillType,
                         skillPowersMin[skillIndex],
                         skillStatPowerRatioMin[skillIndex],
-                        refStatType);
+                        lib9cRefStat);
                     var targetEffectMax = SkillExtensions.EffectToString(
                         skillRow.Id,
-                        skillRow.SkillType,
+                        lib9cSkillType,
                         skillPowersMax[skillIndex],
                         skillStatPowerRatioMax[skillIndex],
-                        refStatType);
+                        lib9cRefStat);
 
                     var valueText = $"<color=#FBF0B8>({currentEffect} > <color=#E3C32C>{targetEffectMin.Replace("%", "")}~{targetEffectMax}</color><sprite name=icon_Arrow>)</color>";
                     var chanceText = $"<color=#FBF0B8>({chance}% > <color=#E3C32C>{skillChancesMin[skillIndex]}~{skillChancesMax[skillIndex]}%</color><sprite name=icon_Arrow>)</color>";
                     skillView.Set(
                         skillRow.GetLocalizedName(),
-                        (Nekoyume.SingleClient.Models.Skills.SkillType)(int)skillRow.SkillType,
+                        skillRow.SkillType,
                         skillRow.Id,
                         skillRow.Cooldown,
                         chanceText,
@@ -631,7 +663,7 @@ namespace Nekoyume.UI
                 var nextCp = CPHelper.GetStatCP(mainStatType, baseStatMax);
                 for (var statIndex = 0; statIndex < itemOptionInfo.StatOptions.Count; statIndex++)
                 {
-                    nextCp += CPHelper.GetStatCP(itemOptionInfo.StatOptions[statIndex].type, statOptionsMax[statIndex]);
+                    nextCp += CPHelper.GetStatCP((Lib9cStatType)(int)itemOptionInfo.StatOptions[statIndex].type, statOptionsMax[statIndex]);
                 }
 
                 nextCp *= CPHelper.GetSkillsMultiplier(itemOptionInfo.SkillOptions.Count);

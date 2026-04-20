@@ -9,10 +9,14 @@ using Nekoyume.Model.Item;
 using Nekoyume.Model.Mail;
 using Nekoyume.Model.Skill;
 using Nekoyume.Model.Stat;
+using Nekoyume.SingleClient.Models.Items;
+using Nekoyume.SingleClient.Models.TableData;
 using Nekoyume.UI.Model;
 using Nekoyume.UI.Module;
 using TMPro;
 using UnityEngine;
+using Lib9cSkillType = Nekoyume.Model.Skill.SkillType;
+using Lib9cStatType = Nekoyume.Model.Stat.StatType;
 using Random = UnityEngine.Random;
 
 namespace Nekoyume.UI
@@ -178,19 +182,25 @@ namespace Nekoyume.UI
                 return;
             }
 
-            if (!(result.preItemUsable is Equipment preEquipment))
+            // ItemUsable → EquipmentSnapshot via poly-dispatch; preserves the "not equipment"
+            // error branches without taking a hard Equipment dependency on the attached usables.
+            if (result.preItemUsable.ToPolySnapshot() is not EquipmentSnapshot preEqSnap)
             {
                 NcDebug.LogError("result.preItemUsable is not Equipment");
                 return;
             }
 
-            if (!(result.itemUsable is Equipment equipment))
+            if (result.itemUsable.ToPolySnapshot() is not EquipmentSnapshot eqSnap)
             {
                 NcDebug.LogError("result.itemUsable is not Equipment");
                 return;
             }
 
-            Show(result.enhancementResult, preEquipment, equipment, result.CRYSTAL.GetQuantityString());
+            // Route through the Equipment-typed public Show to keep the old entry point stable
+            // (so EditorProperty tests and any remaining callers don't need to change). The
+            // heavy-lifting path now lives on the snapshot overload below; the Equipment overload
+            // just re-projects and delegates.
+            ShowInternal(result.enhancementResult, preEqSnap, eqSnap, (Equipment)result.itemUsable, result.CRYSTAL.GetQuantityString());
         }
 
         public void Show(
@@ -211,17 +221,39 @@ namespace Nekoyume.UI
                 return;
             }
 
-            var itemOptionInfoPre = new ItemOptionInfo(preEquipment);
-            var itemOptionInfo = new ItemOptionInfo(equipment);
+            ShowInternal(
+                enhancementResult,
+                preEquipment.ToEquipmentSnapshot(),
+                equipment.ToEquipmentSnapshot(),
+                equipment,
+                crystal);
+        }
 
+        private void ShowInternal(
+            ItemEnhancement13.EnhancementResult enhancementResult,
+            EquipmentSnapshot preEqSnap,
+            EquipmentSnapshot eqSnap,
+            Equipment equipment,
+            string crystal)
+        {
+            var skillSheet = Game.Game.instance.TableSheets.SkillSheet;
+            System.Func<int, SkillSheetRowView?> skillRowLookup = skillId =>
+                skillSheet.TryGetValue(skillId, out var row) ? SkillSheetRowMapper.ToView(row) : (SkillSheetRowView?)null;
+            var itemOptionInfoPre = preEqSnap.ToItemOptionInfoRichSnapshot(skillRowLookup);
+            var itemOptionInfo = eqSnap.ToItemOptionInfoRichSnapshot(skillRowLookup);
+
+            // SimpleItemView.SetData still takes the lib9c Item-backed CountableItem; we keep the
+            // Equipment reference alive strictly to feed this view and the localized-name helper,
+            // neither of which has a snapshot surface yet.
             _resultItem.itemView.SetData(new CountableItem(equipment, 1));
-            _resultItem.beforeGradeText.text = $"+{equipment.level - 1}";
-            _resultItem.afterGradeText.text = $"+{equipment.level}";
+            _resultItem.beforeGradeText.text = $"+{eqSnap.Level - 1}";
+            _resultItem.afterGradeText.text = $"+{eqSnap.Level}";
             _resultItem.itemNameText.text = equipment.GetLocalizedName(false, true);
             _resultItem.cpText.text = $"CP {TextHelper.FormatNumber(itemOptionInfo.CP)}";
 
             var (_, _, mainStatTotalValuePre) = itemOptionInfoPre.MainStat;
-            var (mainStatType, _, mainStatTotalValue) = itemOptionInfo.MainStat;
+            var (clientMainStatType, _, mainStatTotalValue) = itemOptionInfo.MainStat;
+            var mainStatType = (Lib9cStatType)(int)clientMainStatType;
             _itemMainStatView.UpdateViewAsTotalAndPlusStat(
                 mainStatType,
                 mainStatTotalValue,
@@ -241,7 +273,7 @@ namespace Nekoyume.UI
 
                 var (_, preValue, _) = itemOptionInfoPre.StatOptions[i];
                 var (statType, value, count) = statOptions[i];
-                optionView.UpdateAsTotalAndPlusStatWithCount(statType, value, value - preValue, count);
+                optionView.UpdateAsTotalAndPlusStatWithCount((Lib9cStatType)(int)statType, value, value - preValue, count);
             }
 
             var skillOptions = itemOptionInfo.SkillOptions;
@@ -258,13 +290,15 @@ namespace Nekoyume.UI
 
                 var (_, prePower, preChance, preRatio, _) = itemOptionInfoPre.SkillOptions[i];
                 var (skillRow, power, chance, ratio, type) = skillOptions[i];
-                var powerText = SkillExtensions.EffectToString(skillRow.Id, skillRow.SkillType, power, ratio, type);
+                var lib9cSkillType = (Lib9cSkillType)(int)skillRow.SkillType;
+                var lib9cRefStat = (Lib9cStatType)(int)type;
+                var powerText = SkillExtensions.EffectToString(skillRow.Id, lib9cSkillType, power, ratio, lib9cRefStat);
                 var plusPowerText = SkillExtensions.EffectToString(
                     skillRow.Id,
-                    skillRow.SkillType,
+                    lib9cSkillType,
                     power - prePower,
                     ratio - preRatio,
-                    type);
+                    lib9cRefStat);
                 optionView.UpdateAsTotalAndPlusSkill(
                     skillRow.GetLocalizedName(),
                     powerText,

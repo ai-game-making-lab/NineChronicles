@@ -8,11 +8,15 @@ using Nekoyume.Helper;
 using Nekoyume.Model.Item;
 using Nekoyume.Model.Skill;
 using Nekoyume.Model.Stat;
+using Nekoyume.SingleClient.Models.Items;
+using Nekoyume.SingleClient.Models.TableData;
 using Nekoyume.UI.Module;
 using TMPro;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.UI;
+using Lib9cSkillType = Nekoyume.Model.Skill.SkillType;
+using Lib9cStatType = Nekoyume.Model.Stat.StatType;
 using Random = UnityEngine.Random;
 
 namespace Nekoyume.UI
@@ -117,7 +121,7 @@ namespace Nekoyume.UI
         private static readonly int AnimatorHashLoop = Animator.StringToHash("Loop");
         private static readonly int AnimatorHashClose = Animator.StringToHash("Close");
 
-        private ItemOptionInfo _itemOptionInfo;
+        private ItemOptionInfoRichSnapshot _itemOptionInfo;
         private readonly List<decimal> _cpListForAnimationSteps = new();
         private IDisposable _disposableOfSkip;
         private IDisposable _disposableOfCPAnimation;
@@ -213,9 +217,19 @@ namespace Nekoyume.UI
             _resultItem.mainStatText.text = string.Empty;
             _resultItem.cpText.text = string.Empty;
 
-            _itemOptionInfo = itemUsable is Equipment equipment
-                ? new ItemOptionInfo(equipment)
-                : new ItemOptionInfo(itemUsable);
+            // Poly-dispatch onto the client snapshot: Equipment produces the rich option rollup
+            // (main stat + stat options + skill options), Consumable yields a NONE main stat with
+            // per-stat options and no skills. Both feed the same downstream animation loop.
+            var poly = itemUsable.ToPolySnapshot();
+            var skillSheet = Game.Game.instance.TableSheets.SkillSheet;
+            System.Func<int, SkillSheetRowView?> skillRowLookup = skillId =>
+                skillSheet.TryGetValue(skillId, out var row) ? SkillSheetRowMapper.ToView(row) : (SkillSheetRowView?)null;
+            _itemOptionInfo = poly switch
+            {
+                EquipmentSnapshot eqSnap => eqSnap.ToItemOptionInfoRichSnapshot(skillRowLookup),
+                ConsumableSnapshot conSnap => conSnap.ToItemOptionInfoRichSnapshot(),
+                _ => default,
+            };
 
             var statOptions = _itemOptionInfo.StatOptions;
             var statOptionsCount = statOptions.Count;
@@ -250,7 +264,7 @@ namespace Nekoyume.UI
                 }
 
                 var (type, value, count) = statOptions[i];
-                optionView.UpdateAsStatWithCount(type, value, count);
+                optionView.UpdateAsStatWithCount((Lib9cStatType)(int)type, value, count);
             }
 
             for (var i = 0; i < _itemSkillOptionViews.Count; i++)
@@ -264,11 +278,13 @@ namespace Nekoyume.UI
                 }
 
                 var (skillRow, power, chance, ratio, type) = skillOptions[i];
-                var powerText = SkillExtensions.EffectToString(skillRow.Id, skillRow.SkillType, power, ratio, type);
+                var lib9cSkillType = (Lib9cSkillType)(int)skillRow.SkillType;
+                var lib9cRefStat = (Lib9cStatType)(int)type;
+                var powerText = SkillExtensions.EffectToString(skillRow.Id, lib9cSkillType, power, ratio, lib9cRefStat);
                 optionView.UpdateAsSkill(skillRow.GetLocalizedName(), powerText, chance);
             }
 
-            if (itemUsable.ItemType == ItemType.Equipment)
+            if (itemUsable.ItemType == Nekoyume.Model.Item.ItemType.Equipment)
             {
                 PostShowAsEquipment(subRecipeOptionCount);
             }
@@ -294,7 +310,11 @@ namespace Nekoyume.UI
         {
             _iconImage.overrideSprite = _equipmentIconSprite;
 
-            var (mainStatType, _, mainStatTotalValue) = _itemOptionInfo.MainStat;
+            var (clientMainStatType, _, mainStatTotalValue) = _itemOptionInfo.MainStat;
+            // Cast once into lib9c StatType — StatExtensions.ValueToString + CPHelper.GetStatCP
+            // both sit on the lib9c enum surface. The tuple destructuring keeps the client type
+            // alive for the comparison against per-option stat types below.
+            var mainStatType = (Lib9cStatType)(int)clientMainStatType;
             _resultItem.mainStatText.text = $"{mainStatType} {mainStatType.ValueToString(mainStatTotalValue)}";
 
             var statsCP = CPHelper.GetStatCP(mainStatType, mainStatTotalValue);
@@ -306,9 +326,9 @@ namespace Nekoyume.UI
             {
                 // NOTE: Do not add a CP which is same type with mainStatType. Because statsCP already contains this amount.
                 // But we should add statsCP to _cpListForAnimationSteps for animation.
-                if (type != mainStatType)
+                if (type != clientMainStatType)
                 {
-                    statsCP += CPHelper.GetStatCP(type, value);
+                    statsCP += CPHelper.GetStatCP((Lib9cStatType)(int)type, value);
                 }
 
                 _cpListForAnimationSteps.Add(statsCP);

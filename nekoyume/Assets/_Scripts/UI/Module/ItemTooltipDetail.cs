@@ -11,6 +11,7 @@ using Nekoyume.Model.Stat;
 using Nekoyume.SingleClient.Models.Elemental;
 using Nekoyume.SingleClient.Models.Items;
 using Nekoyume.SingleClient.Models.Skills;
+using Nekoyume.SingleClient.Models.TableData;
 using Nekoyume.SingleClient.State;
 using Nekoyume.State;
 using Nekoyume.UI.Module.Common;
@@ -172,8 +173,14 @@ namespace Nekoyume.UI.Module
                     iconArea.combatPowerText.text = equipment.GetCPText();
                     iconArea.countObject.SetActive(false);
 
-                    var optionInfo = new ItemOptionInfo(equipment);
-                    var (mainStatType, _, mainStatTotalValue) = optionInfo.MainStat;
+                    var eqSnap = equipment.ToEquipmentSnapshot();
+                    var skillSheet = TableSheets.Instance.SkillSheet;
+                    var optionInfo = eqSnap.ToItemOptionInfoRichSnapshot(skillId =>
+                        skillSheet.TryGetValue(skillId, out var row)
+                            ? SkillSheetRowMapper.ToView(row)
+                            : (SkillSheetRowView?)null);
+                    var mainStatType = (StatType)(int)optionInfo.MainStat.type;
+                    var mainStatTotalValue = optionInfo.MainStat.totalValue;
                     for (var i = 0; i < statViewList.Count; i++)
                     {
                         var statView = statViewList[i];
@@ -188,7 +195,8 @@ namespace Nekoyume.UI.Module
 
                     foreach (var (type, value, count) in optionInfo.StatOptions)
                     {
-                        AddStat(type, value, count);
+                        // AddStat expects lib9c StatType; rich snapshot carries the client mirror.
+                        AddStat((StatType)(int)type, value, count);
                         statCount += count;
                     }
 
