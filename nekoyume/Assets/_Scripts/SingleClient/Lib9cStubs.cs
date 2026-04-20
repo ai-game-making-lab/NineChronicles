@@ -1,4 +1,3 @@
-#if LIB9C_RESTORED // stubbed out after lib9c deletion
 // ============================================================================
 // Lib9cStubs.cs — Post-Lib9c-removal compile stubs
 // ============================================================================
@@ -254,6 +253,20 @@ namespace Nekoyume.Game.Controller { }
 namespace Nekoyume.L10n
 {
     public static class L10nManager { public static string Localize(string key) => key; }
+}
+
+namespace Nekoyume
+{
+    public static class SkillExtensions
+    {
+        public static string GetLocalizedName(this Nekoyume.Model.Skill.SkillSheetRow row) => string.Empty;
+        public static string EffectToString(int id, Nekoyume.Model.Skill.SkillType type, decimal power, int ratio, Nekoyume.Model.Stat.StatType refType) => string.Empty;
+    }
+
+    public static class SkillIconHelper
+    {
+        public static UnityEngine.Sprite GetSkillIcon(int skillId) => null;
+    }
 }
 
 // ============================================================================
@@ -584,6 +597,8 @@ namespace Nekoyume.Battle
         public static long GetCP(object o) => 0;
         public static long GetCP(object o, object sheet) => 0;
         public static long GetStatCP(Nekoyume.Model.Stat.StatType type, decimal value) => 0;
+        public static long DecimalToLong(decimal d) => (long)d;
+        public static decimal GetSkillsMultiplier(int skillCount, int buffCount = 0) => 1m;
     }
     public class Simulator { }
     public class StageSimulator : Simulator { }
@@ -637,6 +652,7 @@ namespace Nekoyume.TableData
             public Nekoyume.Model.Stat.StatType UniqueStatType;
             public decimal Stat;
             public int SpineResourceId;
+            public long Exp;
         }
     }
 
@@ -955,5 +971,3 @@ namespace Nekoyume.Helper
         public string PrivateKey;
     }
 }
-
-#endif

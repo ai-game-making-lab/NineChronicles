@@ -77,5 +77,4 @@ namespace Nekoyume.SingleClient.Models.Items
         }
     }
 }
-
 #endif
