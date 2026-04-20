@@ -197,6 +197,132 @@ namespace Nekoyume.SingleClient.State
             }
         }
 
+        public System.Numerics.BigInteger CurrentAgentCrystalBalanceMajorUnit
+        {
+            get
+            {
+                var agentState = _states.AgentState;
+                if (agentState is null)
+                {
+                    return System.Numerics.BigInteger.Zero;
+                }
+
+                return _states.CrystalBalance.MajorUnit;
+            }
+        }
+
+        public int StakingLevel => _states.StakingLevel;
+
+        public System.Numerics.BigInteger CurrentAgentGoldBalanceMajorUnit
+        {
+            get
+            {
+                var agentState = _states.AgentState;
+                if (agentState is null)
+                {
+                    return System.Numerics.BigInteger.Zero;
+                }
+
+                return _states.GoldBalanceState.Gold.MajorUnit;
+            }
+        }
+
+        public Libplanet.Types.Assets.FungibleAssetValue CurrentAgentGoldBalanceFav =>
+            _states.AgentState is null
+                ? default
+                : _states.GoldBalanceState.Gold;
+
+        public Nekoyume.Model.State.AvatarState CurrentAvatarStateRaw => _states.CurrentAvatarState;
+
+        public Nekoyume.Model.State.AgentState CurrentAgentStateRaw => _states.AgentState;
+
+        public Nekoyume.Model.State.GoldBalanceState CurrentGoldBalanceStateRaw => _states.GoldBalanceState;
+
+        public Nekoyume.Model.State.GameConfigState CurrentGameConfigStateRaw => _states.GameConfigState;
+
+        public System.Collections.Generic.IReadOnlyDictionary<int, Nekoyume.Model.State.AvatarState>
+            AvatarStatesRaw =>
+            (System.Collections.Generic.IReadOnlyDictionary<int, Nekoyume.Model.State.AvatarState>)
+            _states.AvatarStates;
+
+        public System.Collections.Generic.IReadOnlyDictionary<Nekoyume.Model.EnumType.BattleType, Nekoyume.Model.State.ItemSlotState>
+            CurrentItemSlotStatesRaw =>
+            (System.Collections.Generic.IReadOnlyDictionary<Nekoyume.Model.EnumType.BattleType, Nekoyume.Model.State.ItemSlotState>)
+            _states.CurrentItemSlotStates;
+
+        public System.Collections.Generic.IReadOnlyDictionary<Nekoyume.Model.EnumType.BattleType, Nekoyume.Model.State.RuneSlotState>
+            CurrentRuneSlotStatesRaw =>
+            (System.Collections.Generic.IReadOnlyDictionary<Nekoyume.Model.EnumType.BattleType, Nekoyume.Model.State.RuneSlotState>)
+            _states.CurrentRuneSlotStates;
+
+        public Nekoyume.Model.State.AllRuneState AllRuneStateRaw => _states.AllRuneState;
+        public Nekoyume.Model.State.CrystalRandomSkillState CrystalRandomSkillStateRaw => _states.CrystalRandomSkillState;
+        public Nekoyume.State.PetStates PetStatesRaw => _states.PetStates;
+        public Nekoyume.Model.Stake.StakeState? StakeStateV2Raw => _states.StakeStateV2;
+
+        public System.Collections.Generic.IReadOnlyDictionary<string, Libplanet.Types.Assets.FungibleAssetValue>
+            CurrentAvatarBalancesRaw =>
+            (System.Collections.Generic.IReadOnlyDictionary<string, Libplanet.Types.Assets.FungibleAssetValue>)
+            _states.CurrentAvatarBalances;
+
+        public Libplanet.Types.Assets.FungibleAssetValue StakedBalanceRaw => _states.StakedBalance;
+        public Libplanet.Types.Assets.FungibleAssetValue CrystalBalanceRaw => _states.CrystalBalance;
+
+        public Nekoyume.Model.State.CollectionState CollectionStateRaw => _states.CollectionState;
+        public System.Collections.Generic.IReadOnlyDictionary<int, Nekoyume.Model.State.HammerPointState> HammerPointStatesRaw =>
+            _states.HammerPointStates;
+        public Nekoyume.TableData.StakeRegularRewardSheet StakeRegularRewardSheetRaw => _states.StakeRegularRewardSheet;
+
+        public (System.Collections.Generic.List<Nekoyume.Model.Item.Equipment>, System.Collections.Generic.List<Nekoyume.Model.Item.Costume>)
+            GetEquippedItems(Nekoyume.Model.EnumType.BattleType battleType) =>
+            _states.GetEquippedItems(battleType);
+
+        public System.Collections.Generic.List<Nekoyume.Model.State.RuneState>
+            GetEquippedRuneStates(Nekoyume.Model.EnumType.BattleType battleType) =>
+            _states.GetEquippedRuneStates(battleType);
+
+        public System.Collections.Generic.List<Nekoyume.Model.State.RuneState>
+            GetEquippedRuneStates(Nekoyume.Model.State.AllRuneState allRuneState, Nekoyume.Model.EnumType.BattleType battleType) =>
+            _states.GetEquippedRuneStates(allRuneState, battleType);
+
+        public System.Collections.Generic.Dictionary<int, Nekoyume.Model.State.CombinationSlotState>
+            GetUsedCombinationSlotState() =>
+            _states.GetUsedCombinationSlotState();
+
+        public System.Collections.Generic.Dictionary<int, Nekoyume.Model.State.CombinationSlotState>
+            GetUsedCombinationSlotState(Nekoyume.Model.State.AvatarState avatarState, long currentBlockIndex) =>
+            _states.GetUsedCombinationSlotState(avatarState, currentBlockIndex);
+
+        public System.Collections.Generic.IDictionary<int, Nekoyume.Model.State.CombinationSlotState>
+            GetCombinationSlotState(Nekoyume.Model.State.AvatarState avatarState) =>
+            _states.GetCombinationSlotState(avatarState);
+
+        public void UpdateRuneSlotState() => _states.UpdateRuneSlotState();
+
+        public void UpdateHammerPointStates(System.Collections.Generic.IEnumerable<int> recipeIds) =>
+            _states.UpdateHammerPointStates(recipeIds);
+
+        public void SetCurrentAvatarBalance(Libplanet.Types.Assets.FungibleAssetValue fav) =>
+            _states.SetCurrentAvatarBalance(fav);
+
+        public Cysharp.Threading.Tasks.UniTask<Nekoyume.Model.State.AvatarState>
+            SelectAvatarAsync(int index, Libplanet.Common.HashDigest<System.Security.Cryptography.SHA256> stateRootHash) =>
+            _states.SelectAvatarAsync(index, stateRootHash);
+
+        public Cysharp.Threading.Tasks.UniTask<Nekoyume.Model.State.AvatarState>
+            SelectAvatarAsync(int index, Libplanet.Common.HashDigest<System.Security.Cryptography.SHA256> stateRootHash, bool forceNewSelection) =>
+            _states.SelectAvatarAsync(index, stateRootHash, forceNewSelection: forceNewSelection);
+
+        public Cysharp.Threading.Tasks.UniTask<Nekoyume.Model.State.AvatarState>
+            SelectAvatarAsync(int index, Libplanet.Common.HashDigest<System.Security.Cryptography.SHA256> stateRootHash, Nekoyume.Model.State.AvatarState avatarState, bool forceNewSelection) =>
+            _states.SelectAvatarAsync(index, stateRootHash, avatarState, forceNewSelection: forceNewSelection);
+
+        public Cysharp.Threading.Tasks.UniTask InitAvatarBalancesAsync() =>
+            _states.InitAvatarBalancesAsync();
+
+        public Cysharp.Threading.Tasks.UniTask InitItemSlotStates() =>
+            _states.InitItemSlotStates();
+
         public void Dispose()
         {
             if (_disposed)

@@ -78,7 +78,8 @@ namespace Nekoyume.SingleClient.Models.Items
                 byCustomCraft: source.ByCustomCraft,
                 craftWithRandom: source.CraftWithRandom,
                 hasRandomOnlyIcon: source.HasRandomOnlyIcon,
-                uniqueStatType: BuffViewMapper.MapStatType(source.UniqueStatType));
+                uniqueStatType: BuffViewMapper.MapStatType(source.UniqueStatType),
+                exp: source.Exp);
         }
 
         public static CostumeSnapshot ToCostumeSnapshot(this Lib9cCostume source)

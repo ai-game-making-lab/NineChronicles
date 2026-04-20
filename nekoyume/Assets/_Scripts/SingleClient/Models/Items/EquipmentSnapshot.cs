@@ -84,6 +84,13 @@ namespace Nekoyume.SingleClient.Models.Items
         /// </summary>
         public StatType UniqueStatType { get; }
 
+        /// <summary>
+        /// Mirrors lib9c <c>Equipment.Exp</c>. Experience accumulated via enhancement. Used by
+        /// Enhancement UI together with <c>GetRealExp</c> to project enhancement targets. Equals
+        /// zero for vanilla equipment whose Exp has not been set on-chain.
+        /// </summary>
+        public long Exp { get; }
+
         public EquipmentSnapshot(
             ItemType itemType,
             ItemSubType itemSubType,
@@ -106,7 +113,8 @@ namespace Nekoyume.SingleClient.Models.Items
             bool byCustomCraft,
             bool craftWithRandom,
             bool hasRandomOnlyIcon,
-            StatType uniqueStatType)
+            StatType uniqueStatType,
+            long exp = 0L)
         {
             ItemType = itemType;
             ItemSubType = itemSubType;
@@ -130,6 +138,7 @@ namespace Nekoyume.SingleClient.Models.Items
             CraftWithRandom = craftWithRandom;
             HasRandomOnlyIcon = hasRandomOnlyIcon;
             UniqueStatType = uniqueStatType;
+            Exp = exp;
         }
 
         public bool Equals(EquipmentSnapshot other) =>

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Immutable;
+using System.Numerics;
 
 namespace Nekoyume.SingleClient.Blockchain
 {
@@ -13,14 +14,19 @@ namespace Nekoyume.SingleClient.Blockchain
 
         public bool TotalSupplyTrackable { get; }
 
-        public FungibleAssetValue? MaximumSupply { get; }
+        public BigInteger? MaximumSupplyRawValue { get; }
+
+        public FungibleAssetValue? MaximumSupply =>
+            MaximumSupplyRawValue.HasValue
+                ? FungibleAssetValue.FromRawValue(this, MaximumSupplyRawValue.Value)
+                : (FungibleAssetValue?)null;
 
         private Currency(
             string ticker,
             byte decimalPlaces,
             IImmutableSet<Address> minters,
             bool totalSupplyTrackable,
-            FungibleAssetValue? maximumSupply)
+            BigInteger? maximumSupplyRawValue)
         {
             if (string.IsNullOrWhiteSpace(ticker))
             {
@@ -31,7 +37,7 @@ namespace Nekoyume.SingleClient.Blockchain
             DecimalPlaces = decimalPlaces;
             Minters = minters ?? ImmutableHashSet<Address>.Empty;
             TotalSupplyTrackable = totalSupplyTrackable;
-            MaximumSupply = maximumSupply;
+            MaximumSupplyRawValue = maximumSupplyRawValue;
         }
 
         public static Currency Legacy(
@@ -75,13 +81,11 @@ namespace Nekoyume.SingleClient.Blockchain
         public static Currency Capped(
             string ticker,
             byte decimalPlaces,
-            (System.Numerics.BigInteger Major, System.Numerics.BigInteger Minor) maximum,
+            (BigInteger Major, BigInteger Minor) maximum,
             IImmutableSet<Address> minters)
         {
-            var currency = new Currency(ticker, decimalPlaces, minters, true, null);
-            var raw = maximum.Major * System.Numerics.BigInteger.Pow(10, decimalPlaces) + maximum.Minor;
-            var max = FungibleAssetValue.FromRawValue(currency, raw);
-            return new Currency(ticker, decimalPlaces, minters, true, max);
+            var raw = maximum.Major * BigInteger.Pow(10, decimalPlaces) + maximum.Minor;
+            return new Currency(ticker, decimalPlaces, minters, true, raw);
         }
 
         public FungibleAssetValue ZeroValue => FungibleAssetValue.FromRawValue(this, 0);

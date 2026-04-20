@@ -93,6 +93,219 @@ namespace Nekoyume.SingleClient.State
         long CurrentAgentCrystalBalance { get; }
 
         /// <summary>
+        /// Current agent's CRYSTAL balance as <see cref="System.Numerics.BigInteger"/>, matching
+        /// lib9c <c>FungibleAssetValue.MajorUnit</c>. Avoids the <see cref="long"/> truncation of
+        /// <see cref="CurrentAgentCrystalBalance"/> for accumulator balances that can exceed
+        /// <see cref="long.MaxValue"/>. Returns <c>0</c> when no agent is set.
+        /// </summary>
+        System.Numerics.BigInteger CurrentAgentCrystalBalanceMajorUnit { get; }
+
+        /// <summary>
+        /// Current staking level (0 = no stake, 1+ = staked tier). Mirrors
+        /// <c>States.Instance.StakingLevel</c>. Used by WorldMap / MobileShop / ArenaBoard /
+        /// ShopSell UI to gate stake-dependent features.
+        /// </summary>
+        int StakingLevel { get; }
+
+        /// <summary>
+        /// Current agent's NCG (gold) balance MajorUnit as <see cref="System.Numerics.BigInteger"/>.
+        /// Mirrors <c>States.Instance.GoldBalanceState.Gold.MajorUnit</c>. Used across
+        /// Shop/Craft/Arena/AdventureBoss UI for NCG affordability checks. Returns <c>0</c> when
+        /// no agent is set.
+        /// </summary>
+        System.Numerics.BigInteger CurrentAgentGoldBalanceMajorUnit { get; }
+
+        /// <summary>
+        /// Current agent's NCG (gold) balance as full <see cref="Libplanet.Types.Assets.FungibleAssetValue"/>.
+        /// Pragmatic shim that re-exposes the Libplanet value so Payment / ItemTooltipBuy /
+        /// TicketPurchase UI can compare FAVs directly without a facade-level FAV DTO. Will
+        /// be narrowed to a client currency DTO in a follow-up slice.
+        /// </summary>
+        Libplanet.Types.Assets.FungibleAssetValue CurrentAgentGoldBalanceFav { get; }
+
+        // ---- S6c pragmatic shims (mass-migration accelerator) ----
+        // The following shims re-expose lib9c types as-is so the ~100 remaining consumers can
+        // consolidate reads onto the facade without waiting on per-type DTO design. This
+        // breaks the facade's "client-owned DTO only" invariant intentionally; once the rest
+        // of the audit (S9c/S9d) lands and States.Instance is fully shadowed, each shim can be
+        // narrowed to a DTO in a dedicated follow-up slice.
+
+        /// <summary>
+        /// <b>Pragmatic shim.</b> Raw lib9c <c>AvatarState</c> of the current avatar, or
+        /// <see langword="null"/> if none selected. Bridges the 100+ consumers that read
+        /// <c>inventory</c>/<c>worldInformation</c>/<c>questList</c>/<c>mailBox</c> directly.
+        /// </summary>
+        Nekoyume.Model.State.AvatarState CurrentAvatarStateRaw { get; }
+
+        /// <summary>
+        /// <b>Pragmatic shim.</b> Raw lib9c <c>AgentState</c> of the current agent, or
+        /// <see langword="null"/>. Bridges consumers that read agent-scoped data the snapshot
+        /// does not yet surface.
+        /// </summary>
+        Nekoyume.Model.State.AgentState CurrentAgentStateRaw { get; }
+
+        /// <summary>
+        /// <b>Pragmatic shim.</b> Raw lib9c <c>GoldBalanceState</c> of the current agent.
+        /// Kept to satisfy payment/staking call sites that pass the whole state object.
+        /// </summary>
+        Nekoyume.Model.State.GoldBalanceState CurrentGoldBalanceStateRaw { get; }
+
+        /// <summary>
+        /// <b>Pragmatic shim.</b> Raw lib9c <c>GameConfigState</c>.
+        /// </summary>
+        Nekoyume.Model.State.GameConfigState CurrentGameConfigStateRaw { get; }
+
+        /// <summary>
+        /// <b>Pragmatic shim.</b> Raw lib9c <c>AvatarStates</c> dictionary. Mirrors
+        /// <c>States.Instance.AvatarStates</c> directly for consumers that need the full lib9c
+        /// <c>AvatarState</c> object rather than the snapshot projection.
+        /// </summary>
+        System.Collections.Generic.IReadOnlyDictionary<int, Nekoyume.Model.State.AvatarState>
+            AvatarStatesRaw { get; }
+
+        /// <summary>
+        /// <b>Pragmatic shim.</b> Raw lib9c <c>CurrentItemSlotStates</c> dict (battleType → ItemSlotState).
+        /// </summary>
+        System.Collections.Generic.IReadOnlyDictionary<Nekoyume.Model.EnumType.BattleType, Nekoyume.Model.State.ItemSlotState>
+            CurrentItemSlotStatesRaw { get; }
+
+        /// <summary>
+        /// <b>Pragmatic shim.</b> Raw lib9c <c>CurrentRuneSlotStates</c> dict.
+        /// </summary>
+        System.Collections.Generic.IReadOnlyDictionary<Nekoyume.Model.EnumType.BattleType, Nekoyume.Model.State.RuneSlotState>
+            CurrentRuneSlotStatesRaw { get; }
+
+        /// <summary>
+        /// <b>Pragmatic shim.</b> Raw lib9c <c>AllRuneState</c>.
+        /// </summary>
+        Nekoyume.Model.State.AllRuneState AllRuneStateRaw { get; }
+
+        /// <summary>
+        /// <b>Pragmatic shim.</b> Client-owned <c>PetStates</c> (Nekoyume.State namespace).
+        /// </summary>
+        Nekoyume.State.PetStates PetStatesRaw { get; }
+
+        /// <summary>
+        /// <b>Pragmatic shim.</b> Raw lib9c <c>StakeState</c> nullable (aliased as StakeStateV2 in States.cs).
+        /// </summary>
+        Nekoyume.Model.Stake.StakeState? StakeStateV2Raw { get; }
+
+        /// <summary>
+        /// <b>Pragmatic shim.</b> Raw lib9c <c>CrystalRandomSkillState</c>.
+        /// </summary>
+        Nekoyume.Model.State.CrystalRandomSkillState CrystalRandomSkillStateRaw { get; }
+
+        /// <summary>
+        /// <b>Pragmatic shim.</b> Raw lib9c <c>CurrentAvatarBalances</c> dict (ticker → FAV).
+        /// </summary>
+        System.Collections.Generic.IReadOnlyDictionary<string, Libplanet.Types.Assets.FungibleAssetValue>
+            CurrentAvatarBalancesRaw { get; }
+
+        /// <summary>
+        /// <b>Pragmatic shim.</b> Raw lib9c <c>StakedBalance</c> FAV.
+        /// </summary>
+        Libplanet.Types.Assets.FungibleAssetValue StakedBalanceRaw { get; }
+
+        /// <summary>
+        /// <b>Pragmatic shim.</b> Raw lib9c <c>CrystalBalance</c> FAV.
+        /// </summary>
+        Libplanet.Types.Assets.FungibleAssetValue CrystalBalanceRaw { get; }
+
+        /// <summary>
+        /// <b>Pragmatic shim.</b> Raw lib9c <c>CollectionState</c>.
+        /// </summary>
+        Nekoyume.Model.State.CollectionState CollectionStateRaw { get; }
+
+        /// <summary>
+        /// <b>Pragmatic shim.</b> Raw lib9c <c>HammerPointStates</c> dict.
+        /// </summary>
+        System.Collections.Generic.IReadOnlyDictionary<int, Nekoyume.Model.State.HammerPointState> HammerPointStatesRaw { get; }
+
+        /// <summary>
+        /// <b>Pragmatic shim.</b> Raw lib9c <c>StakeRegularRewardSheet</c>.
+        /// </summary>
+        Nekoyume.TableData.StakeRegularRewardSheet StakeRegularRewardSheetRaw { get; }
+
+        /// <summary>
+        /// <b>Pragmatic shim.</b> Proxies <c>States.Instance.GetEquippedItems(battleType)</c>.
+        /// </summary>
+        (System.Collections.Generic.List<Nekoyume.Model.Item.Equipment>, System.Collections.Generic.List<Nekoyume.Model.Item.Costume>)
+            GetEquippedItems(Nekoyume.Model.EnumType.BattleType battleType);
+
+        /// <summary>
+        /// <b>Pragmatic shim.</b> Proxies <c>States.Instance.GetEquippedRuneStates(battleType)</c>.
+        /// </summary>
+        System.Collections.Generic.List<Nekoyume.Model.State.RuneState>
+            GetEquippedRuneStates(Nekoyume.Model.EnumType.BattleType battleType);
+
+        /// <summary>
+        /// <b>Pragmatic shim.</b> 2-arg overload of <c>GetEquippedRuneStates</c>.
+        /// </summary>
+        System.Collections.Generic.List<Nekoyume.Model.State.RuneState>
+            GetEquippedRuneStates(Nekoyume.Model.State.AllRuneState allRuneState, Nekoyume.Model.EnumType.BattleType battleType);
+
+        /// <summary>
+        /// <b>Pragmatic shim.</b> Proxies <c>States.Instance.GetUsedCombinationSlotState()</c>.
+        /// </summary>
+        System.Collections.Generic.Dictionary<int, Nekoyume.Model.State.CombinationSlotState>
+            GetUsedCombinationSlotState();
+
+        /// <summary>
+        /// <b>Pragmatic shim.</b> Proxies the 2-arg <c>GetUsedCombinationSlotState(AvatarState, long)</c>.
+        /// </summary>
+        System.Collections.Generic.Dictionary<int, Nekoyume.Model.State.CombinationSlotState>
+            GetUsedCombinationSlotState(Nekoyume.Model.State.AvatarState avatarState, long currentBlockIndex);
+
+        /// <summary>
+        /// <b>Pragmatic shim.</b> Proxies <c>States.Instance.GetCombinationSlotState(avatarState)</c>.
+        /// </summary>
+        System.Collections.Generic.IDictionary<int, Nekoyume.Model.State.CombinationSlotState>
+            GetCombinationSlotState(Nekoyume.Model.State.AvatarState avatarState);
+
+        /// <summary>
+        /// <b>Pragmatic shim.</b> Proxies <c>States.Instance.UpdateRuneSlotState()</c>.
+        /// </summary>
+        void UpdateRuneSlotState();
+
+        /// <summary>
+        /// <b>Pragmatic shim.</b> Proxies <c>States.Instance.UpdateHammerPointStates(IEnumerable&lt;int&gt;)</c>.
+        /// </summary>
+        void UpdateHammerPointStates(System.Collections.Generic.IEnumerable<int> recipeIds);
+
+        /// <summary>
+        /// <b>Pragmatic shim.</b> Proxies <c>States.Instance.SetCurrentAvatarBalance(FungibleAssetValue)</c>.
+        /// </summary>
+        void SetCurrentAvatarBalance(Libplanet.Types.Assets.FungibleAssetValue fav);
+
+        /// <summary>
+        /// <b>Pragmatic shim.</b> Proxies <c>States.Instance.SelectAvatarAsync(int, HashDigest&lt;SHA256&gt;)</c>.
+        /// </summary>
+        Cysharp.Threading.Tasks.UniTask<Nekoyume.Model.State.AvatarState>
+            SelectAvatarAsync(int index, Libplanet.Common.HashDigest<System.Security.Cryptography.SHA256> stateRootHash);
+
+        /// <summary>
+        /// <b>Pragmatic shim.</b> 3-arg variant with forceNewSelection.
+        /// </summary>
+        Cysharp.Threading.Tasks.UniTask<Nekoyume.Model.State.AvatarState>
+            SelectAvatarAsync(int index, Libplanet.Common.HashDigest<System.Security.Cryptography.SHA256> stateRootHash, bool forceNewSelection);
+
+        /// <summary>
+        /// <b>Pragmatic shim.</b> 4-arg variant with provided AvatarState.
+        /// </summary>
+        Cysharp.Threading.Tasks.UniTask<Nekoyume.Model.State.AvatarState>
+            SelectAvatarAsync(int index, Libplanet.Common.HashDigest<System.Security.Cryptography.SHA256> stateRootHash, Nekoyume.Model.State.AvatarState avatarState, bool forceNewSelection);
+
+        /// <summary>
+        /// <b>Pragmatic shim.</b> Proxies <c>States.Instance.InitAvatarBalancesAsync()</c>.
+        /// </summary>
+        Cysharp.Threading.Tasks.UniTask InitAvatarBalancesAsync();
+
+        /// <summary>
+        /// <b>Pragmatic shim.</b> Proxies <c>States.Instance.InitItemSlotStates()</c>.
+        /// </summary>
+        Cysharp.Threading.Tasks.UniTask InitItemSlotStates();
+
+        /// <summary>
         /// Raised after the underlying <c>States</c> instance completes an avatar
         /// selection/update. The new avatar is accessible via <see cref="CurrentAvatar"/> from
         /// the handler; no snapshot payload is passed because handlers overwhelmingly want the

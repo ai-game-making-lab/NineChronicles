@@ -68,10 +68,23 @@ namespace Nekoyume.SingleClient.Models.TableData
     /// single rune stat line. Declared as a struct instead of <c>ValueTuple</c> so consumers
     /// can refer to the fields by name without ambiguity.
     /// </summary>
+    /// <remarks>
+    /// <see cref="TotalValue"/> mirrors <c>StatView.TotalValue</c> / lib9c
+    /// <c>DecimalStat.TotalValue</c> so UI call sites that render stat magnitudes stay uniform
+    /// across equipment, costume, and rune sources. Rune options have no additional-value
+    /// component in lib9c, so it equals <see cref="Value"/>; the field is kept distinct to
+    /// match the naming contract callers already use (<c>info.stat.TotalValue</c> in
+    /// <c>RuneOptionView</c>, <c>RuneTooltip</c>, etc.).
+    /// </remarks>
     public readonly struct RuneStatOption
     {
         public StatType StatType { get; }
         public decimal Value { get; }
+
+        /// Convenience alias for <see cref="Value"/> that mirrors the lib9c
+        /// <c>DecimalStat.TotalValue</c> surface. Rune stat options have no separate
+        /// additional-value component, so this is always equal to <see cref="Value"/>.
+        public decimal TotalValue => Value;
 
         public RuneStatOption(StatType statType, decimal value)
         {

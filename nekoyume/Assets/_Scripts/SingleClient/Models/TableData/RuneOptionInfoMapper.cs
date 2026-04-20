@@ -20,6 +20,31 @@ namespace Nekoyume.SingleClient.Models.TableData
                 return default;
             }
 
+            SkillSheetRowView? skill = null;
+            if (skillRow != null)
+            {
+                skill = skillRow.ToView();
+            }
+
+            return source.ToView(skill);
+        }
+
+        /// <summary>
+        /// Overload accepting an already-projected <see cref="SkillSheetRowView"/> so migrated
+        /// call sites never need to hold on to a lib9c <see cref="Lib9cSkillSheet.Row"/> just
+        /// to satisfy the mapper signature. Passing <see langword="null"/> is equivalent to
+        /// <see cref="ToView(Lib9cRuneOptionInfo, Lib9cSkillSheet.Row)"/> with no companion
+        /// skill.
+        /// </summary>
+        public static RuneOptionInfoView ToView(
+            this Lib9cRuneOptionInfo source,
+            SkillSheetRowView? skill)
+        {
+            if (source is null)
+            {
+                return default;
+            }
+
             var stats = new List<RuneStatOption>(source.Stats?.Count ?? 0);
             if (source.Stats != null)
             {
@@ -34,12 +59,6 @@ namespace Nekoyume.SingleClient.Models.TableData
                         statType: BuffViewMapper.MapStatType(stat.StatType),
                         value: stat.BaseValue));
                 }
-            }
-
-            SkillSheetRowView? skill = null;
-            if (skillRow != null)
-            {
-                skill = skillRow.ToView();
             }
 
             return new RuneOptionInfoView(
