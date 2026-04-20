@@ -50,7 +50,10 @@ namespace Nekoyume.Helper
 
         public const float GridScrollerAdjustCellCount = 20;
 
-        public static double BlockInterval => Blockchain.Policy.BlockPolicySource.BlockInterval.TotalSeconds;
+        // Matches Lib9c Blockchain.Policy.BlockPolicySource.BlockInterval (TimeSpan.FromSeconds(8)).
+        // Inlined so Helper/ no longer transitively imports Lib9c.Policy — a prerequisite for
+        // Track 4 (S9d) Lib9c source removal. If mainnet block cadence ever changes, update both.
+        public const double BlockInterval = 8.0;
 
         public static async Task<ClientOrder> GetClientOrder(Guid orderId)
         {

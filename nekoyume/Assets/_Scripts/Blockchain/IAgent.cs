@@ -14,7 +14,6 @@ using Libplanet.Types.Assets;
 using Libplanet.Types.Blocks;
 using Libplanet.Types.Tx;
 using Nekoyume.Action;
-using Nekoyume.Blockchain.Policy;
 using Nekoyume.Helper;
 using Nekoyume.Model.State;
 using UniRx;
