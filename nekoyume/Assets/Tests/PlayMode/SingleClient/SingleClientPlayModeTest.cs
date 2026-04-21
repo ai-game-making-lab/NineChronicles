@@ -67,6 +67,30 @@ namespace Nekoyume.Tests.PlayMode.SingleClient
         }
 
         [UnityTest]
+        public IEnumerator BattleStage_OnWin_AdvancesStageAndGainsExp()
+        {
+            yield return null;
+
+            var entry = SingleClientEntryPoint.Instance;
+            Assert.IsNotNull(entry);
+
+            var runtime = entry.Runtime;
+            runtime.FillActionPoint(20);
+            var beforeStage = runtime.State.HighestClearedStageId;
+            var beforeExp = runtime.State.AvatarExp;
+
+            // Level-1 avatar vs Stage 1 (Slime) is a reliable win with a
+            // fixed seed — matches the EditMode smoke test.
+            var result = runtime.BattleStage(stageId: 1, seed: 12345);
+
+            Assert.IsTrue(result.PlayerWon, "Expected Level-1 avatar to win Stage 1.");
+            Assert.Greater(result.State.HighestClearedStageId, beforeStage);
+            Assert.AreEqual(30L, result.ExpGained);
+            Assert.Greater(result.State.AvatarExp, beforeExp);
+            Assert.Less(result.State.ActionPoint, 20L);
+        }
+
+        [UnityTest]
         public IEnumerator Analytics_TrackDoesNotThrow()
         {
             yield return null;

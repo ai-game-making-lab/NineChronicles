@@ -12,6 +12,7 @@ namespace Nekoyume.SingleClient
         public string AvatarName { get; }
         public int AvatarSlotIndex { get; }
         public int AvatarLevel { get; }
+        public long AvatarExp { get; }
         public long ActionPoint { get; }
         public IReadOnlyList<ClientAvatarState> Avatars { get; }
         public IReadOnlyList<ClientInventoryItemState> InventoryItems { get; }
@@ -28,6 +29,7 @@ namespace Nekoyume.SingleClient
             AvatarName = state.avatar?.name;
             AvatarSlotIndex = state.avatar?.slotIndex ?? 0;
             AvatarLevel = state.avatar?.level ?? 0;
+            AvatarExp = state.avatar?.exp ?? 0;
             ActionPoint = state.avatar?.actionPoint ?? 0;
             Avatars = state.avatars?
                 .Where(avatar => avatar is not null)
@@ -507,6 +509,107 @@ namespace Nekoyume.SingleClient
             LevelAfter = result.LevelAfter;
             MaterialEquipmentIds = result.MaterialEquipmentIds?.ToArray()
                 ?? Array.Empty<string>();
+        }
+    }
+
+    public sealed class SingleClientBattleStageResult
+    {
+        public SingleClientState State { get; }
+        public int StageId { get; }
+        public bool PlayerWon { get; }
+        public bool WasFirstClear { get; }
+        public int Turns { get; }
+        public long AttackerRemainingHp { get; }
+        public long DefenderRemainingHp { get; }
+        public long ActionPointCost { get; }
+        public long ActionPointBefore { get; }
+        public long ActionPointAfter { get; }
+        public long ExpGained { get; }
+        public long ExpBefore { get; }
+        public long ExpAfter { get; }
+        public int LevelBefore { get; }
+        public int LevelAfter { get; }
+        public int LevelsGained { get; }
+        public IReadOnlyList<string> Events { get; }
+
+        public SingleClientBattleStageResult(
+            SingleClientState state,
+            int stageId,
+            bool playerWon,
+            bool wasFirstClear,
+            int turns,
+            long attackerRemainingHp,
+            long defenderRemainingHp,
+            long actionPointCost,
+            long actionPointBefore,
+            long actionPointAfter,
+            long expGained,
+            long expBefore,
+            long expAfter,
+            int levelBefore,
+            int levelAfter,
+            int levelsGained,
+            IReadOnlyList<string> events)
+        {
+            State = state;
+            StageId = stageId;
+            PlayerWon = playerWon;
+            WasFirstClear = wasFirstClear;
+            Turns = turns;
+            AttackerRemainingHp = attackerRemainingHp;
+            DefenderRemainingHp = defenderRemainingHp;
+            ActionPointCost = actionPointCost;
+            ActionPointBefore = actionPointBefore;
+            ActionPointAfter = actionPointAfter;
+            ExpGained = expGained;
+            ExpBefore = expBefore;
+            ExpAfter = expAfter;
+            LevelBefore = levelBefore;
+            LevelAfter = levelAfter;
+            LevelsGained = levelsGained;
+            Events = events ?? System.Array.Empty<string>();
+        }
+    }
+
+    public sealed class ClientBattleStageResult
+    {
+        public ClientRuntimeState State { get; }
+        public int StageId { get; }
+        public bool PlayerWon { get; }
+        public bool WasFirstClear { get; }
+        public int Turns { get; }
+        public long AttackerRemainingHp { get; }
+        public long DefenderRemainingHp { get; }
+        public long ActionPointCost { get; }
+        public long ActionPointBefore { get; }
+        public long ActionPointAfter { get; }
+        public long ExpGained { get; }
+        public long ExpBefore { get; }
+        public long ExpAfter { get; }
+        public int LevelBefore { get; }
+        public int LevelAfter { get; }
+        public int LevelsGained { get; }
+        public IReadOnlyList<string> Events { get; }
+
+        public ClientBattleStageResult(SingleClientBattleStageResult result)
+        {
+            State = new ClientRuntimeState(result.State);
+            StageId = result.StageId;
+            PlayerWon = result.PlayerWon;
+            WasFirstClear = result.WasFirstClear;
+            Turns = result.Turns;
+            AttackerRemainingHp = result.AttackerRemainingHp;
+            DefenderRemainingHp = result.DefenderRemainingHp;
+            ActionPointCost = result.ActionPointCost;
+            ActionPointBefore = result.ActionPointBefore;
+            ActionPointAfter = result.ActionPointAfter;
+            ExpGained = result.ExpGained;
+            ExpBefore = result.ExpBefore;
+            ExpAfter = result.ExpAfter;
+            LevelBefore = result.LevelBefore;
+            LevelAfter = result.LevelAfter;
+            LevelsGained = result.LevelsGained;
+            Events = result.Events;
         }
     }
 

@@ -152,6 +152,11 @@ namespace Nekoyume.SingleClient
             return new ClientRuntimeState(_session.ClearStage(stageId));
         }
 
+        public ClientBattleStageResult BattleStage(int stageId, int seed = 0)
+        {
+            return new ClientBattleStageResult(_session.BattleStage(stageId, seed));
+        }
+
         public ClientSweepResult SweepStage(
             int stageId,
             long actionPointCost,

@@ -581,6 +581,64 @@ namespace Nekoyume.SingleClient
                 itemCostDeltas);
         }
 
+        public SingleClientBattleStageResult BattleStage(int stageId, int seed = 0)
+        {
+            if (stageId < 1)
+            {
+                throw new ArgumentOutOfRangeException(
+                    nameof(stageId), stageId, "Stage id must be positive.");
+            }
+
+            var stage = Combat.SingleClientStageSheet.Get(stageId);
+            var actionPointCost = stage.ActionPointCost;
+
+            EnsureStarted();
+            EnsureStagePlayState();
+
+            var actionPointBalance = State.avatar.actionPoint;
+            if (actionPointBalance < actionPointCost)
+            {
+                throw new InvalidOperationException("Not enough action point.");
+            }
+
+            var wasFirstClear = !State.stage.IsCleared(stageId);
+            var levelBefore = State.avatar.level;
+            var expBefore = State.avatar.exp;
+
+            // AP is the entry fee — consumed regardless of battle outcome.
+            State.avatar.actionPoint -= actionPointCost;
+
+            var outcome = Combat.SingleClientStageBattle.Execute(stage, State.avatar, seed);
+            var levelsGained = 0;
+            if (outcome.PlayerWon)
+            {
+                levelsGained = Combat.SingleClientAvatarStats.GrantExp(
+                    State.avatar, outcome.ExpGained);
+                State.stage.Clear(stageId);
+            }
+
+            _stateStore.Save(State);
+
+            return new SingleClientBattleStageResult(
+                State,
+                stageId,
+                outcome.PlayerWon,
+                wasFirstClear && outcome.PlayerWon,
+                outcome.Turns,
+                outcome.Result.AttackerRemainingHp,
+                outcome.Result.DefenderRemainingHp,
+                actionPointCost,
+                actionPointBalance,
+                State.avatar.actionPoint,
+                outcome.ExpGained,
+                expBefore,
+                State.avatar.exp,
+                levelBefore,
+                State.avatar.level,
+                levelsGained,
+                outcome.Events);
+        }
+
         public long AdvanceBlock(long count = 1)
         {
             if (count < 1)

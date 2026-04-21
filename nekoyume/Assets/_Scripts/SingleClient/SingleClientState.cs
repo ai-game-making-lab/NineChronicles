@@ -235,6 +235,7 @@ namespace Nekoyume.SingleClient
         public string name;
         public int level;
         public long actionPoint;
+        public long exp;
 
         public static SingleClientAvatarState CreateDefault(string avatarId)
         {
@@ -289,6 +290,12 @@ namespace Nekoyume.SingleClient
                 changed = true;
             }
 
+            if (exp < 0)
+            {
+                exp = 0;
+                changed = true;
+            }
+
             return changed;
         }
 
@@ -300,7 +307,8 @@ namespace Nekoyume.SingleClient
                 id = id,
                 name = name,
                 level = level,
-                actionPoint = actionPoint
+                actionPoint = actionPoint,
+                exp = exp
             };
         }
 
@@ -335,6 +343,12 @@ namespace Nekoyume.SingleClient
             if (actionPoint != other.actionPoint)
             {
                 actionPoint = other.actionPoint;
+                changed = true;
+            }
+
+            if (exp != other.exp)
+            {
+                exp = other.exp;
                 changed = true;
             }
 

@@ -68,6 +68,8 @@ namespace Nekoyume.SingleClient
 
         ClientRuntimeState ClearStage(int stageId);
 
+        ClientBattleStageResult BattleStage(int stageId, int seed = 0);
+
         ClientSweepResult SweepStage(
             int stageId,
             long actionPointCost,

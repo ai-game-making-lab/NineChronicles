@@ -58,6 +58,7 @@ namespace Nekoyume.SingleClient.UI
             _statusText = CreateText("NineChronicles — SingleClient Mode");
             CreateButton("Start Game", OnStartGameClicked);
             CreateButton("Avatar Info", OnAvatarInfoClicked);
+            CreateButton("Battle Next Stage", OnBattleNextStageClicked);
             CreateButton("Quit", OnQuitClicked);
         }
 
@@ -130,6 +131,48 @@ namespace Nekoyume.SingleClient.UI
                 $"Stage cleared: {state.HighestClearedStageId}\n" +
                 $"Block: {state.BlockIndex}";
             entry.LogState("AvatarInfo clicked");
+        }
+
+        private void OnBattleNextStageClicked()
+        {
+            var entry = SingleClient.SingleClientEntryPoint.Instance;
+            if (entry == null)
+            {
+                _statusText.text = "Entry point missing";
+                return;
+            }
+
+            var runtime = entry.Runtime;
+            var maxStage = SingleClient.Combat.SingleClientStageSheet.MaxStageId;
+            var nextStageId = runtime.State.HighestClearedStageId + 1;
+            if (nextStageId > maxStage)
+            {
+                _statusText.text = $"All {maxStage} stages cleared.";
+                return;
+            }
+
+            // Ensure the avatar has at least enough AP to enter the stage.
+            var stage = SingleClient.Combat.SingleClientStageSheet.Get(nextStageId);
+            if (runtime.State.ActionPoint < stage.ActionPointCost)
+            {
+                entry.Runtime.FillActionPoint(stage.ActionPointCost);
+            }
+
+            try
+            {
+                var result = runtime.BattleStage(nextStageId);
+                var outcome = result.PlayerWon ? "WIN" : "LOSE";
+                _statusText.text =
+                    $"Stage {nextStageId} {outcome} — {result.Turns} turns\n" +
+                    $"Level: {result.LevelBefore}→{result.LevelAfter} " +
+                    $"(exp {result.ExpBefore}→{result.ExpAfter}, +{result.LevelsGained} lv)\n" +
+                    $"AP: {result.ActionPointBefore}→{result.ActionPointAfter}";
+                entry.LogState($"BattleStage {nextStageId}: {outcome}");
+            }
+            catch (System.Exception ex)
+            {
+                _statusText.text = $"Battle error: {ex.Message}";
+            }
         }
 
         private void OnQuitClicked()
