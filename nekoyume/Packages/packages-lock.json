@@ -31,6 +31,15 @@
       },
       "hash": "25a9cdb4007f5fc05692576bf27d65063de0b4cd"
     },
+    "com.coplaydev.unity-mcp": {
+      "version": "file:../../../unity-mcp/MCPForUnity",
+      "depth": 0,
+      "source": "local",
+      "dependencies": {
+        "com.unity.nuget.newtonsoft-json": "3.0.2",
+        "com.unity.test-framework": "1.1.31"
+      }
+    },
     "com.cysharp.unitask": {
       "version": "https://github.com/Cysharp/UniTask.git?path=src/UniTask/Assets/Plugins/UniTask#2.2.5",
       "depth": 0,
@@ -278,7 +287,7 @@
     },
     "com.unity.nuget.newtonsoft-json": {
       "version": "3.2.2",
-      "depth": 2,
+      "depth": 1,
       "source": "registry",
       "dependencies": {},
       "url": "https://packages.unity.com"
