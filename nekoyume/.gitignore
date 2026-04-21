@@ -4,3 +4,6 @@
 **/googleservices*.xml*
 **/google-services*.xml*
 **/google-services-desktop*.json*
+
+# Local dev artifacts (Unity test logs/XML, single-client runbooks):
+_workspace/
