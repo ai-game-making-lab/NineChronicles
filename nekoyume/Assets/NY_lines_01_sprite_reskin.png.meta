@@ -1,0 +1,650 @@
+fileFormatVersion: 2
+guid: ce907485fc5720d498e68b2b79a0691b
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -3170743095647048254
+    second: NY_lines_01_sprite_reskin_0
+  - first:
+      213: -1177289505352669677
+    second: NY_lines_01_sprite_reskin_1
+  - first:
+      213: -3264443875620927288
+    second: NY_lines_01_sprite_reskin_2
+  - first:
+      213: 71243764076488227
+    second: NY_lines_01_sprite_reskin_3
+  - first:
+      213: -2732840118002862345
+    second: NY_lines_01_sprite_reskin_4
+  - first:
+      213: -3393299233828121585
+    second: NY_lines_01_sprite_reskin_5
+  - first:
+      213: 8127056643065956030
+    second: NY_lines_01_sprite_reskin_6
+  - first:
+      213: -2184052288632735116
+    second: NY_lines_01_sprite_reskin_7
+  - first:
+      213: -904850384931149700
+    second: NY_lines_01_sprite_reskin_8
+  - first:
+      213: 4830209156871711124
+    second: NY_lines_01_sprite_reskin_9
+  - first:
+      213: 6518558474713453914
+    second: NY_lines_01_sprite_reskin_10
+  - first:
+      213: 7453905765620405507
+    second: NY_lines_01_sprite_reskin_11
+  - first:
+      213: 8730315397809311556
+    second: NY_lines_01_sprite_reskin_12
+  - first:
+      213: 5304200189586661960
+    second: NY_lines_01_sprite_reskin_13
+  - first:
+      213: 5306425219066119418
+    second: NY_lines_01_sprite_reskin_14
+  - first:
+      213: -8965141180831325338
+    second: NY_lines_01_sprite_reskin_15
+  - first:
+      213: 7697926432660084671
+    second: NY_lines_01_sprite_reskin_16
+  - first:
+      213: 6092775550323349071
+    second: NY_lines_01_sprite_reskin_17
+  - first:
+      213: -5326501736113146109
+    second: NY_lines_01_sprite_reskin_18
+  - first:
+      213: -8236120034917224567
+    second: NY_lines_01_sprite_reskin_19
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: NY_lines_01_sprite_reskin_0
+      rect:
+        serializedVersion: 2
+        x: 87
+        y: 82
+        width: 31
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2cd6fed24f14ff3d0800000000000000
+      internalID: -3170743095647048254
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NY_lines_01_sprite_reskin_1
+      rect:
+        serializedVersion: 2
+        x: 144
+        y: 77
+        width: 41
+        height: 37
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 316a8a3be6d69afe0800000000000000
+      internalID: -1177289505352669677
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NY_lines_01_sprite_reskin_2
+      rect:
+        serializedVersion: 2
+        x: 233
+        y: 98
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8c84a64479d52b2d0800000000000000
+      internalID: -3264443875620927288
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NY_lines_01_sprite_reskin_3
+      rect:
+        serializedVersion: 2
+        x: 234
+        y: 106
+        width: 10
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 326ad3273db1df000800000000000000
+      internalID: 71243764076488227
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NY_lines_01_sprite_reskin_4
+      rect:
+        serializedVersion: 2
+        x: 7
+        y: 71
+        width: 34
+        height: 33
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7f6b0825460031ad0800000000000000
+      internalID: -2732840118002862345
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NY_lines_01_sprite_reskin_5
+      rect:
+        serializedVersion: 2
+        x: 83
+        y: 84
+        width: 8
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f04d117435498e0d0800000000000000
+      internalID: -3393299233828121585
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NY_lines_01_sprite_reskin_6
+      rect:
+        serializedVersion: 2
+        x: 74
+        y: 72
+        width: 10
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: eb6cc6735fa19c070800000000000000
+      internalID: 8127056643065956030
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NY_lines_01_sprite_reskin_7
+      rect:
+        serializedVersion: 2
+        x: 92
+        y: 28
+        width: 16
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 47aba2dd300b0b1e0800000000000000
+      internalID: -2184052288632735116
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NY_lines_01_sprite_reskin_8
+      rect:
+        serializedVersion: 2
+        x: 96
+        y: 24
+        width: 22
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c78ad477e535173f0800000000000000
+      internalID: -904850384931149700
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NY_lines_01_sprite_reskin_9
+      rect:
+        serializedVersion: 2
+        x: 163
+        y: 36
+        width: 12
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4996d2af2a9580340800000000000000
+      internalID: 4830209156871711124
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NY_lines_01_sprite_reskin_10
+      rect:
+        serializedVersion: 2
+        x: 171
+        y: 37
+        width: 16
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a5558ec5562967a50800000000000000
+      internalID: 6518558474713453914
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NY_lines_01_sprite_reskin_11
+      rect:
+        serializedVersion: 2
+        x: 232
+        y: 40
+        width: 9
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3055a052dc7917760800000000000000
+      internalID: 7453905765620405507
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NY_lines_01_sprite_reskin_12
+      rect:
+        serializedVersion: 2
+        x: 244
+        y: 44
+        width: 9
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 44f0c8f599f482970800000000000000
+      internalID: 8730315397809311556
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NY_lines_01_sprite_reskin_13
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 0
+        width: 41
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8426fd538fd4c9940800000000000000
+      internalID: 5304200189586661960
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NY_lines_01_sprite_reskin_14
+      rect:
+        serializedVersion: 2
+        x: 71
+        y: 6
+        width: 25
+        height: 21
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: af44c914f9534a940800000000000000
+      internalID: 5306425219066119418
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NY_lines_01_sprite_reskin_15
+      rect:
+        serializedVersion: 2
+        x: 149
+        y: 17
+        width: 14
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 663a25b689b659380800000000000000
+      internalID: -8965141180831325338
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NY_lines_01_sprite_reskin_16
+      rect:
+        serializedVersion: 2
+        x: 162
+        y: 27
+        width: 11
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fb75bcd1e4784da60800000000000000
+      internalID: 7697926432660084671
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NY_lines_01_sprite_reskin_17
+      rect:
+        serializedVersion: 2
+        x: 209
+        y: 16
+        width: 28
+        height: 21
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f4655350513ed8450800000000000000
+      internalID: 6092775550323349071
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NY_lines_01_sprite_reskin_18
+      rect:
+        serializedVersion: 2
+        x: 138
+        y: 7
+        width: 7
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 307797b54e67416b0800000000000000
+      internalID: -5326501736113146109
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NY_lines_01_sprite_reskin_19
+      rect:
+        serializedVersion: 2
+        x: 142
+        y: 11
+        width: 7
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 98fe74f077c63bd80800000000000000
+      internalID: -8236120034917224567
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    outline: []
+    customData:
+    physicsShape: []
+    bones: []
+    spriteID:
+    internalID: 0
+    vertices: []
+    indices:
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      NY_lines_01_sprite_reskin_0: -3170743095647048254
+      NY_lines_01_sprite_reskin_1: -1177289505352669677
+      NY_lines_01_sprite_reskin_10: 6518558474713453914
+      NY_lines_01_sprite_reskin_11: 7453905765620405507
+      NY_lines_01_sprite_reskin_12: 8730315397809311556
+      NY_lines_01_sprite_reskin_13: 5304200189586661960
+      NY_lines_01_sprite_reskin_14: 5306425219066119418
+      NY_lines_01_sprite_reskin_15: -8965141180831325338
+      NY_lines_01_sprite_reskin_16: 7697926432660084671
+      NY_lines_01_sprite_reskin_17: 6092775550323349071
+      NY_lines_01_sprite_reskin_18: -5326501736113146109
+      NY_lines_01_sprite_reskin_19: -8236120034917224567
+      NY_lines_01_sprite_reskin_2: -3264443875620927288
+      NY_lines_01_sprite_reskin_3: 71243764076488227
+      NY_lines_01_sprite_reskin_4: -2732840118002862345
+      NY_lines_01_sprite_reskin_5: -3393299233828121585
+      NY_lines_01_sprite_reskin_6: 8127056643065956030
+      NY_lines_01_sprite_reskin_7: -2184052288632735116
+      NY_lines_01_sprite_reskin_8: -904850384931149700
+      NY_lines_01_sprite_reskin_9: 4830209156871711124
+  mipmapLimitGroupName:
+  pSDRemoveMatte: 0
+  userData:
+  assetBundleName:
+  assetBundleVariant:

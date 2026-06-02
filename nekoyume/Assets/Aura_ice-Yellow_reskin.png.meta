@@ -1,0 +1,598 @@
+fileFormatVersion: 2
+guid: 8822917a27fa38a439946c05482c7f13
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 637254199269540567
+    second: Aura_ice-Yellow_reskin_0
+  - first:
+      213: 5703351663695950314
+    second: Aura_ice-Yellow_reskin_1
+  - first:
+      213: -2638395066189415938
+    second: Aura_ice-Yellow_reskin_2
+  - first:
+      213: 1343022363137161915
+    second: Aura_ice-Yellow_reskin_3
+  - first:
+      213: -187301064250573027
+    second: Aura_ice-Yellow_reskin_4
+  - first:
+      213: -8341301490250246548
+    second: Aura_ice-Yellow_reskin_5
+  - first:
+      213: 8450857861372332086
+    second: Aura_ice-Yellow_reskin_6
+  - first:
+      213: 105294927473070433
+    second: Aura_ice-Yellow_reskin_7
+  - first:
+      213: -6651305844427089644
+    second: Aura_ice-Yellow_reskin_8
+  - first:
+      213: 1210818921357633414
+    second: Aura_ice-Yellow_reskin_9
+  - first:
+      213: -8153749319073098359
+    second: Aura_ice-Yellow_reskin_10
+  - first:
+      213: 4264485661598049139
+    second: Aura_ice-Yellow_reskin_11
+  - first:
+      213: 3230217472548951672
+    second: Aura_ice-Yellow_reskin_12
+  - first:
+      213: -7813225925957599102
+    second: Aura_ice-Yellow_reskin_13
+  - first:
+      213: -7099203287888608330
+    second: Aura_ice-Yellow_reskin_14
+  - first:
+      213: 3390532697567760559
+    second: Aura_ice-Yellow_reskin_15
+  - first:
+      213: -6780830662689522869
+    second: Aura_ice-Yellow_reskin_16
+  - first:
+      213: 6221503997980520016
+    second: Aura_ice-Yellow_reskin_17
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Aura_ice-Yellow_reskin_0
+      rect:
+        serializedVersion: 2
+        x: 1
+        y: 233
+        width: 21
+        height: 21
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7d24613615bf7d800800000000000000
+      internalID: 637254199269540567
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aura_ice-Yellow_reskin_1
+      rect:
+        serializedVersion: 2
+        x: 1
+        y: 12
+        width: 255
+        height: 221
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ae1fab7de10662f40800000000000000
+      internalID: 5703351663695950314
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aura_ice-Yellow_reskin_2
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 205
+        width: 77
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ef9f2a68aa9826bd0800000000000000
+      internalID: -2638395066189415938
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aura_ice-Yellow_reskin_3
+      rect:
+        serializedVersion: 2
+        x: 333
+        y: 203
+        width: 55
+        height: 52
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bba323049bf53a210800000000000000
+      internalID: 1343022363137161915
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aura_ice-Yellow_reskin_4
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 118
+        width: 69
+        height: 87
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d1fba47aca2966df0800000000000000
+      internalID: -187301064250573027
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aura_ice-Yellow_reskin_5
+      rect:
+        serializedVersion: 2
+        x: 363
+        y: 168
+        width: 66
+        height: 35
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c66923d1d7ebd3c80800000000000000
+      internalID: -8341301490250246548
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aura_ice-Yellow_reskin_6
+      rect:
+        serializedVersion: 2
+        x: 388
+        y: 203
+        width: 14
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6384a6a437a774570800000000000000
+      internalID: 8450857861372332086
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aura_ice-Yellow_reskin_7
+      rect:
+        serializedVersion: 2
+        x: 325
+        y: 186
+        width: 16
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 161deacbd25167100800000000000000
+      internalID: 105294927473070433
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aura_ice-Yellow_reskin_8
+      rect:
+        serializedVersion: 2
+        x: 325
+        y: 118
+        width: 38
+        height: 68
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 419917a1390d1b3a0800000000000000
+      internalID: -6651305844427089644
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aura_ice-Yellow_reskin_9
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 12
+        width: 79
+        height: 106
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 687e7dec461bdc010800000000000000
+      internalID: 1210818921357633414
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aura_ice-Yellow_reskin_10
+      rect:
+        serializedVersion: 2
+        x: 335
+        y: 96
+        width: 21
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9859019d13018de80800000000000000
+      internalID: -8153749319073098359
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aura_ice-Yellow_reskin_11
+      rect:
+        serializedVersion: 2
+        x: 363
+        y: 102
+        width: 67
+        height: 66
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3736c417d1f7e2b30800000000000000
+      internalID: 4264485661598049139
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aura_ice-Yellow_reskin_12
+      rect:
+        serializedVersion: 2
+        x: 394
+        y: 54
+        width: 86
+        height: 48
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8765a864da904dc20800000000000000
+      internalID: 3230217472548951672
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aura_ice-Yellow_reskin_13
+      rect:
+        serializedVersion: 2
+        x: 430
+        y: 102
+        width: 50
+        height: 63
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 280cc65aa68d19390800000000000000
+      internalID: -7813225925957599102
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aura_ice-Yellow_reskin_14
+      rect:
+        serializedVersion: 2
+        x: 335
+        y: 12
+        width: 59
+        height: 84
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6b34d1d09309a7d90800000000000000
+      internalID: -7099203287888608330
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aura_ice-Yellow_reskin_15
+      rect:
+        serializedVersion: 2
+        x: 394
+        y: 12
+        width: 93
+        height: 42
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fa09fdd46879d0f20800000000000000
+      internalID: 3390532697567760559
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aura_ice-Yellow_reskin_16
+      rect:
+        serializedVersion: 2
+        x: 487
+        y: 37
+        width: 14
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b4b705c4076a5e1a0800000000000000
+      internalID: -6780830662689522869
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aura_ice-Yellow_reskin_17
+      rect:
+        serializedVersion: 2
+        x: 487
+        y: 12
+        width: 23
+        height: 25
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 05e2d485ce8375650800000000000000
+      internalID: 6221503997980520016
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    outline: []
+    customData:
+    physicsShape: []
+    bones: []
+    spriteID:
+    internalID: 0
+    vertices: []
+    indices:
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Aura_ice-Yellow_reskin_0: 637254199269540567
+      Aura_ice-Yellow_reskin_1: 5703351663695950314
+      Aura_ice-Yellow_reskin_10: -8153749319073098359
+      Aura_ice-Yellow_reskin_11: 4264485661598049139
+      Aura_ice-Yellow_reskin_12: 3230217472548951672
+      Aura_ice-Yellow_reskin_13: -7813225925957599102
+      Aura_ice-Yellow_reskin_14: -7099203287888608330
+      Aura_ice-Yellow_reskin_15: 3390532697567760559
+      Aura_ice-Yellow_reskin_16: -6780830662689522869
+      Aura_ice-Yellow_reskin_17: 6221503997980520016
+      Aura_ice-Yellow_reskin_2: -2638395066189415938
+      Aura_ice-Yellow_reskin_3: 1343022363137161915
+      Aura_ice-Yellow_reskin_4: -187301064250573027
+      Aura_ice-Yellow_reskin_5: -8341301490250246548
+      Aura_ice-Yellow_reskin_6: 8450857861372332086
+      Aura_ice-Yellow_reskin_7: 105294927473070433
+      Aura_ice-Yellow_reskin_8: -6651305844427089644
+      Aura_ice-Yellow_reskin_9: 1210818921357633414
+  mipmapLimitGroupName:
+  pSDRemoveMatte: 0
+  userData:
+  assetBundleName:
+  assetBundleVariant:

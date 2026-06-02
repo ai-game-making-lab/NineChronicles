@@ -1,0 +1,598 @@
+fileFormatVersion: 2
+guid: 2657dda7da2c1de4db2022894ebca399
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -8999260534523778101
+    second: Aura_ice-Blue_reskin_0
+  - first:
+      213: -1198913393395206627
+    second: Aura_ice-Blue_reskin_1
+  - first:
+      213: 392226798204055226
+    second: Aura_ice-Blue_reskin_2
+  - first:
+      213: 3492820283178744037
+    second: Aura_ice-Blue_reskin_3
+  - first:
+      213: -8670250239152647620
+    second: Aura_ice-Blue_reskin_4
+  - first:
+      213: 7608197352668617981
+    second: Aura_ice-Blue_reskin_5
+  - first:
+      213: 8019578346607358842
+    second: Aura_ice-Blue_reskin_6
+  - first:
+      213: 1805507575117516529
+    second: Aura_ice-Blue_reskin_7
+  - first:
+      213: -2653597641873041067
+    second: Aura_ice-Blue_reskin_8
+  - first:
+      213: 161751175989375803
+    second: Aura_ice-Blue_reskin_9
+  - first:
+      213: -7385235943427569322
+    second: Aura_ice-Blue_reskin_10
+  - first:
+      213: 3664934996911817278
+    second: Aura_ice-Blue_reskin_11
+  - first:
+      213: 1896543330878624245
+    second: Aura_ice-Blue_reskin_12
+  - first:
+      213: -215159954780603001
+    second: Aura_ice-Blue_reskin_13
+  - first:
+      213: -8271666154958132895
+    second: Aura_ice-Blue_reskin_14
+  - first:
+      213: 8536039526295631760
+    second: Aura_ice-Blue_reskin_15
+  - first:
+      213: -1956978865943012330
+    second: Aura_ice-Blue_reskin_16
+  - first:
+      213: 329951618399029775
+    second: Aura_ice-Blue_reskin_17
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Aura_ice-Blue_reskin_0
+      rect:
+        serializedVersion: 2
+        x: 1
+        y: 233
+        width: 21
+        height: 21
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bcba48659343c1380800000000000000
+      internalID: -8999260534523778101
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aura_ice-Blue_reskin_1
+      rect:
+        serializedVersion: 2
+        x: 1
+        y: 12
+        width: 255
+        height: 221
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d16783eee9a9c5fe0800000000000000
+      internalID: -1198913393395206627
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aura_ice-Blue_reskin_2
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 205
+        width: 77
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: abe6752e138717500800000000000000
+      internalID: 392226798204055226
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aura_ice-Blue_reskin_3
+      rect:
+        serializedVersion: 2
+        x: 333
+        y: 203
+        width: 55
+        height: 52
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5e8f523ba8df87030800000000000000
+      internalID: 3492820283178744037
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aura_ice-Blue_reskin_4
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 118
+        width: 69
+        height: 87
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c329f8d28551da780800000000000000
+      internalID: -8670250239152647620
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aura_ice-Blue_reskin_5
+      rect:
+        serializedVersion: 2
+        x: 363
+        y: 168
+        width: 66
+        height: 35
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dfc51eaae2fb59960800000000000000
+      internalID: 7608197352668617981
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aura_ice-Blue_reskin_6
+      rect:
+        serializedVersion: 2
+        x: 388
+        y: 203
+        width: 14
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a7332f544044b4f60800000000000000
+      internalID: 8019578346607358842
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aura_ice-Blue_reskin_7
+      rect:
+        serializedVersion: 2
+        x: 325
+        y: 186
+        width: 16
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1fe0826d2937e0910800000000000000
+      internalID: 1805507575117516529
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aura_ice-Blue_reskin_8
+      rect:
+        serializedVersion: 2
+        x: 325
+        y: 118
+        width: 38
+        height: 68
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 559d75b01078c2bd0800000000000000
+      internalID: -2653597641873041067
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aura_ice-Blue_reskin_9
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 12
+        width: 79
+        height: 106
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b3339da66d7ae3200800000000000000
+      internalID: 161751175989375803
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aura_ice-Blue_reskin_10
+      rect:
+        serializedVersion: 2
+        x: 335
+        y: 96
+        width: 21
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6598d81c90f528990800000000000000
+      internalID: -7385235943427569322
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aura_ice-Blue_reskin_11
+      rect:
+        serializedVersion: 2
+        x: 363
+        y: 102
+        width: 67
+        height: 66
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e3283d746f67cd230800000000000000
+      internalID: 3664934996911817278
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aura_ice-Blue_reskin_12
+      rect:
+        serializedVersion: 2
+        x: 394
+        y: 54
+        width: 86
+        height: 48
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5f118227c10e15a10800000000000000
+      internalID: 1896543330878624245
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aura_ice-Blue_reskin_13
+      rect:
+        serializedVersion: 2
+        x: 430
+        y: 102
+        width: 50
+        height: 63
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 78db96d3929930df0800000000000000
+      internalID: -215159954780603001
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aura_ice-Blue_reskin_14
+      rect:
+        serializedVersion: 2
+        x: 335
+        y: 12
+        width: 59
+        height: 84
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 169691d0573253d80800000000000000
+      internalID: -8271666154958132895
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aura_ice-Blue_reskin_15
+      rect:
+        serializedVersion: 2
+        x: 394
+        y: 12
+        width: 93
+        height: 42
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0977b8929ba167670800000000000000
+      internalID: 8536039526295631760
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aura_ice-Blue_reskin_16
+      rect:
+        serializedVersion: 2
+        x: 487
+        y: 37
+        width: 14
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 61c1586071a67d4e0800000000000000
+      internalID: -1956978865943012330
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aura_ice-Blue_reskin_17
+      rect:
+        serializedVersion: 2
+        x: 487
+        y: 12
+        width: 23
+        height: 25
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f0a4dbfaf39349400800000000000000
+      internalID: 329951618399029775
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    outline: []
+    customData:
+    physicsShape: []
+    bones: []
+    spriteID:
+    internalID: 0
+    vertices: []
+    indices:
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Aura_ice-Blue_reskin_0: -8999260534523778101
+      Aura_ice-Blue_reskin_1: -1198913393395206627
+      Aura_ice-Blue_reskin_10: -7385235943427569322
+      Aura_ice-Blue_reskin_11: 3664934996911817278
+      Aura_ice-Blue_reskin_12: 1896543330878624245
+      Aura_ice-Blue_reskin_13: -215159954780603001
+      Aura_ice-Blue_reskin_14: -8271666154958132895
+      Aura_ice-Blue_reskin_15: 8536039526295631760
+      Aura_ice-Blue_reskin_16: -1956978865943012330
+      Aura_ice-Blue_reskin_17: 329951618399029775
+      Aura_ice-Blue_reskin_2: 392226798204055226
+      Aura_ice-Blue_reskin_3: 3492820283178744037
+      Aura_ice-Blue_reskin_4: -8670250239152647620
+      Aura_ice-Blue_reskin_5: 7608197352668617981
+      Aura_ice-Blue_reskin_6: 8019578346607358842
+      Aura_ice-Blue_reskin_7: 1805507575117516529
+      Aura_ice-Blue_reskin_8: -2653597641873041067
+      Aura_ice-Blue_reskin_9: 161751175989375803
+  mipmapLimitGroupName:
+  pSDRemoveMatte: 0
+  userData:
+  assetBundleName:
+  assetBundleVariant:
